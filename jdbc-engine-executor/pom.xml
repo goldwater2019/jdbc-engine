@@ -17,9 +17,10 @@
         <junit.version>5.6.2</junit.version>
         <maven.plugin.build.helper.version>3.2.0</maven.plugin.build.helper.version>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss z</maven.build.timestamp.format>
-
+        <lombok.version>1.18.20</lombok.version>
+        <scala.version>2.12.5</scala.version>
+        <scla.binary.version>2.12</scla.binary.version>
     </properties>
-
 
     <dependencies>
 
