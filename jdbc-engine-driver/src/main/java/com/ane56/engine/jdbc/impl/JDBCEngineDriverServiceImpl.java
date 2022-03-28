@@ -5,18 +5,23 @@ import com.ane56.engine.jdbc.exetuor.JDBCEngineExecutorManager;
 import com.ane56.engine.jdbc.thrift.service.JDBCEngineDriverService;
 import com.ane56.engine.jdbc.thrift.struct.TJDBCCatalog;
 import com.ane56.engine.jdbc.thrift.struct.TJDBCEngineExecutor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TException;
 
 import java.util.List;
 
+@Slf4j
 public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService.Iface {
     private JDBCCatalogManager jdbcCatalogManager;
     private JDBCEngineExecutorManager jdbcEngineExecutorManager;
 
     @Override
     public boolean heartBeat(TJDBCEngineExecutor jdbcEngineExecutor) throws TException {
+        long startTime = System.currentTimeMillis();
         checkInitialStatus();
-        return jdbcEngineExecutorManager.heartbeat(jdbcEngineExecutor);
+        boolean result = jdbcEngineExecutorManager.heartbeat(jdbcEngineExecutor);
+        log.info("heartBeat : " + (System.currentTimeMillis() - startTime) + " ms");
+        return result;
     }
 
     /**
@@ -26,8 +31,11 @@ public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService.Ifac
      */
     @Override
     public List<TJDBCCatalog> getCatalogs() throws TException {
+        long startTime = System.currentTimeMillis();
         checkInitialStatus();
-        return jdbcCatalogManager.getCatalogs();
+        List<TJDBCCatalog> result = jdbcCatalogManager.getCatalogs();
+        log.info("heartBeat : " + (System.currentTimeMillis() - startTime) + " ms");
+        return result;
     }
 
     public JDBCEngineDriverServiceImpl() {

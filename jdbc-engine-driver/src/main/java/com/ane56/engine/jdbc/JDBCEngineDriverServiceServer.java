@@ -3,6 +3,7 @@ package com.ane56.engine.jdbc;
 
 import com.ane56.engine.jdbc.impl.JDBCEngineDriverServiceImpl;
 import com.ane56.engine.jdbc.thrift.service.JDBCEngineDriverService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.TProcessorFactory;
 import org.apache.thrift.protocol.TCompactProtocol;
@@ -15,6 +16,7 @@ import org.apache.thrift.transport.layered.TFramedTransport;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@Slf4j
 public class JDBCEngineDriverServiceServer {
     private int servicePort = 7911;
 
@@ -38,7 +40,7 @@ public class JDBCEngineDriverServiceServer {
         ExecutorService pool = Executors.newFixedThreadPool(3);
         args.executorService(pool);
         TThreadedSelectorServer server = new TThreadedSelectorServer(args);
-        System.out.println("Starting server on port " + servicePort + "......");
+        log.info("Starting server on port " + servicePort + "......");
         server.serve();
     }
 
