@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>kyuubi-jdbc-engine</artifactId>
+        <groupId>com.lambda.bigdata</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>jdbc-engine-server</artifactId>
+    <name>${project.artifactId}</name>
+    <packaging>jar</packaging>
+
+    <properties>
+        <junit.version>5.6.2</junit.version>
+        <maven.plugin.build.helper.version>3.2.0</maven.plugin.build.helper.version>
+        <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss z</maven.build.timestamp.format>
+
+    </properties>
+
+
+    <dependencies>
+
+        <!-- netty dependency  -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.1.65.Final</version>
+        </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>org.apache.hive</groupId>-->
+<!--            <artifactId>hive-jdbc</artifactId>-->
+<!--            <version>2.3.7</version>-->
+<!--        </dependency>-->
+
+    </dependencies>
+
+    <build>
+        <!--        <finalName>spark-core</finalName>-->
+        <!--        <sourceDirectory>src/main/scala</sourceDirectory>-->
+        <!--        <testSourceDirectory>src/test/scala</testSourceDirectory>-->
+        <!--        <outputDirectory>target</outputDirectory>-->
+        <!--        &lt;!&ndash;        本地调试时注释&ndash;&gt;-->
+        <!--        &lt;!&ndash;        <resources>&ndash;&gt;-->
+        <!--        &lt;!&ndash;            &lt;!&ndash; 控制资源文件的拷贝 &ndash;&gt;&ndash;&gt;-->
+        <!--        &lt;!&ndash;            <resource>&ndash;&gt;-->
+        <!--        &lt;!&ndash;                &lt;!&ndash; 本任用的idea 打包时需要修改src/main/java/resources 为 src/main/resources  否则配置文件打包不到,运行时又需要改回去,否则无法运行&ndash;&gt;&ndash;&gt;-->
+        <!--        &lt;!&ndash;                <directory>src/main/resources</directory>&ndash;&gt;-->
+        <!--        &lt;!&ndash;                <includes>&ndash;&gt;-->
+        <!--        &lt;!&ndash;                    <include>**/*.properties</include>&ndash;&gt;-->
+        <!--        &lt;!&ndash;                    <include>**/*.xml</include>&ndash;&gt;-->
+        <!--        &lt;!&ndash;                </includes>&ndash;&gt;-->
+        <!--        &lt;!&ndash;                <filtering>false</filtering>&ndash;&gt;-->
+        <!--        &lt;!&ndash;                <targetPath>${project.build.directory}/config</targetPath>&ndash;&gt;-->
+        <!--        &lt;!&ndash;            </resource>&ndash;&gt;-->
+        <!--        &lt;!&ndash;        </resources>&ndash;&gt;-->
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>${maven.plugin.build.helper.version}</version>
+                <executions>
+                    <execution>
+                        <id>module-timestamp-property</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>timestamp-property</goal>
+                        </goals>
+                        <configuration>
+                            <name>module.build.timestamp</name>
+                            <pattern>${maven.build.timestamp.format}</pattern>
+                            <timeSource>current</timeSource>
+                            <timeZone>Asia/Shanghai</timeZone>
+                            <locale>en_US</locale>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>local-timestamp-property</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>timestamp-property</goal>
+                        </goals>
+                        <configuration>
+                            <name>local.build.timestamp</name>
+                            <pattern>${maven.build.timestamp.format}</pattern>
+                            <timeSource>build</timeSource>
+                            <timeZone>Asia/Shanghai</timeZone>
+                            <locale>en_US</locale>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-scala-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/scala-${scala.binary.version}</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
+                <!--                <version>3.3.2</version>-->
+                <executions>
+                    <execution>
+                        <id>scala-compile-first</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>scala-test-compile</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- 打包依赖包到jar中 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4.1</version>
+                <configuration>
+                    <!-- get all project dependencies -->
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <!-- MainClass in mainfest make a executable jar -->
+                    <archive>
+                        <manifest>
+                            <mainClass>com.ane56.bigdata.kyuubi.extensions.JDBCDemo</mainClass>
+                        </manifest>
+                        <!--                        本地调试时注释-->
+                        <!--                        &lt;!&ndash; (配置文件外置目录) &ndash;&gt;-->
+                        <!--                        <manifestEntries>-->
+                        <!--                            <Class-Path>config/</Class-Path>-->
+                        <!--                            <Class-Path>src/main/resources/</Class-Path>-->
+                        <!--                        </manifestEntries>-->
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <!-- bind to the packaging phase -->
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>6</source>
+                    <target>6</target>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+
+
+    <!--仓库信息-->
+    <repositories>
+        <repository>
+            <id>aliyun</id>
+            <name>阿里maven仓库</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+</project>
