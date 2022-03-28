@@ -11,7 +11,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>jdbc-engine-server</module>
+        <module>jdbc-engine-driver</module>
+        <module>jdbc-engine-executor</module>
     </modules>
 
 
