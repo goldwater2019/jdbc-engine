@@ -77,7 +77,7 @@ public class JDBCExecutor {
         name2catalog.put(catalog.getName(), catalog);
     }
 
-    public static void main(String[] args) throws InterruptedException, TException, SQLException {
+    public static void main(String[] args) throws InterruptedException, TException, SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         JDBCExecutor jdbcExecutor = new JDBCExecutor();
 
         JDBCEngineDriverServiceClientManager clientManager = JDBCEngineDriverServiceClientManager.getInstance("localhost", 8888);
@@ -103,17 +103,18 @@ public class JDBCExecutor {
         for (Map.Entry<String, DruidDataSource> stringDruidDataSourceEntry : name2source.entrySet()) {
             DruidDataSource druidDataSource = stringDruidDataSourceEntry.getValue();
             DruidPooledConnection connection = druidDataSource.getConnection();
-            String sql = "select * from tx_dev.bd_center_center_month";
+            String sql = "select send_date as sdate, * from tx_dev.bd_center_center_month";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 ResultSetMetaData metaData = resultSet.getMetaData();
-
                 int columnCount = metaData.getColumnCount();
-                for (int i = 0; i < columnCount; i++) {
-                    System.out.println(metaData.getColumnClassName(i));
+                for (int i = 0 ; i < columnCount; i++) {
+                    String columnLabel = metaData.getColumnLabel(i + 1);
+                    int columnType = metaData.getColumnType(i + 1);
+                    String columnClassName = metaData.getColumnClassName(i + 1);
+                    System.out.println(columnLabel + "\t" + columnType + "\t" + columnClassName);
                 }
-                break;
             }
         }
 
