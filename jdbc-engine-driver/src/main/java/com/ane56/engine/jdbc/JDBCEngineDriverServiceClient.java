@@ -1,8 +1,8 @@
 package com.ane56.engine.jdbc;
 
-import com.ane56.engine.jdbc.exetuor.JDBCEngineExecutorRef;
-import com.ane56.engine.jdbc.thrift.service.JDBCEngineDriverService;
-import com.ane56.engine.jdbc.thrift.struct.TJDBCCatalog;
+import com.ane56.engine.jdbc.model.JDBCEngineExecutorRef;
+import com.ane56.engine.jdbc.thrit.service.JDBCEngineDriverService;
+import com.ane56.engine.jdbc.thrit.struct.TJDBCCatalog;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TProtocol;

@@ -2,9 +2,9 @@ package com.ane56.engine.jdbc.impl;
 
 import com.ane56.engine.jdbc.catalog.JDBCCatalogManager;
 import com.ane56.engine.jdbc.exetuor.JDBCEngineExecutorManager;
-import com.ane56.engine.jdbc.thrift.service.JDBCEngineDriverService;
-import com.ane56.engine.jdbc.thrift.struct.TJDBCCatalog;
-import com.ane56.engine.jdbc.thrift.struct.TJDBCEngineExecutor;
+import com.ane56.engine.jdbc.thrit.service.JDBCEngineDriverService;
+import com.ane56.engine.jdbc.thrit.struct.TJDBCCatalog;
+import com.ane56.engine.jdbc.thrit.struct.TJDBCEngineExecutor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TException;
 

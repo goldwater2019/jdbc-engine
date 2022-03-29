@@ -1,7 +1,7 @@
-package com.ane56.engine.jdbc.exetuor;
+package com.ane56.engine.jdbc.model;
 
 
-import com.ane56.engine.jdbc.thrift.struct.TJDBCEngineExecutor;
+import com.ane56.engine.jdbc.thrit.struct.TJDBCEngineExecutor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

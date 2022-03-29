@@ -2,7 +2,7 @@ package com.ane56.engine.jdbc;
 
 
 import com.ane56.engine.jdbc.impl.JDBCEngineDriverServiceImpl;
-import com.ane56.engine.jdbc.thrift.service.JDBCEngineDriverService;
+import com.ane56.engine.jdbc.thrit.service.JDBCEngineDriverService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.TProcessorFactory;

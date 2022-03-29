@@ -1,6 +1,7 @@
 package com.ane56.engine.jdbc.catalog;
 
-import com.ane56.engine.jdbc.thrift.struct.TJDBCCatalog;
+import com.ane56.engine.jdbc.model.JDBCCatalog;
+import com.ane56.engine.jdbc.thrit.struct.TJDBCCatalog;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;

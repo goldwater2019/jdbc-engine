@@ -1,6 +1,6 @@
-package com.ane56.engine.jdbc.catalog;
+package com.ane56.engine.jdbc.model;
 
-import com.ane56.engine.jdbc.thrift.struct.TJDBCCatalog;
+import com.ane56.engine.jdbc.thrit.struct.TJDBCCatalog;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

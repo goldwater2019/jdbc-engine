@@ -1,11 +1,8 @@
 package com.ane56.engine.jdbc.exetuor;
 
-import com.ane56.engine.jdbc.catalog.JDBCCatalog;
-import com.ane56.engine.jdbc.thrift.struct.TJDBCCatalog;
-import com.ane56.engine.jdbc.thrift.struct.TJDBCEngineExecutor;
+import com.ane56.engine.jdbc.model.JDBCEngineExecutorRef;
+import com.ane56.engine.jdbc.thrit.struct.TJDBCEngineExecutor;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
