@@ -1,4 +1,4 @@
-namespace java com.ane56.engine.jdbc.thrit.enum
+namespace java com.ane56.engine.jdbc.thrit.enumeration
 
 enum TJDBCQueryStatus {
     OK = 0,
