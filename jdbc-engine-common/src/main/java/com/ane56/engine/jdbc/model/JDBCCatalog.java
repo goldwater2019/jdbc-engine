@@ -28,4 +28,14 @@ public class JDBCCatalog {
         tjdbcCatalog.setPassword(password);
         return tjdbcCatalog;
     }
+
+    public static JDBCCatalog parseFromTJDBCCatalog(TJDBCCatalog tJdbcCatalog) {
+        return JDBCCatalog.builder()
+                .name(tJdbcCatalog.getName())
+                .driverClass(tJdbcCatalog.getDriver())
+                .uri(tJdbcCatalog.getUrl())
+                .username(tJdbcCatalog.getUsername())
+                .password(tJdbcCatalog.getPassword())
+                .build();
+    }
 }

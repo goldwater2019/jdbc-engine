@@ -14,3 +14,11 @@ struct TJDBCCatalog {
     4: string username,
     5: string password
 }
+
+struct TJDBCOperationRef {
+    1: i64 startTime,
+    2: i64 endTime,
+    3: string catalogName,
+    4: string operationRefId,
+    5: string sqlStatement
+}

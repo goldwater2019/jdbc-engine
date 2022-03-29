@@ -2,6 +2,7 @@ package com.ane56.engine.jdbc.impl;
 
 import com.ane56.engine.jdbc.catalog.JDBCCatalogManager;
 import com.ane56.engine.jdbc.exetuor.JDBCEngineExecutorManager;
+import com.ane56.engine.jdbc.model.JDBCCatalog;
 import com.ane56.engine.jdbc.thrit.service.JDBCEngineDriverService;
 import com.ane56.engine.jdbc.thrit.struct.TJDBCCatalog;
 import com.ane56.engine.jdbc.thrit.struct.TJDBCEngineExecutor;
@@ -36,6 +37,11 @@ public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService.Ifac
         List<TJDBCCatalog> result = jdbcCatalogManager.getCatalogs();
         log.info("heartBeat : " + (System.currentTimeMillis() - startTime) + " ms");
         return result;
+    }
+
+    @Override
+    public boolean addCatalog(TJDBCCatalog jdbcCatalog) throws TException {
+        return jdbcCatalogManager.upsertJDBCCatalog(JDBCCatalog.parseFromTJDBCCatalog(jdbcCatalog));
     }
 
     public JDBCEngineDriverServiceImpl() {

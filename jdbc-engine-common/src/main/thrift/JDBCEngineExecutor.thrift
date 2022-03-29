@@ -2,7 +2,7 @@ namespace java com.ane56.engine.jdbc.thrit.service
 
 include "TJDBCEngineStruct.thrift"
 
-service JDBCEngineDriverService {
+service JDBCEngineExecutorService {
 
     /**
     * 心跳

@@ -18,7 +18,7 @@ import java.util.concurrent.Executors;
 
 @Slf4j
 public class JDBCEngineDriverServiceServer {
-    private int servicePort = 7911;
+    private int servicePort = 8888;
 
     public void invoke() throws TTransportException {
         // 非阻塞式的，配合TFramedTransport使用

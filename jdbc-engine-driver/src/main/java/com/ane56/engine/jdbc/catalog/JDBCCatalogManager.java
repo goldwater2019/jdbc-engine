@@ -28,14 +28,13 @@ public class JDBCCatalogManager {
      * @param jdbcCatalog
      * @return
      */
-    public boolean addJDBCCatalog(JDBCCatalog jdbcCatalog) {
+    public boolean upsertJDBCCatalog(JDBCCatalog jdbcCatalog) {
         JDBCCatalog catalog = name2jdbcCatalogs.getOrDefault(jdbcCatalog.getName(), null);
+        name2jdbcCatalogs.put(jdbcCatalog.getName(), jdbcCatalog);
         if (catalog == null) {
-            name2jdbcCatalogs.put(jdbcCatalog.getName(), jdbcCatalog);
-        } else {
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     /**
@@ -55,14 +54,13 @@ public class JDBCCatalogManager {
      */
     public void loadOrDefaultCatalogs() {
         JDBCCatalog jdbcCatalog = JDBCCatalog.builder()
-                // TODO driver的修改
-                .driverClass("com")
+                .driverClass("com.mysql.cj.jdbc.Driver")
                 .name("starrocks")
                 .password("anetx")
                 .uri("jdbc:mysql://10.10.230.2:9030/tx_dev")
                 .username("anetx")
                 .build();
 
-        addJDBCCatalog(jdbcCatalog);
+        upsertJDBCCatalog(jdbcCatalog);
     }
 }
