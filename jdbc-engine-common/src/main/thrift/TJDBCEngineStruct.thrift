@@ -1,4 +1,4 @@
-namespace java com.ane56.engine.jdbc
+namespace java com.ane56.engine.jdbc.thrit.struct
 
 struct TJDBCEngineExecutor {
     1: string host,
@@ -13,17 +13,4 @@ struct TJDBCCatalog {
     3: string url,
     4: string username,
     5: string password
-}
-
-service JDBCEngineDriverService {
-
-    /**
-    * 心跳
-    **/
-    bool heartBeat(1: TJDBCEngineExecutor jdbcEngineExecutor),
-
-    /**
-    * 获得相应的心跳
-    **/
-    list<TJDBCCatalog> getCatalogs(),
 }
