@@ -1,8 +1,9 @@
-package com.ane56.engine.jdbc.impl;
+package com.ane56.engine.jdbc.driver.impl;
 
 import com.ane56.engine.jdbc.catalog.JDBCCatalogManager;
 import com.ane56.engine.jdbc.exetuor.JDBCEngineExecutorManager;
 import com.ane56.engine.jdbc.model.JDBCCatalog;
+import com.ane56.engine.jdbc.model.JDBCEngineExecutorRef;
 import com.ane56.engine.jdbc.thrit.service.JDBCEngineDriverService;
 import com.ane56.engine.jdbc.thrit.struct.TJDBCCatalog;
 import com.ane56.engine.jdbc.thrit.struct.TJDBCEngineExecutor;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TException;
 
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService.Iface {
@@ -21,7 +23,9 @@ public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService.Ifac
         long startTime = System.currentTimeMillis();
         checkInitialStatus();
         boolean result = jdbcEngineExecutorManager.heartbeat(jdbcEngineExecutor);
-        log.info("heartBeat : " + (System.currentTimeMillis() - startTime) + " ms");
+        log.info("heartBeat : " + (System.currentTimeMillis() - startTime) + " ms, body: " + jdbcEngineExecutorManager.getUuid2jdbcEngineExecutorRefs().get(
+                UUID.fromString(jdbcEngineExecutor.getExecutorRefId())
+        ));
         return result;
     }
 
@@ -35,7 +39,7 @@ public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService.Ifac
         long startTime = System.currentTimeMillis();
         checkInitialStatus();
         List<TJDBCCatalog> result = jdbcCatalogManager.getCatalogs();
-        log.info("heartBeat : " + (System.currentTimeMillis() - startTime) + " ms");
+        log.info("getCatalogs : " + (System.currentTimeMillis() - startTime) + " ms");
         return result;
     }
 

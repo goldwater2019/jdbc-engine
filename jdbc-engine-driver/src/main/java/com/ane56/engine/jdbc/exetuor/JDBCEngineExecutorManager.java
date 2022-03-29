@@ -2,11 +2,18 @@ package com.ane56.engine.jdbc.exetuor;
 
 import com.ane56.engine.jdbc.model.JDBCEngineExecutorRef;
 import com.ane56.engine.jdbc.thrit.struct.TJDBCEngineExecutor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+@AllArgsConstructor
+@Builder
+@Data
 public class JDBCEngineExecutorManager {
 
     private static volatile JDBCEngineExecutorManager singleton;

@@ -13,8 +13,13 @@ import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
 import org.apache.thrift.transport.layered.TFramedTransport;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class JDBCEngineDriverServiceClientManager {
@@ -27,11 +32,12 @@ public class JDBCEngineDriverServiceClientManager {
     Map<JDBCEngineDriverService.Client, TTransport> client2tTransport = new ConcurrentHashMap<>();
 
     private static volatile JDBCEngineDriverServiceClientManager singleton;
+
     public static JDBCEngineDriverServiceClientManager getInstance(String driverHost, int driverPort) {
         if (singleton == null) {
             synchronized (JDBCEngineDriverServiceClientManager.class) {
                 if (singleton == null) {
-                    singleton = new JDBCEngineDriverServiceClientManager(driverHost, driverPort, 10*1000, 8);
+                    singleton = new JDBCEngineDriverServiceClientManager(driverHost, driverPort, 10 * 1000, 8);
                 }
             }
         }
@@ -94,7 +100,7 @@ public class JDBCEngineDriverServiceClientManager {
         JDBCEngineDriverServiceClientManager jdbcEngineDriverServiceClientManager = new JDBCEngineDriverServiceClientManager(
                 "localhost",
                 8888,
-                10*1000,
+                10 * 1000,
                 8
         );
     }
@@ -133,7 +139,6 @@ public class JDBCEngineDriverServiceClientManager {
             transport.close();
         }
     }
-
 
 
     public JDBCEngineDriverServiceClientSuite getAvailableClient() throws InterruptedException {

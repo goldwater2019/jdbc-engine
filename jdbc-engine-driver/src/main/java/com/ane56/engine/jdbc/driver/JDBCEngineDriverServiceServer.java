@@ -1,8 +1,12 @@
-package com.ane56.engine.jdbc;
+package com.ane56.engine.jdbc.driver;
 
 
-import com.ane56.engine.jdbc.impl.JDBCEngineDriverServiceImpl;
+import com.ane56.engine.jdbc.driver.impl.JDBCEngineDriverServiceImpl;
 import com.ane56.engine.jdbc.thrit.service.JDBCEngineDriverService;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.TProcessorFactory;
@@ -17,8 +21,25 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Slf4j
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@Builder
 public class JDBCEngineDriverServiceServer {
     private int servicePort = 8888;
+
+    private static volatile JDBCEngineDriverServiceServer singleton;
+
+    public static JDBCEngineDriverServiceServer getInstance() {
+        if (singleton == null) {
+            synchronized (JDBCEngineDriverServiceServer.class) {
+                if (singleton == null) {
+                    singleton = new JDBCEngineDriverServiceServer();
+                }
+            }
+        }
+        return singleton;
+    }
 
     public void invoke() throws TTransportException {
         // 非阻塞式的，配合TFramedTransport使用
@@ -45,7 +66,7 @@ public class JDBCEngineDriverServiceServer {
     }
 
     public static void main(String[] args) throws TTransportException {
-        JDBCEngineDriverServiceServer jdbcEngineDriverServiceServer = new JDBCEngineDriverServiceServer();
+        JDBCEngineDriverServiceServer jdbcEngineDriverServiceServer = JDBCEngineDriverServiceServer.getInstance();
         jdbcEngineDriverServiceServer.invoke();
     }
 }
