@@ -27,6 +27,7 @@ import org.apache.thrift.transport.TTransportException;
 import org.apache.thrift.transport.layered.TFramedTransport;
 
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -64,7 +65,8 @@ public class JDBCEngineExecutorServiceServer {
         if (singleton == null) {
             synchronized (JDBCEngineExecutorServiceServer.class) {
                 if (singleton == null) {
-                    singleton = new JDBCEngineExecutorServiceServer(driverHost, driverPort, servicePort);
+                    // TODO 关闭随机端口
+                    singleton = new JDBCEngineExecutorServiceServer(driverHost, driverPort, Math.abs(new Random().nextInt()) % 10000 + 5000);
                 }
             }
         }
