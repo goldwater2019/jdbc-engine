@@ -5,8 +5,10 @@ include "TJDBCEngineStruct.thrift"
 service JDBCEngineExecutorService {
 
     /**
-    * 心跳
-    **/
-    bool heartBeat(1: TJDBCEngineStruct.TJDBCEngineExecutor jdbcEngineExecutor),
+     * SQL查询
+     * 请求时绑定starttime
+     * 结束时绑定endtime
+     **/
+    TJDBCEngineStruct.TJDBCOperationRef query(1: TJDBCEngineStruct.TJDBCOperationRef jdbcOperationRef)
 
 }
