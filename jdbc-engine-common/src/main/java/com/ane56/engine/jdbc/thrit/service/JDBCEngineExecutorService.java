@@ -13,18 +13,20 @@ public class JDBCEngineExecutorService {
   public interface Iface {
 
     /**
-     * 心跳
+     * SQL查询
+     * 请求时绑定starttime
+     * 结束时绑定endtime
      * 
      * 
-     * @param jdbcEngineExecutor
+     * @param jdbcOperationRef
      */
-    public boolean heartBeat(com.ane56.engine.jdbc.thrit.struct.TJDBCEngineExecutor jdbcEngineExecutor) throws org.apache.thrift.TException;
+    public com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef query(com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef jdbcOperationRef) throws org.apache.thrift.TException;
 
   }
 
   public interface AsyncIface {
 
-    public void heartBeat(com.ane56.engine.jdbc.thrit.struct.TJDBCEngineExecutor jdbcEngineExecutor, org.apache.thrift.async.AsyncMethodCallback<java.lang.Boolean> resultHandler) throws org.apache.thrift.TException;
+    public void query(com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef jdbcOperationRef, org.apache.thrift.async.AsyncMethodCallback<com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef> resultHandler) throws org.apache.thrift.TException;
 
   }
 
@@ -48,27 +50,27 @@ public class JDBCEngineExecutorService {
       super(iprot, oprot);
     }
 
-    public boolean heartBeat(com.ane56.engine.jdbc.thrit.struct.TJDBCEngineExecutor jdbcEngineExecutor) throws org.apache.thrift.TException
+    public com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef query(com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef jdbcOperationRef) throws org.apache.thrift.TException
     {
-      send_heartBeat(jdbcEngineExecutor);
-      return recv_heartBeat();
+      send_query(jdbcOperationRef);
+      return recv_query();
     }
 
-    public void send_heartBeat(com.ane56.engine.jdbc.thrit.struct.TJDBCEngineExecutor jdbcEngineExecutor) throws org.apache.thrift.TException
+    public void send_query(com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef jdbcOperationRef) throws org.apache.thrift.TException
     {
-      heartBeat_args args = new heartBeat_args();
-      args.setJdbcEngineExecutor(jdbcEngineExecutor);
-      sendBase("heartBeat", args);
+      query_args args = new query_args();
+      args.setJdbcOperationRef(jdbcOperationRef);
+      sendBase("query", args);
     }
 
-    public boolean recv_heartBeat() throws org.apache.thrift.TException
+    public com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef recv_query() throws org.apache.thrift.TException
     {
-      heartBeat_result result = new heartBeat_result();
-      receiveBase(result, "heartBeat");
+      query_result result = new query_result();
+      receiveBase(result, "query");
       if (result.isSetSuccess()) {
         return result.success;
       }
-      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "heartBeat failed: unknown result");
+      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "query failed: unknown result");
     }
 
   }
@@ -89,35 +91,35 @@ public class JDBCEngineExecutorService {
       super(protocolFactory, clientManager, transport);
     }
 
-    public void heartBeat(com.ane56.engine.jdbc.thrit.struct.TJDBCEngineExecutor jdbcEngineExecutor, org.apache.thrift.async.AsyncMethodCallback<java.lang.Boolean> resultHandler) throws org.apache.thrift.TException {
+    public void query(com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef jdbcOperationRef, org.apache.thrift.async.AsyncMethodCallback<com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef> resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      heartBeat_call method_call = new heartBeat_call(jdbcEngineExecutor, resultHandler, this, ___protocolFactory, ___transport);
+      query_call method_call = new query_call(jdbcOperationRef, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
 
-    public static class heartBeat_call extends org.apache.thrift.async.TAsyncMethodCall<java.lang.Boolean> {
-      private com.ane56.engine.jdbc.thrit.struct.TJDBCEngineExecutor jdbcEngineExecutor;
-      public heartBeat_call(com.ane56.engine.jdbc.thrit.struct.TJDBCEngineExecutor jdbcEngineExecutor, org.apache.thrift.async.AsyncMethodCallback<java.lang.Boolean> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+    public static class query_call extends org.apache.thrift.async.TAsyncMethodCall<com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef> {
+      private com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef jdbcOperationRef;
+      public query_call(com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef jdbcOperationRef, org.apache.thrift.async.AsyncMethodCallback<com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
-        this.jdbcEngineExecutor = jdbcEngineExecutor;
+        this.jdbcOperationRef = jdbcOperationRef;
       }
 
       public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
-        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("heartBeat", org.apache.thrift.protocol.TMessageType.CALL, 0));
-        heartBeat_args args = new heartBeat_args();
-        args.setJdbcEngineExecutor(jdbcEngineExecutor);
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("query", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        query_args args = new query_args();
+        args.setJdbcOperationRef(jdbcOperationRef);
         args.write(prot);
         prot.writeMessageEnd();
       }
 
-      public java.lang.Boolean getResult() throws org.apache.thrift.TException {
+      public com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef getResult() throws org.apache.thrift.TException {
         if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
           throw new java.lang.IllegalStateException("Method call not finished!");
         }
         org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
         org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
-        return (new Client(prot)).recv_heartBeat();
+        return (new Client(prot)).recv_query();
       }
     }
 
@@ -134,17 +136,17 @@ public class JDBCEngineExecutorService {
     }
 
     private static <I extends Iface> java.util.Map<java.lang.String,  org.apache.thrift.ProcessFunction<I, ? extends org.apache.thrift.TBase>> getProcessMap(java.util.Map<java.lang.String, org.apache.thrift.ProcessFunction<I, ? extends  org.apache.thrift.TBase>> processMap) {
-      processMap.put("heartBeat", new heartBeat());
+      processMap.put("query", new query());
       return processMap;
     }
 
-    public static class heartBeat<I extends Iface> extends org.apache.thrift.ProcessFunction<I, heartBeat_args> {
-      public heartBeat() {
-        super("heartBeat");
+    public static class query<I extends Iface> extends org.apache.thrift.ProcessFunction<I, query_args> {
+      public query() {
+        super("query");
       }
 
-      public heartBeat_args getEmptyArgsInstance() {
-        return new heartBeat_args();
+      public query_args getEmptyArgsInstance() {
+        return new query_args();
       }
 
       protected boolean isOneway() {
@@ -156,10 +158,9 @@ public class JDBCEngineExecutorService {
         return false;
       }
 
-      public heartBeat_result getResult(I iface, heartBeat_args args) throws org.apache.thrift.TException {
-        heartBeat_result result = new heartBeat_result();
-        result.success = iface.heartBeat(args.jdbcEngineExecutor);
-        result.setSuccessIsSet(true);
+      public query_result getResult(I iface, query_args args) throws org.apache.thrift.TException {
+        query_result result = new query_result();
+        result.success = iface.query(args.jdbcOperationRef);
         return result;
       }
     }
@@ -177,26 +178,25 @@ public class JDBCEngineExecutorService {
     }
 
     private static <I extends AsyncIface> java.util.Map<java.lang.String,  org.apache.thrift.AsyncProcessFunction<I, ? extends  org.apache.thrift.TBase,?>> getProcessMap(java.util.Map<java.lang.String,  org.apache.thrift.AsyncProcessFunction<I, ? extends  org.apache.thrift.TBase, ?>> processMap) {
-      processMap.put("heartBeat", new heartBeat());
+      processMap.put("query", new query());
       return processMap;
     }
 
-    public static class heartBeat<I extends AsyncIface> extends org.apache.thrift.AsyncProcessFunction<I, heartBeat_args, java.lang.Boolean> {
-      public heartBeat() {
-        super("heartBeat");
+    public static class query<I extends AsyncIface> extends org.apache.thrift.AsyncProcessFunction<I, query_args, com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef> {
+      public query() {
+        super("query");
       }
 
-      public heartBeat_args getEmptyArgsInstance() {
-        return new heartBeat_args();
+      public query_args getEmptyArgsInstance() {
+        return new query_args();
       }
 
-      public org.apache.thrift.async.AsyncMethodCallback<java.lang.Boolean> getResultHandler(final org.apache.thrift.server.AbstractNonblockingServer.AsyncFrameBuffer fb, final int seqid) {
+      public org.apache.thrift.async.AsyncMethodCallback<com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef> getResultHandler(final org.apache.thrift.server.AbstractNonblockingServer.AsyncFrameBuffer fb, final int seqid) {
         final org.apache.thrift.AsyncProcessFunction fcall = this;
-        return new org.apache.thrift.async.AsyncMethodCallback<java.lang.Boolean>() { 
-          public void onComplete(java.lang.Boolean o) {
-            heartBeat_result result = new heartBeat_result();
+        return new org.apache.thrift.async.AsyncMethodCallback<com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef>() { 
+          public void onComplete(com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef o) {
+            query_result result = new query_result();
             result.success = o;
-            result.setSuccessIsSet(true);
             try {
               fcall.sendResponse(fb, result, org.apache.thrift.protocol.TMessageType.REPLY,seqid);
             } catch (org.apache.thrift.transport.TTransportException e) {
@@ -210,7 +210,7 @@ public class JDBCEngineExecutorService {
           public void onError(java.lang.Exception e) {
             byte msgType = org.apache.thrift.protocol.TMessageType.REPLY;
             org.apache.thrift.TSerializable msg;
-            heartBeat_result result = new heartBeat_result();
+            query_result result = new query_result();
             if (e instanceof org.apache.thrift.transport.TTransportException) {
               _LOGGER.error("TTransportException inside handler", e);
               fb.close();
@@ -238,26 +238,26 @@ public class JDBCEngineExecutorService {
         return false;
       }
 
-      public void start(I iface, heartBeat_args args, org.apache.thrift.async.AsyncMethodCallback<java.lang.Boolean> resultHandler) throws org.apache.thrift.TException {
-        iface.heartBeat(args.jdbcEngineExecutor,resultHandler);
+      public void start(I iface, query_args args, org.apache.thrift.async.AsyncMethodCallback<com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef> resultHandler) throws org.apache.thrift.TException {
+        iface.query(args.jdbcOperationRef,resultHandler);
       }
     }
 
   }
 
-  public static class heartBeat_args implements org.apache.thrift.TBase<heartBeat_args, heartBeat_args._Fields>, java.io.Serializable, Cloneable, Comparable<heartBeat_args>   {
-    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("heartBeat_args");
+  public static class query_args implements org.apache.thrift.TBase<query_args, query_args._Fields>, java.io.Serializable, Cloneable, Comparable<query_args>   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("query_args");
 
-    private static final org.apache.thrift.protocol.TField JDBC_ENGINE_EXECUTOR_FIELD_DESC = new org.apache.thrift.protocol.TField("jdbcEngineExecutor", org.apache.thrift.protocol.TType.STRUCT, (short)1);
+    private static final org.apache.thrift.protocol.TField JDBC_OPERATION_REF_FIELD_DESC = new org.apache.thrift.protocol.TField("jdbcOperationRef", org.apache.thrift.protocol.TType.STRUCT, (short)1);
 
-    private static final org.apache.thrift.scheme.SchemeFactory STANDARD_SCHEME_FACTORY = new heartBeat_argsStandardSchemeFactory();
-    private static final org.apache.thrift.scheme.SchemeFactory TUPLE_SCHEME_FACTORY = new heartBeat_argsTupleSchemeFactory();
+    private static final org.apache.thrift.scheme.SchemeFactory STANDARD_SCHEME_FACTORY = new query_argsStandardSchemeFactory();
+    private static final org.apache.thrift.scheme.SchemeFactory TUPLE_SCHEME_FACTORY = new query_argsTupleSchemeFactory();
 
-    public @org.apache.thrift.annotation.Nullable com.ane56.engine.jdbc.thrit.struct.TJDBCEngineExecutor jdbcEngineExecutor; // required
+    public @org.apache.thrift.annotation.Nullable com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef jdbcOperationRef; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-      JDBC_ENGINE_EXECUTOR((short)1, "jdbcEngineExecutor");
+      JDBC_OPERATION_REF((short)1, "jdbcOperationRef");
 
       private static final java.util.Map<java.lang.String, _Fields> byName = new java.util.HashMap<java.lang.String, _Fields>();
 
@@ -273,8 +273,8 @@ public class JDBCEngineExecutorService {
       @org.apache.thrift.annotation.Nullable
       public static _Fields findByThriftId(int fieldId) {
         switch(fieldId) {
-          case 1: // JDBC_ENGINE_EXECUTOR
-            return JDBC_ENGINE_EXECUTOR;
+          case 1: // JDBC_OPERATION_REF
+            return JDBC_OPERATION_REF;
           default:
             return null;
         }
@@ -319,72 +319,72 @@ public class JDBCEngineExecutorService {
     public static final java.util.Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       java.util.Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new java.util.EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-      tmpMap.put(_Fields.JDBC_ENGINE_EXECUTOR, new org.apache.thrift.meta_data.FieldMetaData("jdbcEngineExecutor", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, com.ane56.engine.jdbc.thrit.struct.TJDBCEngineExecutor.class)));
+      tmpMap.put(_Fields.JDBC_OPERATION_REF, new org.apache.thrift.meta_data.FieldMetaData("jdbcOperationRef", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef.class)));
       metaDataMap = java.util.Collections.unmodifiableMap(tmpMap);
-      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(heartBeat_args.class, metaDataMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(query_args.class, metaDataMap);
     }
 
-    public heartBeat_args() {
+    public query_args() {
     }
 
-    public heartBeat_args(
-      com.ane56.engine.jdbc.thrit.struct.TJDBCEngineExecutor jdbcEngineExecutor)
+    public query_args(
+      com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef jdbcOperationRef)
     {
       this();
-      this.jdbcEngineExecutor = jdbcEngineExecutor;
+      this.jdbcOperationRef = jdbcOperationRef;
     }
 
     /**
      * Performs a deep copy on <i>other</i>.
      */
-    public heartBeat_args(heartBeat_args other) {
-      if (other.isSetJdbcEngineExecutor()) {
-        this.jdbcEngineExecutor = new com.ane56.engine.jdbc.thrit.struct.TJDBCEngineExecutor(other.jdbcEngineExecutor);
+    public query_args(query_args other) {
+      if (other.isSetJdbcOperationRef()) {
+        this.jdbcOperationRef = new com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef(other.jdbcOperationRef);
       }
     }
 
-    public heartBeat_args deepCopy() {
-      return new heartBeat_args(this);
+    public query_args deepCopy() {
+      return new query_args(this);
     }
 
     @Override
     public void clear() {
-      this.jdbcEngineExecutor = null;
+      this.jdbcOperationRef = null;
     }
 
     @org.apache.thrift.annotation.Nullable
-    public com.ane56.engine.jdbc.thrit.struct.TJDBCEngineExecutor getJdbcEngineExecutor() {
-      return this.jdbcEngineExecutor;
+    public com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef getJdbcOperationRef() {
+      return this.jdbcOperationRef;
     }
 
-    public heartBeat_args setJdbcEngineExecutor(@org.apache.thrift.annotation.Nullable com.ane56.engine.jdbc.thrit.struct.TJDBCEngineExecutor jdbcEngineExecutor) {
-      this.jdbcEngineExecutor = jdbcEngineExecutor;
+    public query_args setJdbcOperationRef(@org.apache.thrift.annotation.Nullable com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef jdbcOperationRef) {
+      this.jdbcOperationRef = jdbcOperationRef;
       return this;
     }
 
-    public void unsetJdbcEngineExecutor() {
-      this.jdbcEngineExecutor = null;
+    public void unsetJdbcOperationRef() {
+      this.jdbcOperationRef = null;
     }
 
-    /** Returns true if field jdbcEngineExecutor is set (has been assigned a value) and false otherwise */
-    public boolean isSetJdbcEngineExecutor() {
-      return this.jdbcEngineExecutor != null;
+    /** Returns true if field jdbcOperationRef is set (has been assigned a value) and false otherwise */
+    public boolean isSetJdbcOperationRef() {
+      return this.jdbcOperationRef != null;
     }
 
-    public void setJdbcEngineExecutorIsSet(boolean value) {
+    public void setJdbcOperationRefIsSet(boolean value) {
       if (!value) {
-        this.jdbcEngineExecutor = null;
+        this.jdbcOperationRef = null;
       }
     }
 
     public void setFieldValue(_Fields field, @org.apache.thrift.annotation.Nullable java.lang.Object value) {
       switch (field) {
-      case JDBC_ENGINE_EXECUTOR:
+      case JDBC_OPERATION_REF:
         if (value == null) {
-          unsetJdbcEngineExecutor();
+          unsetJdbcOperationRef();
         } else {
-          setJdbcEngineExecutor((com.ane56.engine.jdbc.thrit.struct.TJDBCEngineExecutor)value);
+          setJdbcOperationRef((com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef)value);
         }
         break;
 
@@ -394,8 +394,8 @@ public class JDBCEngineExecutorService {
     @org.apache.thrift.annotation.Nullable
     public java.lang.Object getFieldValue(_Fields field) {
       switch (field) {
-      case JDBC_ENGINE_EXECUTOR:
-        return getJdbcEngineExecutor();
+      case JDBC_OPERATION_REF:
+        return getJdbcOperationRef();
 
       }
       throw new java.lang.IllegalStateException();
@@ -408,31 +408,31 @@ public class JDBCEngineExecutorService {
       }
 
       switch (field) {
-      case JDBC_ENGINE_EXECUTOR:
-        return isSetJdbcEngineExecutor();
+      case JDBC_OPERATION_REF:
+        return isSetJdbcOperationRef();
       }
       throw new java.lang.IllegalStateException();
     }
 
     @Override
     public boolean equals(java.lang.Object that) {
-      if (that instanceof heartBeat_args)
-        return this.equals((heartBeat_args)that);
+      if (that instanceof query_args)
+        return this.equals((query_args)that);
       return false;
     }
 
-    public boolean equals(heartBeat_args that) {
+    public boolean equals(query_args that) {
       if (that == null)
         return false;
       if (this == that)
         return true;
 
-      boolean this_present_jdbcEngineExecutor = true && this.isSetJdbcEngineExecutor();
-      boolean that_present_jdbcEngineExecutor = true && that.isSetJdbcEngineExecutor();
-      if (this_present_jdbcEngineExecutor || that_present_jdbcEngineExecutor) {
-        if (!(this_present_jdbcEngineExecutor && that_present_jdbcEngineExecutor))
+      boolean this_present_jdbcOperationRef = true && this.isSetJdbcOperationRef();
+      boolean that_present_jdbcOperationRef = true && that.isSetJdbcOperationRef();
+      if (this_present_jdbcOperationRef || that_present_jdbcOperationRef) {
+        if (!(this_present_jdbcOperationRef && that_present_jdbcOperationRef))
           return false;
-        if (!this.jdbcEngineExecutor.equals(that.jdbcEngineExecutor))
+        if (!this.jdbcOperationRef.equals(that.jdbcOperationRef))
           return false;
       }
 
@@ -443,27 +443,27 @@ public class JDBCEngineExecutorService {
     public int hashCode() {
       int hashCode = 1;
 
-      hashCode = hashCode * 8191 + ((isSetJdbcEngineExecutor()) ? 131071 : 524287);
-      if (isSetJdbcEngineExecutor())
-        hashCode = hashCode * 8191 + jdbcEngineExecutor.hashCode();
+      hashCode = hashCode * 8191 + ((isSetJdbcOperationRef()) ? 131071 : 524287);
+      if (isSetJdbcOperationRef())
+        hashCode = hashCode * 8191 + jdbcOperationRef.hashCode();
 
       return hashCode;
     }
 
     @Override
-    public int compareTo(heartBeat_args other) {
+    public int compareTo(query_args other) {
       if (!getClass().equals(other.getClass())) {
         return getClass().getName().compareTo(other.getClass().getName());
       }
 
       int lastComparison = 0;
 
-      lastComparison = java.lang.Boolean.compare(isSetJdbcEngineExecutor(), other.isSetJdbcEngineExecutor());
+      lastComparison = java.lang.Boolean.compare(isSetJdbcOperationRef(), other.isSetJdbcOperationRef());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      if (isSetJdbcEngineExecutor()) {
-        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.jdbcEngineExecutor, other.jdbcEngineExecutor);
+      if (isSetJdbcOperationRef()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.jdbcOperationRef, other.jdbcOperationRef);
         if (lastComparison != 0) {
           return lastComparison;
         }
@@ -486,14 +486,14 @@ public class JDBCEngineExecutorService {
 
     @Override
     public java.lang.String toString() {
-      java.lang.StringBuilder sb = new java.lang.StringBuilder("heartBeat_args(");
+      java.lang.StringBuilder sb = new java.lang.StringBuilder("query_args(");
       boolean first = true;
 
-      sb.append("jdbcEngineExecutor:");
-      if (this.jdbcEngineExecutor == null) {
+      sb.append("jdbcOperationRef:");
+      if (this.jdbcOperationRef == null) {
         sb.append("null");
       } else {
-        sb.append(this.jdbcEngineExecutor);
+        sb.append(this.jdbcOperationRef);
       }
       first = false;
       sb.append(")");
@@ -503,8 +503,8 @@ public class JDBCEngineExecutorService {
     public void validate() throws org.apache.thrift.TException {
       // check for required fields
       // check for sub-struct validity
-      if (jdbcEngineExecutor != null) {
-        jdbcEngineExecutor.validate();
+      if (jdbcOperationRef != null) {
+        jdbcOperationRef.validate();
       }
     }
 
@@ -524,15 +524,15 @@ public class JDBCEngineExecutorService {
       }
     }
 
-    private static class heartBeat_argsStandardSchemeFactory implements org.apache.thrift.scheme.SchemeFactory {
-      public heartBeat_argsStandardScheme getScheme() {
-        return new heartBeat_argsStandardScheme();
+    private static class query_argsStandardSchemeFactory implements org.apache.thrift.scheme.SchemeFactory {
+      public query_argsStandardScheme getScheme() {
+        return new query_argsStandardScheme();
       }
     }
 
-    private static class heartBeat_argsStandardScheme extends org.apache.thrift.scheme.StandardScheme<heartBeat_args> {
+    private static class query_argsStandardScheme extends org.apache.thrift.scheme.StandardScheme<query_args> {
 
-      public void read(org.apache.thrift.protocol.TProtocol iprot, heartBeat_args struct) throws org.apache.thrift.TException {
+      public void read(org.apache.thrift.protocol.TProtocol iprot, query_args struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TField schemeField;
         iprot.readStructBegin();
         while (true)
@@ -542,11 +542,11 @@ public class JDBCEngineExecutorService {
             break;
           }
           switch (schemeField.id) {
-            case 1: // JDBC_ENGINE_EXECUTOR
+            case 1: // JDBC_OPERATION_REF
               if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
-                struct.jdbcEngineExecutor = new com.ane56.engine.jdbc.thrit.struct.TJDBCEngineExecutor();
-                struct.jdbcEngineExecutor.read(iprot);
-                struct.setJdbcEngineExecutorIsSet(true);
+                struct.jdbcOperationRef = new com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef();
+                struct.jdbcOperationRef.read(iprot);
+                struct.setJdbcOperationRefIsSet(true);
               } else { 
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
@@ -562,13 +562,13 @@ public class JDBCEngineExecutorService {
         struct.validate();
       }
 
-      public void write(org.apache.thrift.protocol.TProtocol oprot, heartBeat_args struct) throws org.apache.thrift.TException {
+      public void write(org.apache.thrift.protocol.TProtocol oprot, query_args struct) throws org.apache.thrift.TException {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
-        if (struct.jdbcEngineExecutor != null) {
-          oprot.writeFieldBegin(JDBC_ENGINE_EXECUTOR_FIELD_DESC);
-          struct.jdbcEngineExecutor.write(oprot);
+        if (struct.jdbcOperationRef != null) {
+          oprot.writeFieldBegin(JDBC_OPERATION_REF_FIELD_DESC);
+          struct.jdbcOperationRef.write(oprot);
           oprot.writeFieldEnd();
         }
         oprot.writeFieldStop();
@@ -577,35 +577,35 @@ public class JDBCEngineExecutorService {
 
     }
 
-    private static class heartBeat_argsTupleSchemeFactory implements org.apache.thrift.scheme.SchemeFactory {
-      public heartBeat_argsTupleScheme getScheme() {
-        return new heartBeat_argsTupleScheme();
+    private static class query_argsTupleSchemeFactory implements org.apache.thrift.scheme.SchemeFactory {
+      public query_argsTupleScheme getScheme() {
+        return new query_argsTupleScheme();
       }
     }
 
-    private static class heartBeat_argsTupleScheme extends org.apache.thrift.scheme.TupleScheme<heartBeat_args> {
+    private static class query_argsTupleScheme extends org.apache.thrift.scheme.TupleScheme<query_args> {
 
       @Override
-      public void write(org.apache.thrift.protocol.TProtocol prot, heartBeat_args struct) throws org.apache.thrift.TException {
+      public void write(org.apache.thrift.protocol.TProtocol prot, query_args struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TTupleProtocol oprot = (org.apache.thrift.protocol.TTupleProtocol) prot;
         java.util.BitSet optionals = new java.util.BitSet();
-        if (struct.isSetJdbcEngineExecutor()) {
+        if (struct.isSetJdbcOperationRef()) {
           optionals.set(0);
         }
         oprot.writeBitSet(optionals, 1);
-        if (struct.isSetJdbcEngineExecutor()) {
-          struct.jdbcEngineExecutor.write(oprot);
+        if (struct.isSetJdbcOperationRef()) {
+          struct.jdbcOperationRef.write(oprot);
         }
       }
 
       @Override
-      public void read(org.apache.thrift.protocol.TProtocol prot, heartBeat_args struct) throws org.apache.thrift.TException {
+      public void read(org.apache.thrift.protocol.TProtocol prot, query_args struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TTupleProtocol iprot = (org.apache.thrift.protocol.TTupleProtocol) prot;
         java.util.BitSet incoming = iprot.readBitSet(1);
         if (incoming.get(0)) {
-          struct.jdbcEngineExecutor = new com.ane56.engine.jdbc.thrit.struct.TJDBCEngineExecutor();
-          struct.jdbcEngineExecutor.read(iprot);
-          struct.setJdbcEngineExecutorIsSet(true);
+          struct.jdbcOperationRef = new com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef();
+          struct.jdbcOperationRef.read(iprot);
+          struct.setJdbcOperationRefIsSet(true);
         }
       }
     }
@@ -615,15 +615,15 @@ public class JDBCEngineExecutorService {
     }
   }
 
-  public static class heartBeat_result implements org.apache.thrift.TBase<heartBeat_result, heartBeat_result._Fields>, java.io.Serializable, Cloneable, Comparable<heartBeat_result>   {
-    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("heartBeat_result");
+  public static class query_result implements org.apache.thrift.TBase<query_result, query_result._Fields>, java.io.Serializable, Cloneable, Comparable<query_result>   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("query_result");
 
-    private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.BOOL, (short)0);
+    private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRUCT, (short)0);
 
-    private static final org.apache.thrift.scheme.SchemeFactory STANDARD_SCHEME_FACTORY = new heartBeat_resultStandardSchemeFactory();
-    private static final org.apache.thrift.scheme.SchemeFactory TUPLE_SCHEME_FACTORY = new heartBeat_resultTupleSchemeFactory();
+    private static final org.apache.thrift.scheme.SchemeFactory STANDARD_SCHEME_FACTORY = new query_resultStandardSchemeFactory();
+    private static final org.apache.thrift.scheme.SchemeFactory TUPLE_SCHEME_FACTORY = new query_resultTupleSchemeFactory();
 
-    public boolean success; // required
+    public @org.apache.thrift.annotation.Nullable com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef success; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -686,67 +686,66 @@ public class JDBCEngineExecutorService {
     }
 
     // isset id assignments
-    private static final int __SUCCESS_ISSET_ID = 0;
-    private byte __isset_bitfield = 0;
     public static final java.util.Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       java.util.Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new java.util.EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
       tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.BOOL)));
+          new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef.class)));
       metaDataMap = java.util.Collections.unmodifiableMap(tmpMap);
-      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(heartBeat_result.class, metaDataMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(query_result.class, metaDataMap);
     }
 
-    public heartBeat_result() {
+    public query_result() {
     }
 
-    public heartBeat_result(
-      boolean success)
+    public query_result(
+      com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef success)
     {
       this();
       this.success = success;
-      setSuccessIsSet(true);
     }
 
     /**
      * Performs a deep copy on <i>other</i>.
      */
-    public heartBeat_result(heartBeat_result other) {
-      __isset_bitfield = other.__isset_bitfield;
-      this.success = other.success;
+    public query_result(query_result other) {
+      if (other.isSetSuccess()) {
+        this.success = new com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef(other.success);
+      }
     }
 
-    public heartBeat_result deepCopy() {
-      return new heartBeat_result(this);
+    public query_result deepCopy() {
+      return new query_result(this);
     }
 
     @Override
     public void clear() {
-      setSuccessIsSet(false);
-      this.success = false;
+      this.success = null;
     }
 
-    public boolean isSuccess() {
+    @org.apache.thrift.annotation.Nullable
+    public com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef getSuccess() {
       return this.success;
     }
 
-    public heartBeat_result setSuccess(boolean success) {
+    public query_result setSuccess(@org.apache.thrift.annotation.Nullable com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef success) {
       this.success = success;
-      setSuccessIsSet(true);
       return this;
     }
 
     public void unsetSuccess() {
-      __isset_bitfield = org.apache.thrift.EncodingUtils.clearBit(__isset_bitfield, __SUCCESS_ISSET_ID);
+      this.success = null;
     }
 
     /** Returns true if field success is set (has been assigned a value) and false otherwise */
     public boolean isSetSuccess() {
-      return org.apache.thrift.EncodingUtils.testBit(__isset_bitfield, __SUCCESS_ISSET_ID);
+      return this.success != null;
     }
 
     public void setSuccessIsSet(boolean value) {
-      __isset_bitfield = org.apache.thrift.EncodingUtils.setBit(__isset_bitfield, __SUCCESS_ISSET_ID, value);
+      if (!value) {
+        this.success = null;
+      }
     }
 
     public void setFieldValue(_Fields field, @org.apache.thrift.annotation.Nullable java.lang.Object value) {
@@ -755,7 +754,7 @@ public class JDBCEngineExecutorService {
         if (value == null) {
           unsetSuccess();
         } else {
-          setSuccess((java.lang.Boolean)value);
+          setSuccess((com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef)value);
         }
         break;
 
@@ -766,7 +765,7 @@ public class JDBCEngineExecutorService {
     public java.lang.Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
-        return isSuccess();
+        return getSuccess();
 
       }
       throw new java.lang.IllegalStateException();
@@ -787,23 +786,23 @@ public class JDBCEngineExecutorService {
 
     @Override
     public boolean equals(java.lang.Object that) {
-      if (that instanceof heartBeat_result)
-        return this.equals((heartBeat_result)that);
+      if (that instanceof query_result)
+        return this.equals((query_result)that);
       return false;
     }
 
-    public boolean equals(heartBeat_result that) {
+    public boolean equals(query_result that) {
       if (that == null)
         return false;
       if (this == that)
         return true;
 
-      boolean this_present_success = true;
-      boolean that_present_success = true;
+      boolean this_present_success = true && this.isSetSuccess();
+      boolean that_present_success = true && that.isSetSuccess();
       if (this_present_success || that_present_success) {
         if (!(this_present_success && that_present_success))
           return false;
-        if (this.success != that.success)
+        if (!this.success.equals(that.success))
           return false;
       }
 
@@ -814,13 +813,15 @@ public class JDBCEngineExecutorService {
     public int hashCode() {
       int hashCode = 1;
 
-      hashCode = hashCode * 8191 + ((success) ? 131071 : 524287);
+      hashCode = hashCode * 8191 + ((isSetSuccess()) ? 131071 : 524287);
+      if (isSetSuccess())
+        hashCode = hashCode * 8191 + success.hashCode();
 
       return hashCode;
     }
 
     @Override
-    public int compareTo(heartBeat_result other) {
+    public int compareTo(query_result other) {
       if (!getClass().equals(other.getClass())) {
         return getClass().getName().compareTo(other.getClass().getName());
       }
@@ -855,11 +856,15 @@ public class JDBCEngineExecutorService {
 
     @Override
     public java.lang.String toString() {
-      java.lang.StringBuilder sb = new java.lang.StringBuilder("heartBeat_result(");
+      java.lang.StringBuilder sb = new java.lang.StringBuilder("query_result(");
       boolean first = true;
 
       sb.append("success:");
-      sb.append(this.success);
+      if (this.success == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.success);
+      }
       first = false;
       sb.append(")");
       return sb.toString();
@@ -868,6 +873,9 @@ public class JDBCEngineExecutorService {
     public void validate() throws org.apache.thrift.TException {
       // check for required fields
       // check for sub-struct validity
+      if (success != null) {
+        success.validate();
+      }
     }
 
     private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
@@ -880,23 +888,21 @@ public class JDBCEngineExecutorService {
 
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, java.lang.ClassNotFoundException {
       try {
-        // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
-        __isset_bitfield = 0;
         read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
       } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
       }
     }
 
-    private static class heartBeat_resultStandardSchemeFactory implements org.apache.thrift.scheme.SchemeFactory {
-      public heartBeat_resultStandardScheme getScheme() {
-        return new heartBeat_resultStandardScheme();
+    private static class query_resultStandardSchemeFactory implements org.apache.thrift.scheme.SchemeFactory {
+      public query_resultStandardScheme getScheme() {
+        return new query_resultStandardScheme();
       }
     }
 
-    private static class heartBeat_resultStandardScheme extends org.apache.thrift.scheme.StandardScheme<heartBeat_result> {
+    private static class query_resultStandardScheme extends org.apache.thrift.scheme.StandardScheme<query_result> {
 
-      public void read(org.apache.thrift.protocol.TProtocol iprot, heartBeat_result struct) throws org.apache.thrift.TException {
+      public void read(org.apache.thrift.protocol.TProtocol iprot, query_result struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TField schemeField;
         iprot.readStructBegin();
         while (true)
@@ -907,8 +913,9 @@ public class JDBCEngineExecutorService {
           }
           switch (schemeField.id) {
             case 0: // SUCCESS
-              if (schemeField.type == org.apache.thrift.protocol.TType.BOOL) {
-                struct.success = iprot.readBool();
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
+                struct.success = new com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef();
+                struct.success.read(iprot);
                 struct.setSuccessIsSet(true);
               } else { 
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
@@ -925,13 +932,13 @@ public class JDBCEngineExecutorService {
         struct.validate();
       }
 
-      public void write(org.apache.thrift.protocol.TProtocol oprot, heartBeat_result struct) throws org.apache.thrift.TException {
+      public void write(org.apache.thrift.protocol.TProtocol oprot, query_result struct) throws org.apache.thrift.TException {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
-        if (struct.isSetSuccess()) {
+        if (struct.success != null) {
           oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
-          oprot.writeBool(struct.success);
+          struct.success.write(oprot);
           oprot.writeFieldEnd();
         }
         oprot.writeFieldStop();
@@ -940,16 +947,16 @@ public class JDBCEngineExecutorService {
 
     }
 
-    private static class heartBeat_resultTupleSchemeFactory implements org.apache.thrift.scheme.SchemeFactory {
-      public heartBeat_resultTupleScheme getScheme() {
-        return new heartBeat_resultTupleScheme();
+    private static class query_resultTupleSchemeFactory implements org.apache.thrift.scheme.SchemeFactory {
+      public query_resultTupleScheme getScheme() {
+        return new query_resultTupleScheme();
       }
     }
 
-    private static class heartBeat_resultTupleScheme extends org.apache.thrift.scheme.TupleScheme<heartBeat_result> {
+    private static class query_resultTupleScheme extends org.apache.thrift.scheme.TupleScheme<query_result> {
 
       @Override
-      public void write(org.apache.thrift.protocol.TProtocol prot, heartBeat_result struct) throws org.apache.thrift.TException {
+      public void write(org.apache.thrift.protocol.TProtocol prot, query_result struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TTupleProtocol oprot = (org.apache.thrift.protocol.TTupleProtocol) prot;
         java.util.BitSet optionals = new java.util.BitSet();
         if (struct.isSetSuccess()) {
@@ -957,16 +964,17 @@ public class JDBCEngineExecutorService {
         }
         oprot.writeBitSet(optionals, 1);
         if (struct.isSetSuccess()) {
-          oprot.writeBool(struct.success);
+          struct.success.write(oprot);
         }
       }
 
       @Override
-      public void read(org.apache.thrift.protocol.TProtocol prot, heartBeat_result struct) throws org.apache.thrift.TException {
+      public void read(org.apache.thrift.protocol.TProtocol prot, query_result struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TTupleProtocol iprot = (org.apache.thrift.protocol.TTupleProtocol) prot;
         java.util.BitSet incoming = iprot.readBitSet(1);
         if (incoming.get(0)) {
-          struct.success = iprot.readBool();
+          struct.success = new com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef();
+          struct.success.read(iprot);
           struct.setSuccessIsSet(true);
         }
       }
