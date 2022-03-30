@@ -47,6 +47,12 @@ public class JDBCEngineExecutorServiceImpl implements JDBCEngineExecutorService.
     // TODO 将心跳移动至server侧
     // TODO 通过定时任务更新连接池
 
+    public JDBCEngineExecutorServiceImpl(String driverHost, int driverPort) {
+        setDriverHost(driverHost);
+        setDriverPort(driverPort);
+        checkInitialStatus(driverHost, driverPort);
+    }
+
     @Override
     public TJDBCOperationRef query(TJDBCOperationRef jdbcOperationRef) throws TException {
         checkInitialStatus(getDriverHost(), getDriverPort());
@@ -111,12 +117,6 @@ public class JDBCEngineExecutorServiceImpl implements JDBCEngineExecutorService.
             tjdbcOperationRef.setMessage(e.getMessage());
         }
         tjdbcOperationRef.setEndTime(System.currentTimeMillis());
-    }
-
-    public JDBCEngineExecutorServiceImpl(String driverHost, int driverPort) {
-        setDriverHost(driverHost);
-        setDriverPort(driverPort);
-        checkInitialStatus(driverHost, driverPort);
     }
 
     private void checkInitialStatus(String driverHost, int driverPort) {

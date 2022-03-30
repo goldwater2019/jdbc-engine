@@ -10,7 +10,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.thrift.TException;
-import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TSocket;
@@ -23,8 +22,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
@@ -33,15 +30,22 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @NoArgsConstructor
 @Builder
 public class JDBCEngineDriverServiceClientManager {
+    private static volatile JDBCEngineDriverServiceClientManager singleton;
+    AtomicBoolean isRunning = new AtomicBoolean(false);
+    Map<JDBCEngineDriverService.Client, TTransport> client2tTransport = new ConcurrentHashMap<>();
+    JDBCEngineDriverServiceClientSuite jdbcEngineDriverServiceClientSuite = null;  // 连接大礼包
     private int driverPort;
     private String driverHost;
     private int timeout;
     private int poolSize;
-    AtomicBoolean isRunning = new AtomicBoolean(false);
-    Map<JDBCEngineDriverService.Client, TTransport> client2tTransport = new ConcurrentHashMap<>();
-    JDBCEngineDriverServiceClientSuite jdbcEngineDriverServiceClientSuite = null;  // 连接大礼包
 
-    private static volatile JDBCEngineDriverServiceClientManager singleton;
+    public JDBCEngineDriverServiceClientManager(String driverHost, int driverPort, int timeout, int poolSize) {
+        setPoolSize(poolSize);
+        setDriverPort(driverPort);
+        setDriverHost(driverHost);
+        setTimeout(timeout);
+        isRunning.set(true);
+    }
 
     public static JDBCEngineDriverServiceClientManager getInstance(String driverHost, int driverPort) {
         if (singleton == null) {
@@ -52,14 +56,6 @@ public class JDBCEngineDriverServiceClientManager {
             }
         }
         return singleton;
-    }
-
-    public JDBCEngineDriverServiceClientManager(String driverHost, int driverPort, int timeout, int poolSize) {
-        setPoolSize(poolSize);
-        setDriverPort(driverPort);
-        setDriverHost(driverHost);
-        setTimeout(timeout);
-        isRunning.set(true);
     }
 
     private void testGetCatalogs(JDBCEngineDriverService.Client client) throws TException {
@@ -133,7 +129,7 @@ public class JDBCEngineDriverServiceClientManager {
 //                JDBCEngineDriverService.Client client = new JDBCEngineDriverService.Client(protocol);
 //                transport.open();
 //                jdbcEngineDriverServiceClientSuite =
-                        return JDBCEngineDriverServiceClientSuite.builder()
+                return JDBCEngineDriverServiceClientSuite.builder()
                         .client(client)
                         .tTransport(transport)
                         .build();

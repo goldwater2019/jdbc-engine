@@ -3,7 +3,6 @@ package com.ane56.engine.jdbc.driver.impl;
 import com.ane56.engine.jdbc.catalog.JDBCCatalogManager;
 import com.ane56.engine.jdbc.exetuor.JDBCEngineExecutorManager;
 import com.ane56.engine.jdbc.model.JDBCCatalog;
-import com.ane56.engine.jdbc.model.JDBCEngineExecutorRef;
 import com.ane56.engine.jdbc.thrit.service.JDBCEngineDriverService;
 import com.ane56.engine.jdbc.thrit.struct.TJDBCCatalog;
 import com.ane56.engine.jdbc.thrit.struct.TJDBCEngineExecutor;
@@ -18,6 +17,10 @@ public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService.Ifac
     private JDBCCatalogManager jdbcCatalogManager;
     private JDBCEngineExecutorManager jdbcEngineExecutorManager;
 
+    public JDBCEngineDriverServiceImpl() {
+        checkInitialStatus();
+    }
+
     @Override
     public boolean heartBeat(TJDBCEngineExecutor jdbcEngineExecutor) throws TException {
         long startTime = System.currentTimeMillis();
@@ -31,6 +34,7 @@ public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService.Ifac
 
     /**
      * 获得相应的catalogs
+     *
      * @return
      * @throws TException
      */
@@ -46,10 +50,6 @@ public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService.Ifac
     @Override
     public boolean addCatalog(TJDBCCatalog jdbcCatalog) throws TException {
         return jdbcCatalogManager.upsertJDBCCatalog(JDBCCatalog.parseFromTJDBCCatalog(jdbcCatalog));
-    }
-
-    public JDBCEngineDriverServiceImpl() {
-        checkInitialStatus();
     }
 
     public void checkInitialStatus() {

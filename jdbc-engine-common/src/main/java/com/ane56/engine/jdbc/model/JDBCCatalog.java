@@ -18,6 +18,15 @@ public class JDBCCatalog {
     private String username;
     private String password;
 
+    public static JDBCCatalog parseFromTJDBCCatalog(TJDBCCatalog tJdbcCatalog) {
+        return JDBCCatalog.builder()
+                .name(tJdbcCatalog.getName())
+                .driverClass(tJdbcCatalog.getDriver())
+                .uri(tJdbcCatalog.getUrl())
+                .username(tJdbcCatalog.getUsername())
+                .password(tJdbcCatalog.getPassword())
+                .build();
+    }
 
     public TJDBCCatalog asTJDBCCatalog() {
         TJDBCCatalog tjdbcCatalog = new TJDBCCatalog();
@@ -27,15 +36,5 @@ public class JDBCCatalog {
         tjdbcCatalog.setUsername(username);
         tjdbcCatalog.setPassword(password);
         return tjdbcCatalog;
-    }
-
-    public static JDBCCatalog parseFromTJDBCCatalog(TJDBCCatalog tJdbcCatalog) {
-        return JDBCCatalog.builder()
-                .name(tJdbcCatalog.getName())
-                .driverClass(tJdbcCatalog.getDriver())
-                .uri(tJdbcCatalog.getUrl())
-                .username(tJdbcCatalog.getUsername())
-                .password(tJdbcCatalog.getPassword())
-                .build();
     }
 }

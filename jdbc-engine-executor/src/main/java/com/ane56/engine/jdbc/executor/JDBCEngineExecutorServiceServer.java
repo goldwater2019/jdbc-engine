@@ -40,8 +40,9 @@ import java.util.concurrent.TimeUnit;
 @NoArgsConstructor
 @Slf4j
 public class JDBCEngineExecutorServiceServer {
+    private static final int retryTimes = 3;
+    private static volatile JDBCEngineExecutorServiceServer singleton;
     String sql = "select send_date as sdate, * from tx_dev.bd_center_center_month";
-
     private String driverHost = "127.0.0.1";
     private int driverPort = 8888;
     private int servicePort = 8889;
@@ -49,11 +50,21 @@ public class JDBCEngineExecutorServiceServer {
     private PooledDataSourceManager pooledDataSourceManager = null;
     private ScheduledExecutorService heartBeatExecutorService = null;
     private ScheduledExecutorService refreshCatalogExecutorService = null;
-    private UUID engineRefId =  UUID.randomUUID();
+    private UUID engineRefId = UUID.randomUUID();
 
-    private static final int retryTimes = 3;
-
-    private static volatile JDBCEngineExecutorServiceServer singleton;
+    /**
+     * 构造方法
+     *
+     * @param driverHost
+     * @param driverPort
+     * @param servicePort
+     */
+    private JDBCEngineExecutorServiceServer(String driverHost, int driverPort, int servicePort) {
+        setDriverHost(driverHost);
+        setDriverPort(driverPort);
+        setServicePort(servicePort);
+        checkInitialStatus();
+    }
 
     /**
      * 单例方法
@@ -75,20 +86,13 @@ public class JDBCEngineExecutorServiceServer {
         return singleton;
     }
 
-    /**
-     * 构造方法
-     *
-     * @param driverHost
-     * @param driverPort
-     * @param servicePort
-     */
-    private JDBCEngineExecutorServiceServer(String driverHost, int driverPort, int servicePort) {
-        setDriverHost(driverHost);
-        setDriverPort(driverPort);
-        setServicePort(servicePort);
-        checkInitialStatus();
+    public static void main(String[] args) throws TTransportException {
+        String driverHost = "127.0.0.1";
+        int driverPort = 8888;
+        int servicePort = 8889;
+        JDBCEngineExecutorServiceServer jdbcEngineExecutorServiceServer = JDBCEngineExecutorServiceServer.getInstance(driverHost, driverPort, servicePort);
+        jdbcEngineExecutorServiceServer.invoke();
     }
-
 
     /**
      * 检查初始化状态
@@ -136,7 +140,6 @@ public class JDBCEngineExecutorServiceServer {
         log.info("Starting executor service server on port " + servicePort + "......");
         server.serve();
     }
-
 
     /**
      * 定时上报心跳
@@ -193,14 +196,5 @@ public class JDBCEngineExecutorServiceServer {
                 e.printStackTrace();
             }
         }
-    }
-
-
-    public static void main(String[] args) throws TTransportException {
-        String driverHost = "127.0.0.1";
-        int driverPort = 8888;
-        int servicePort = 8889;
-        JDBCEngineExecutorServiceServer jdbcEngineExecutorServiceServer = JDBCEngineExecutorServiceServer.getInstance(driverHost, driverPort, servicePort);
-        jdbcEngineExecutorServiceServer.invoke();
     }
 }

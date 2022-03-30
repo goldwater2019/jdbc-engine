@@ -5,7 +5,6 @@ import com.ane56.engine.jdbc.thrit.struct.TJDBCEngineExecutor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Map;
 import java.util.UUID;
@@ -17,7 +16,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class JDBCEngineExecutorManager {
 
     private static volatile JDBCEngineExecutorManager singleton;
-    private JDBCEngineExecutorManager() {};
+    private Map<UUID, JDBCEngineExecutorRef> uuid2jdbcEngineExecutorRefs = new ConcurrentHashMap<>();
+
+    ;
+
+    private JDBCEngineExecutorManager() {
+    }
+
     public static JDBCEngineExecutorManager getInstance() {
         if (singleton == null) {
             synchronized (JDBCEngineExecutorManager.class) {
@@ -29,10 +34,9 @@ public class JDBCEngineExecutorManager {
         return singleton;
     }
 
-    private Map<UUID, JDBCEngineExecutorRef> uuid2jdbcEngineExecutorRefs = new ConcurrentHashMap<>();
-
     /**
      * 添加相应的executor
+     *
      * @param jdbcEngineExecutorRef
      * @return
      */
@@ -44,6 +48,7 @@ public class JDBCEngineExecutorManager {
 
     /**
      * 处理心跳
+     *
      * @param tjdbcEngineExecutor
      * @return
      */

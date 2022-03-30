@@ -3,13 +3,21 @@ package com.ane56.engine.jdbc.catalog;
 import com.ane56.engine.jdbc.model.JDBCCatalog;
 import com.ane56.engine.jdbc.thrit.struct.TJDBCCatalog;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class JDBCCatalogManager {
 
     private static volatile JDBCCatalogManager singleton;
-    private JDBCCatalogManager() {};
+    private Map<String, JDBCCatalog> name2jdbcCatalogs = new ConcurrentHashMap<>();
+
+    ;
+
+    private JDBCCatalogManager() {
+    }
+
     public static JDBCCatalogManager getInstance() {
         if (singleton == null) {
             synchronized (JDBCCatalogManager.class) {
@@ -21,10 +29,9 @@ public class JDBCCatalogManager {
         return singleton;
     }
 
-    private Map<String, JDBCCatalog> name2jdbcCatalogs = new ConcurrentHashMap<>();
-
     /**
      * 添加相应的catalog
+     *
      * @param jdbcCatalog
      * @return
      */
@@ -39,6 +46,7 @@ public class JDBCCatalogManager {
 
     /**
      * 将数据直接转换成thrift格式
+     *
      * @return
      */
     public List<TJDBCCatalog> getCatalogs() {

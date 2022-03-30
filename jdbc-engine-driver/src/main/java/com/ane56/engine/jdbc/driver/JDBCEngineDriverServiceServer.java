@@ -10,14 +10,10 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.TProcessorFactory;
-import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TCompactProtocol;
-import org.apache.thrift.server.TServer;
-import org.apache.thrift.server.TSimpleServer;
 import org.apache.thrift.server.TThreadedSelectorServer;
 import org.apache.thrift.transport.TNonblockingServerSocket;
 import org.apache.thrift.transport.TNonblockingServerTransport;
-import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TTransportException;
 import org.apache.thrift.transport.layered.TFramedTransport;
 
@@ -30,9 +26,8 @@ import java.util.concurrent.Executors;
 @Data
 @Builder
 public class JDBCEngineDriverServiceServer {
-    private int servicePort = 8888;
-
     private static volatile JDBCEngineDriverServiceServer singleton;
+    private int servicePort = 8888;
 
     public static JDBCEngineDriverServiceServer getInstance() {
         if (singleton == null) {
@@ -43,6 +38,11 @@ public class JDBCEngineDriverServiceServer {
             }
         }
         return singleton;
+    }
+
+    public static void main(String[] args) throws TTransportException {
+        JDBCEngineDriverServiceServer jdbcEngineDriverServiceServer = JDBCEngineDriverServiceServer.getInstance();
+        jdbcEngineDriverServiceServer.invoke();
     }
 
     public void invoke() throws TTransportException {
@@ -80,10 +80,5 @@ public class JDBCEngineDriverServiceServer {
 //        TServer server = new TSimpleServer(tArgs);
 //        log.info("Starting server on port " + servicePort + "......");
 //        server.serve();
-    }
-
-    public static void main(String[] args) throws TTransportException {
-        JDBCEngineDriverServiceServer jdbcEngineDriverServiceServer = JDBCEngineDriverServiceServer.getInstance();
-        jdbcEngineDriverServiceServer.invoke();
     }
 }

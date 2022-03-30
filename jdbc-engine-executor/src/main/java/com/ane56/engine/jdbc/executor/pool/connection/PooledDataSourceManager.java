@@ -19,6 +19,13 @@ public class PooledDataSourceManager {
      * 单例方法
      */
     private static volatile PooledDataSourceManager singleton;
+    private Map<String, JDBCCatalog> name2catalog = new HashMap<>();
+    private Map<String, DruidDataSource> name2source = new HashMap<>();
+
+    ;
+
+    private PooledDataSourceManager() {
+    }
 
     public static PooledDataSourceManager getInstance() {
         if (singleton == null) {
@@ -30,14 +37,6 @@ public class PooledDataSourceManager {
         }
         return singleton;
     }
-
-    private PooledDataSourceManager() {
-    }
-
-    ;
-
-    private Map<String, JDBCCatalog> name2catalog = new HashMap<>();
-    private Map<String, DruidDataSource> name2source = new HashMap<>();
 
     public Map<String, JDBCCatalog> getName2catalog() {
         return name2catalog;

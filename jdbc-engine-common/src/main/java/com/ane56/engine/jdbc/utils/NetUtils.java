@@ -14,7 +14,7 @@ import java.net.UnknownHostException;
 
 public class NetUtils {
 
-    public static String getInetHostAddress(){
+    public static String getInetHostAddress() {
         InetAddress ip4 = null;
         try {
             ip4 = Inet4Address.getLocalHost();
