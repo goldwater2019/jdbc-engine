@@ -37,7 +37,6 @@ public class JDBCEngineDriverServiceClientManager {
     private String driverHost;
     private int timeout;
     private int poolSize;
-    ExecutorService executorService = null;
     AtomicBoolean isRunning = new AtomicBoolean(false);
     Map<JDBCEngineDriverService.Client, TTransport> client2tTransport = new ConcurrentHashMap<>();
     JDBCEngineDriverServiceClientSuite jdbcEngineDriverServiceClientSuite = null;  // 连接大礼包
@@ -60,9 +59,6 @@ public class JDBCEngineDriverServiceClientManager {
         setDriverPort(driverPort);
         setDriverHost(driverHost);
         setTimeout(timeout);
-        // focus on generate client
-        executorService = Executors.newFixedThreadPool(1);
-//        executorService.submit(new PushInClientPool());
         isRunning.set(true);
     }
 
@@ -125,18 +121,19 @@ public class JDBCEngineDriverServiceClientManager {
         if (jdbcEngineDriverServiceClientSuite == null) {
             //使用非阻塞方式，按块的大小进行传输，类似于Java中的NIO。记得调用close释放资源
             try {
-//                TTransport transport = new TFramedTransport(new TSocket(driverHost, driverPort, timeout));
-//                //高效率的、密集的二进制编码格式进行数据传输协议
-//                TProtocol protocol = new TCompactProtocol(transport);
-//                JDBCEngineDriverService.Client client = new JDBCEngineDriverService.Client(protocol);
-//                open(transport);
-                TTransport transport = new TSocket(driverHost, driverPort, timeout);
-                // 协议要和服务端一致
-                TProtocol protocol = new TBinaryProtocol(transport);
-
+                TTransport transport = new TFramedTransport(new TSocket(driverHost, driverPort, timeout));
+                //高效率的、密集的二进制编码格式进行数据传输协议
+                TProtocol protocol = new TCompactProtocol(transport);
                 JDBCEngineDriverService.Client client = new JDBCEngineDriverService.Client(protocol);
-                transport.open();
-                jdbcEngineDriverServiceClientSuite = JDBCEngineDriverServiceClientSuite.builder()
+                open(transport);
+//                TTransport transport = new TSocket(driverHost, driverPort, timeout);
+//                // 协议要和服务端一致
+//                TProtocol protocol = new TBinaryProtocol(transport);
+//
+//                JDBCEngineDriverService.Client client = new JDBCEngineDriverService.Client(protocol);
+//                transport.open();
+//                jdbcEngineDriverServiceClientSuite =
+                        return JDBCEngineDriverServiceClientSuite.builder()
                         .client(client)
                         .tTransport(transport)
                         .build();
@@ -144,9 +141,13 @@ public class JDBCEngineDriverServiceClientManager {
                 e.printStackTrace();
             }
         }
-        return jdbcEngineDriverServiceClientSuite;
+        return null;
     }
 
+    /**
+     * 连接池
+     */
+    @Deprecated
     public class PushInClientPool implements Runnable {
 
         @Override
@@ -175,11 +176,5 @@ public class JDBCEngineDriverServiceClientManager {
                 }
             }
         }
-    }
-
-    public void shutdown() throws InterruptedException {
-        getIsRunning().set(false);
-        Thread.sleep(1000L);
-        executorService.shutdownNow();
     }
 }

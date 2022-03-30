@@ -102,11 +102,11 @@ public class JDBCEngineExecutorServiceServer {
         }
         if (heartBeatExecutorService == null) {
             heartBeatExecutorService = Executors.newSingleThreadScheduledExecutor();
-            heartBeatExecutorService.scheduleAtFixedRate(new HeartBeatRunnable(), 0L, 1000L, TimeUnit.MILLISECONDS);
+            heartBeatExecutorService.scheduleAtFixedRate(new HeartBeatRunnable(), 0L, 100L, TimeUnit.MILLISECONDS);
         }
         if (refreshCatalogExecutorService == null) {
             refreshCatalogExecutorService = Executors.newSingleThreadScheduledExecutor();
-            refreshCatalogExecutorService.scheduleAtFixedRate(new RefreshCatalogs(), 2000L, 10000L, TimeUnit.MILLISECONDS);
+            refreshCatalogExecutorService.scheduleAtFixedRate(new RefreshCatalogs(), 2000L, 1000L, TimeUnit.MILLISECONDS);
         }
     }
 
