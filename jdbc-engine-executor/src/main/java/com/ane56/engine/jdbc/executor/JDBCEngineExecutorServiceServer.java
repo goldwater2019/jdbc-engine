@@ -51,6 +51,8 @@ public class JDBCEngineExecutorServiceServer {
     private ScheduledExecutorService refreshCatalogExecutorService = null;
     private UUID engineRefId =  UUID.randomUUID();
 
+    private static final int retryTimes = 3;
+
     private static volatile JDBCEngineExecutorServiceServer singleton;
 
     /**
@@ -152,8 +154,10 @@ public class JDBCEngineExecutorServiceServer {
                 tJdbcEngineExecutor.setPort(servicePort);
                 tJdbcEngineExecutor.setExecutorRefId(engineRefId.toString());
                 tJdbcEngineExecutor.setPrefix("");
-                client.heartBeat(tJdbcEngineExecutor);
+                boolean b = client.heartBeat(tJdbcEngineExecutor);
+
                 jdbcEngineDriverServiceClientManager.close(tTransport);
+                jdbcEngineDriverServiceClientManager.setJdbcEngineDriverServiceClientSuite(null);
             } catch (InterruptedException | TException e) {
                 e.printStackTrace();
             }
@@ -184,6 +188,7 @@ public class JDBCEngineExecutorServiceServer {
                 }
                 pooledDataSourceManager.checkDataSources();
                 jdbcEngineDriverServiceClientManager.close(tTransport);
+                jdbcEngineDriverServiceClientManager.setJdbcEngineDriverServiceClientSuite(null);
             } catch (InterruptedException | TException e) {
                 e.printStackTrace();
             }

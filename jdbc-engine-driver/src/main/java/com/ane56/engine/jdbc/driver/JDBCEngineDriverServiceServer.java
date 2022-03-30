@@ -10,10 +10,14 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.TProcessorFactory;
+import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TCompactProtocol;
+import org.apache.thrift.server.TServer;
+import org.apache.thrift.server.TSimpleServer;
 import org.apache.thrift.server.TThreadedSelectorServer;
 import org.apache.thrift.transport.TNonblockingServerSocket;
 import org.apache.thrift.transport.TNonblockingServerTransport;
+import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TTransportException;
 import org.apache.thrift.transport.layered.TFramedTransport;
 
@@ -42,25 +46,38 @@ public class JDBCEngineDriverServiceServer {
     }
 
     public void invoke() throws TTransportException {
-        // 非阻塞式的，配合TFramedTransport使用
-        TNonblockingServerTransport serverTransport = new TNonblockingServerSocket(servicePort);
-        // 关联处理器与Service服务的实现
-        TProcessor processor = new JDBCEngineDriverService.Processor<JDBCEngineDriverService.Iface>(new JDBCEngineDriverServiceImpl());
-        // 目前Thrift提供的最高级的模式，可并发处理客户端请求
-        TThreadedSelectorServer.Args args = new TThreadedSelectorServer.Args(serverTransport);
-        args.processor(processor);
-        // 设置协议工厂，高效率的、密集的二进制编码格式进行数据传输协议
-        args.protocolFactory(new TCompactProtocol.Factory());
-        // 设置传输工厂，使用非阻塞方式，按块的大小进行传输，类似于Java中的NIO
-        args.transportFactory(new TFramedTransport.Factory());
-        // 设置处理器工厂,只返回一个单例实例
-        args.processorFactory(new TProcessorFactory(processor));
-        // 多个线程，主要负责客户端的IO处理
-        args.selectorThreads(8);
-        // 工作线程池
-        ExecutorService pool = Executors.newFixedThreadPool(64);
-        args.executorService(pool);
-        TThreadedSelectorServer server = new TThreadedSelectorServer(args);
+//        // 非阻塞式的，配合TFramedTransport使用
+//        TNonblockingServerTransport serverTransport = new TNonblockingServerSocket(servicePort);
+//        // 关联处理器与Service服务的实现
+//        TProcessor processor = new JDBCEngineDriverService.Processor<JDBCEngineDriverService.Iface>(new JDBCEngineDriverServiceImpl());
+//        // 目前Thrift提供的最高级的模式，可并发处理客户端请求
+//        TThreadedSelectorServer.Args args = new TThreadedSelectorServer.Args(serverTransport);
+//        args.processor(processor);
+//        // 设置协议工厂，高效率的、密集的二进制编码格式进行数据传输协议
+//        args.protocolFactory(new TCompactProtocol.Factory());
+//        // 设置传输工厂，使用非阻塞方式，按块的大小进行传输，类似于Java中的NIO
+//        args.transportFactory(new TFramedTransport.Factory());
+//        // 设置处理器工厂,只返回一个单例实例
+//        args.processorFactory(new TProcessorFactory(processor));
+//        // 多个线程，主要负责客户端的IO处理
+//        args.selectorThreads(8);
+//        // 工作线程池
+//        ExecutorService pool = Executors.newFixedThreadPool(64);
+//        args.executorService(pool);
+//        TThreadedSelectorServer server = new TThreadedSelectorServer(args);
+//        log.info("Starting server on port " + servicePort + "......");
+//        server.serve();
+
+
+        //在这里调用了 HelloWorldImpl 规定了接受的方法和返回的参数
+        TProcessor tprocessor = new JDBCEngineDriverService.Processor<JDBCEngineDriverService.Iface>( new JDBCEngineDriverServiceImpl());
+
+        TServerSocket serverTransport = new TServerSocket(servicePort);
+        TServer.Args tArgs = new TServer.Args(serverTransport);
+        tArgs.processor(tprocessor);
+        tArgs.protocolFactory(new TBinaryProtocol.Factory());
+
+        TServer server = new TSimpleServer(tArgs);
         log.info("Starting server on port " + servicePort + "......");
         server.serve();
     }
