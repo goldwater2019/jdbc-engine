@@ -7,27 +7,28 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @AllArgsConstructor
 @Builder
 @Data
-public class JDBCEngineExecutorManager {
+public class JDBCEngineExecutorRefManager {
 
-    private static volatile JDBCEngineExecutorManager singleton;
+    private static volatile JDBCEngineExecutorRefManager singleton;
     private Map<UUID, JDBCEngineExecutorRef> uuid2jdbcEngineExecutorRefs = new ConcurrentHashMap<>();
 
     ;
 
-    private JDBCEngineExecutorManager() {
+    private JDBCEngineExecutorRefManager() {
     }
 
-    public static JDBCEngineExecutorManager getInstance() {
+    public static JDBCEngineExecutorRefManager getInstance() {
         if (singleton == null) {
-            synchronized (JDBCEngineExecutorManager.class) {
+            synchronized (JDBCEngineExecutorRefManager.class) {
                 if (singleton == null) {
-                    singleton = new JDBCEngineExecutorManager();
+                    singleton = new JDBCEngineExecutorRefManager();
                 }
             }
         }
@@ -54,6 +55,34 @@ public class JDBCEngineExecutorManager {
      */
     public boolean heartbeat(TJDBCEngineExecutor tjdbcEngineExecutor) {
         return upsertJDBCEngineExecutorRef(JDBCEngineExecutorRef.parseFromTJDBCEngineDriver(tjdbcEngineExecutor));
+    }
+
+    public JDBCEngineExecutorRef getEngineRef(UUID uuid) {
+        return uuid2jdbcEngineExecutorRefs.get(uuid);
+    }
+
+    /**
+     * TODO 添加负载均衡选举
+     * 选择一个UUID
+     *
+     * @return
+     */
+    public UUID pickupUUID() {
+        return randomPickup();
+    }
+
+    private UUID randomPickup() {
+        int size = uuid2jdbcEngineExecutorRefs.size();
+        Random random = new Random();
+        int pickupIndex = Math.abs(random.nextInt()) % size;
+        int index = 0;
+        for (UUID uuid : uuid2jdbcEngineExecutorRefs.keySet()) {
+            if (index == pickupIndex) {
+                return uuid;
+            }
+            index += 1;
+        }
+        return null;
     }
 
 }

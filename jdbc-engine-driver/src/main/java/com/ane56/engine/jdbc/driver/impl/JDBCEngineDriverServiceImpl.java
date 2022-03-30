@@ -1,7 +1,7 @@
 package com.ane56.engine.jdbc.driver.impl;
 
 import com.ane56.engine.jdbc.catalog.JDBCCatalogManager;
-import com.ane56.engine.jdbc.exetuor.JDBCEngineExecutorManager;
+import com.ane56.engine.jdbc.exetuor.JDBCEngineExecutorRefManager;
 import com.ane56.engine.jdbc.model.JDBCCatalog;
 import com.ane56.engine.jdbc.thrit.service.JDBCEngineDriverService;
 import com.ane56.engine.jdbc.thrit.struct.TJDBCCatalog;
@@ -15,7 +15,7 @@ import java.util.UUID;
 @Slf4j
 public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService.Iface {
     private JDBCCatalogManager jdbcCatalogManager;
-    private JDBCEngineExecutorManager jdbcEngineExecutorManager;
+    private JDBCEngineExecutorRefManager jdbcEngineExecutorRefManager;
 
     public JDBCEngineDriverServiceImpl() {
         checkInitialStatus();
@@ -25,8 +25,8 @@ public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService.Ifac
     public boolean heartBeat(TJDBCEngineExecutor jdbcEngineExecutor) throws TException {
         long startTime = System.currentTimeMillis();
         checkInitialStatus();
-        boolean result = jdbcEngineExecutorManager.heartbeat(jdbcEngineExecutor);
-        log.info("heartBeat : " + (System.currentTimeMillis() - startTime) + " ms, body: " + jdbcEngineExecutorManager.getUuid2jdbcEngineExecutorRefs().get(
+        boolean result = jdbcEngineExecutorRefManager.heartbeat(jdbcEngineExecutor);
+        log.info("heartBeat : " + (System.currentTimeMillis() - startTime) + " ms, body: " + jdbcEngineExecutorRefManager.getUuid2jdbcEngineExecutorRefs().get(
                 UUID.fromString(jdbcEngineExecutor.getExecutorRefId())
         ));
         return result;
@@ -57,8 +57,8 @@ public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService.Ifac
             jdbcCatalogManager = JDBCCatalogManager.getInstance();
             jdbcCatalogManager.loadOrDefaultCatalogs();
         }
-        if (jdbcEngineExecutorManager == null) {
-            jdbcEngineExecutorManager = JDBCEngineExecutorManager.getInstance();
+        if (jdbcEngineExecutorRefManager == null) {
+            jdbcEngineExecutorRefManager = JDBCEngineExecutorRefManager.getInstance();
         }
     }
 }
