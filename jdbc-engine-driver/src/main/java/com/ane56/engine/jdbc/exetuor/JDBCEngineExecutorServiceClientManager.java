@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TProtocol;
@@ -25,21 +26,21 @@ import java.util.UUID;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 @Builder
+@Slf4j
 public class JDBCEngineExecutorServiceClientManager {
 
     private static final int TIMEOUT = 10 * 1000;
     private static volatile JDBCEngineExecutorServiceClientManager singleton;
     private JDBCEngineExecutorRefManager jdbcEngineExecutorRefManager;
 
-    public JDBCEngineExecutorServiceClientManager(String driverHost, int driverPort, int timeout, int poolSize) {
+    public JDBCEngineExecutorServiceClientManager() {
         if (jdbcEngineExecutorRefManager == null) {
             jdbcEngineExecutorRefManager = JDBCEngineExecutorRefManager.getInstance();
         }
     }
 
-    public static JDBCEngineExecutorServiceClientManager getInstance(String driverHost, int driverPort) {
+    public static JDBCEngineExecutorServiceClientManager getInstance() {
         if (singleton == null) {
             synchronized (JDBCEngineExecutorServiceClientManager.class) {
                 if (singleton == null) {
@@ -103,8 +104,10 @@ public class JDBCEngineExecutorServiceClientManager {
      * @throws TException
      */
     public JDBCResultRef query(String catalogName, String querySQL, JDBCEngineExecutorRef jdbcEngineExecutorRef) throws InterruptedException, TException {
-
+        long startTime = System.currentTimeMillis();
         JDBCEngineExecutorServiceClientSuite availableClient = getAvailableClient(jdbcEngineExecutorRef.getHost(), jdbcEngineExecutorRef.getPort());
+        log.info("get client costs: " + (System.currentTimeMillis() - startTime));
+        startTime = System.currentTimeMillis();
         JDBCEngineExecutorService.Client client = availableClient.getClient();
         TTransport tTransport = availableClient.getTTransport();
         jdbcEngineExecutorRefManager.accessJDBCEngineRef(jdbcEngineExecutorRef);  // 更新最新的接入时间
@@ -119,7 +122,11 @@ public class JDBCEngineExecutorServiceClientManager {
                 .sqlStatement(querySQL)
                 .message("")
                 .build();
+        log.info("create JDBCOperationRef costs: " + (System.currentTimeMillis() - startTime));
+        startTime = System.currentTimeMillis();
         TJDBCResultRef tjdbcResultRef = client.query(jdbcOperationRef.asTJDBCOperationRef());
+        log.info("client query costs: " + (System.currentTimeMillis() - startTime));
+        startTime = System.currentTimeMillis();
         JDBCResultRef jdbcResultRef = JDBCResultRef.parseFromTJDBCResultRef(tjdbcResultRef);
         close(tTransport);
         jdbcEngineExecutorRefManager.accessJDBCEngineRef(jdbcEngineExecutorRef);  // 更新最新的接入时间

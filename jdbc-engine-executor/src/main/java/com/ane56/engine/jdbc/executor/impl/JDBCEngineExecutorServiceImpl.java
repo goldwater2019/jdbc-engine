@@ -16,6 +16,9 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TException;
 
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.UUID;
 
@@ -47,6 +50,7 @@ public class JDBCEngineExecutorServiceImpl implements JDBCEngineExecutorService.
 
     @Override
     public TJDBCResultRef query(TJDBCOperationRef jdbcOperationRef) throws TException {
+        long startTime = System.currentTimeMillis();
         checkInitialStatus(getDriverHost(), getDriverPort());
         JDBCOperationRef operationRef = JDBCOperationRef.builder()
                 .startTime(jdbcOperationRef.getStartTime())
@@ -58,13 +62,15 @@ public class JDBCEngineExecutorServiceImpl implements JDBCEngineExecutorService.
                 .sqlStatement(jdbcOperationRef.getSqlStatement())
                 .build();
 
-
+        log.info("create JDBCOperationRef costs: " + (System.currentTimeMillis() - startTime));
         JDBCResultSet jdbcResultSet = null;
         try {
             jdbcResultSet = pooledDataSourceManager.query(jdbcOperationRef.getCatalogName(), jdbcOperationRef.getSqlStatement());
         } catch (SQLException e) {
             operationRef.setQueryStatus(JDBCQueryStatus.FAILED);
-            operationRef.setMessage(e.getMessage());  // TODO 使用更完善的错误捕获
+            StringWriter   sw=new StringWriter();
+            e.printStackTrace(new PrintWriter(sw, true));
+            operationRef.setMessage(sw.toString());  // TODO 更详细的错误收集
         }
         operationRef.setEndTime(System.currentTimeMillis());
         JDBCResultRef jdbcResultRef = JDBCResultRef.builder()

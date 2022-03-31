@@ -4,6 +4,7 @@ import com.ane56.engine.jdbc.driver.JDBCEngineDriverServiceClientManager;
 import com.ane56.engine.jdbc.executor.impl.JDBCEngineExecutorServiceImpl;
 import com.ane56.engine.jdbc.executor.pool.connection.PooledDataSourceManager;
 import com.ane56.engine.jdbc.model.JDBCCatalog;
+import com.ane56.engine.jdbc.model.JDBCEngineExecutorRef;
 import com.ane56.engine.jdbc.model.thrift.JDBCEngineDriverServiceClientSuite;
 import com.ane56.engine.jdbc.thrit.service.JDBCEngineDriverService;
 import com.ane56.engine.jdbc.thrit.service.JDBCEngineExecutorService;
@@ -37,20 +38,19 @@ import java.util.concurrent.TimeUnit;
 @Data
 @AllArgsConstructor
 @Builder
-@NoArgsConstructor
 @Slf4j
+@NoArgsConstructor
 public class JDBCEngineExecutorServiceServer {
     private static final int retryTimes = 3;
     private static volatile JDBCEngineExecutorServiceServer singleton;
-    String sql = "select send_date as sdate, * from tx_dev.bd_center_center_month";
-    private String driverHost = "127.0.0.1";
-    private int driverPort = 8888;
-    private int servicePort = 8889;
-    private JDBCEngineDriverServiceClientManager jdbcEngineDriverServiceClientManager = null;
-    private PooledDataSourceManager pooledDataSourceManager = null;
-    private ScheduledExecutorService heartBeatExecutorService = null;
-    private ScheduledExecutorService refreshCatalogExecutorService = null;
-    private UUID engineRefId = UUID.randomUUID();
+    private String driverHost;
+    private int driverPort;
+    private int servicePort;
+    private JDBCEngineDriverServiceClientManager jdbcEngineDriverServiceClientManager;
+    private PooledDataSourceManager pooledDataSourceManager;
+    private ScheduledExecutorService heartBeatExecutorService;
+    private ScheduledExecutorService refreshCatalogExecutorService;
+    private static final UUID ENGINE_REF_ID=UUID.randomUUID();
 
     /**
      * 构造方法
@@ -79,7 +79,7 @@ public class JDBCEngineExecutorServiceServer {
             synchronized (JDBCEngineExecutorServiceServer.class) {
                 if (singleton == null) {
                     // TODO 关闭随机端口
-                    singleton = new JDBCEngineExecutorServiceServer(driverHost, driverPort, Math.abs(new Random().nextInt()) % 10000 + 5000);
+                    singleton = new JDBCEngineExecutorServiceServer("127.0.0.1", 8888, 8889); //Math.abs(new Random().nextInt()) % 10000 + 5000);
                 }
             }
         }
@@ -106,11 +106,11 @@ public class JDBCEngineExecutorServiceServer {
         }
         if (heartBeatExecutorService == null) {
             heartBeatExecutorService = Executors.newSingleThreadScheduledExecutor();
-            heartBeatExecutorService.scheduleAtFixedRate(new HeartBeatRunnable(), 0L, 100L, TimeUnit.MILLISECONDS);
+            heartBeatExecutorService.scheduleAtFixedRate(new HeartBeatRunnable(), 0L, 1000L, TimeUnit.MILLISECONDS);
         }
         if (refreshCatalogExecutorService == null) {
             refreshCatalogExecutorService = Executors.newSingleThreadScheduledExecutor();
-            refreshCatalogExecutorService.scheduleAtFixedRate(new RefreshCatalogs(), 2000L, 1000L, TimeUnit.MILLISECONDS);
+            refreshCatalogExecutorService.scheduleAtFixedRate(new RefreshCatalogs(), 2000L, 10000L, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -155,12 +155,12 @@ public class JDBCEngineExecutorServiceServer {
                 TJDBCEngineExecutor tJdbcEngineExecutor = new TJDBCEngineExecutor();
                 tJdbcEngineExecutor.setHost(NetUtils.getInetHostAddress());
                 tJdbcEngineExecutor.setPort(servicePort);
-                tJdbcEngineExecutor.setExecutorRefId(engineRefId.toString());
+                tJdbcEngineExecutor.setExecutorRefId(ENGINE_REF_ID.toString());
                 tJdbcEngineExecutor.setPrefix("");
-                boolean b = client.heartBeat(tJdbcEngineExecutor);
+                client.heartBeat(tJdbcEngineExecutor);
+//                log.info("calling heartBeat interface: " + JDBCEngineExecutorRef.parseFromTJDBCEngineDriver(tJdbcEngineExecutor));
 
                 jdbcEngineDriverServiceClientManager.close(tTransport);
-                jdbcEngineDriverServiceClientManager.setJdbcEngineDriverServiceClientSuite(null);
             } catch (InterruptedException | TException e) {
                 e.printStackTrace();
             }
@@ -191,7 +191,6 @@ public class JDBCEngineExecutorServiceServer {
                 }
                 pooledDataSourceManager.checkDataSources();
                 jdbcEngineDriverServiceClientManager.close(tTransport);
-                jdbcEngineDriverServiceClientManager.setJdbcEngineDriverServiceClientSuite(null);
             } catch (InterruptedException | TException e) {
                 e.printStackTrace();
             }

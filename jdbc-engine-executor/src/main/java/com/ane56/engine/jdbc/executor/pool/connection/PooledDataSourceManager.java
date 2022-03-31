@@ -7,6 +7,7 @@ import com.ane56.engine.jdbc.model.JDBCCatalog;
 import com.ane56.engine.jdbc.model.JDBCResultColumn;
 import com.ane56.engine.jdbc.model.JDBCResultRow;
 import com.ane56.engine.jdbc.model.JDBCResultSet;
+import lombok.extern.slf4j.Slf4j;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,6 +25,7 @@ import java.util.Map;
  * @Version: v1.0
  */
 
+@Slf4j
 public class PooledDataSourceManager {
 
     /**
@@ -121,10 +123,13 @@ public class PooledDataSourceManager {
      * @return
      */
     public JDBCResultSet query(String catalogName, String sqlStatement) throws SQLException {
+        long startTime = System.currentTimeMillis();
         DruidDataSource dataSource = getName2source().get(catalogName);
         if (dataSource == null) {
             return null;
         }
+        log.info("get data source costs: " + (System.currentTimeMillis() - startTime));
+        startTime = System.currentTimeMillis();
         DruidPooledConnection connection = dataSource.getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(sqlStatement);
         ResultSet resultSet = preparedStatement.executeQuery();
@@ -148,6 +153,8 @@ public class PooledDataSourceManager {
                             .build()
             );
         }
+        connection.close();
+        log.info("query pool costs: " + (System.currentTimeMillis() - startTime));
         return JDBCResultSet.builder()
                 .resultRowList(jdbcResultRowList)
                 .build();

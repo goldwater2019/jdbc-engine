@@ -3,10 +3,6 @@ package com.ane56.engine.jdbc.driver;
 
 import com.ane56.engine.jdbc.driver.impl.JDBCEngineDriverServiceImpl;
 import com.ane56.engine.jdbc.thrit.service.JDBCEngineDriverService;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.TProcessorFactory;
@@ -21,10 +17,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Slf4j
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
-@Builder
 public class JDBCEngineDriverServiceServer {
     private static volatile JDBCEngineDriverServiceServer singleton;
     private int servicePort = 8888;

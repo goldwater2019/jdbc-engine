@@ -17,9 +17,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class JDBCEngineExecutorRefManager {
 
     private static volatile JDBCEngineExecutorRefManager singleton;
-    private Map<UUID, JDBCEngineExecutorRef> uuid2jdbcEngineExecutorRefs = new ConcurrentHashMap<>();
+    private Map<UUID, JDBCEngineExecutorRef> uuid2jdbcEngineExecutorRefs;
 
     private JDBCEngineExecutorRefManager() {
+        if (uuid2jdbcEngineExecutorRefs == null) {
+            uuid2jdbcEngineExecutorRefs = new ConcurrentHashMap<>();
+        }
     }
 
     public static JDBCEngineExecutorRefManager getInstance() {
@@ -57,6 +60,11 @@ public class JDBCEngineExecutorRefManager {
 
     public JDBCEngineExecutorRef getEngineRef(UUID uuid) {
         return uuid2jdbcEngineExecutorRefs.get(uuid);
+    }
+
+    public JDBCEngineExecutorRef pickupOneEngine() {
+        UUID uuid = pickupUUID();
+        return getEngineRef(uuid);
     }
 
     /**
