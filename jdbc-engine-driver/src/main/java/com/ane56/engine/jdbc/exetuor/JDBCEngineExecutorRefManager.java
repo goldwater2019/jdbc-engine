@@ -19,8 +19,6 @@ public class JDBCEngineExecutorRefManager {
     private static volatile JDBCEngineExecutorRefManager singleton;
     private Map<UUID, JDBCEngineExecutorRef> uuid2jdbcEngineExecutorRefs = new ConcurrentHashMap<>();
 
-    ;
-
     private JDBCEngineExecutorRefManager() {
     }
 
@@ -83,6 +81,22 @@ public class JDBCEngineExecutorRefManager {
             index += 1;
         }
         return null;
+    }
+
+
+    /**
+     * 修改最新的接入时间
+     * 开始query的时候和结束query的时候都接入
+     * @param jdbcEngineExecutorRef
+     */
+    public void accessJDBCEngineRef(JDBCEngineExecutorRef jdbcEngineExecutorRef) {
+        UUID executorRefId = jdbcEngineExecutorRef.getExecutorRefId();
+        JDBCEngineExecutorRef jdbcEngineExecutorRef1 = uuid2jdbcEngineExecutorRefs.get(executorRefId);
+        if (jdbcEngineExecutorRef1 == null) {
+            // TODO invalid engine
+            return;
+        }
+        jdbcEngineExecutorRef1.setLastAccessTime(System.currentTimeMillis());
     }
 
 }

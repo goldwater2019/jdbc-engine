@@ -9,6 +9,6 @@ service JDBCEngineExecutorService {
      * 请求时绑定starttime
      * 结束时绑定endtime
      **/
-    TJDBCEngineStruct.TJDBCOperationRef query(1: TJDBCEngineStruct.TJDBCOperationRef jdbcOperationRef)
+    TJDBCEngineStruct.TJDBCResultRef query(1: TJDBCEngineStruct.TJDBCOperationRef jdbcOperationRef)
 
 }

@@ -40,5 +40,10 @@ struct TJDBCRsultRow {
 }
 
 struct TJDBCResultSet {
-    1: list<TJDBCRsultRow> resultSet;
+    1: list<TJDBCRsultRow> resultRowList;
+}
+
+struct TJDBCResultRef {
+    1: TJDBCResultSet resultSet,
+    2: TJDBCOperationRef operationRef
 }

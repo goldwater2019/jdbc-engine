@@ -19,6 +19,7 @@ public class JDBCEngineExecutorRef {
     private String prefixPath;
     private UUID executorRefId;
     private long latestHeartbeatTime;
+    private long lastAccessTime;  // 为了负载均衡使用
 
     public static JDBCEngineExecutorRef parseFromTJDBCEngineDriver(TJDBCEngineExecutor engineExecutor) {
         return JDBCEngineExecutorRef.builder()
