@@ -67,18 +67,5 @@ public class JDBCEngineDriverServiceServer {
         TThreadedSelectorServer server = new TThreadedSelectorServer(args);
         log.info("Starting server on port " + servicePort + "......");
         server.serve();
-
-
-        // 非主从线程模型的实现
-//        TProcessor tprocessor = new JDBCEngineDriverService.Processor<JDBCEngineDriverService.Iface>( new JDBCEngineDriverServiceImpl());
-//
-//        TServerSocket serverTransport = new TServerSocket(servicePort);
-//        TServer.Args tArgs = new TServer.Args(serverTransport);
-//        tArgs.processor(tprocessor);
-//        tArgs.protocolFactory(new TBinaryProtocol.Factory());
-//
-//        TServer server = new TSimpleServer(tArgs);
-//        log.info("Starting server on port " + servicePort + "......");
-//        server.serve();
     }
 }
