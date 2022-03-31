@@ -22,16 +22,6 @@ import java.util.List;
 public class JDBCResultSet {
     private List<JDBCResultRow> resultRowList;
 
-    public TJDBCResultSet asTJDBCResultSet() {
-        TJDBCResultSet tjdbcResultSet = new TJDBCResultSet();
-        List<TJDBCRsultRow> resultRowList = new LinkedList<>();
-        for (JDBCResultRow jdbcResultRow : getResultRowList()) {
-            resultRowList.add(jdbcResultRow.asTJDBCRsultRow());
-        }
-        tjdbcResultSet.setResultRowList(resultRowList);
-        return tjdbcResultSet;
-    }
-
     public static JDBCResultSet parseFromTJDBCResultSet(TJDBCResultSet tjdbcResultSet) {
         List<TJDBCRsultRow> resultRowList = tjdbcResultSet.getResultRowList();
         List<JDBCResultRow> resultRows = new LinkedList<>();
@@ -41,5 +31,15 @@ public class JDBCResultSet {
         return JDBCResultSet.builder()
                 .resultRowList(resultRows)
                 .build();
+    }
+
+    public TJDBCResultSet asTJDBCResultSet() {
+        TJDBCResultSet tjdbcResultSet = new TJDBCResultSet();
+        List<TJDBCRsultRow> resultRowList = new LinkedList<>();
+        for (JDBCResultRow jdbcResultRow : getResultRowList()) {
+            resultRowList.add(jdbcResultRow.asTJDBCRsultRow());
+        }
+        tjdbcResultSet.setResultRowList(resultRowList);
+        return tjdbcResultSet;
     }
 }

@@ -18,20 +18,8 @@ public class JDBCResultColumn {
     private String columnValue;
 
     /**
-     * 将JDBCResultColumn转化成TJDBCResultColumn
-     * @return
-     */
-    public TJDBCResultColumn asTJDBCResultColumn() {
-        TJDBCResultColumn tjdbcResultColumn = new TJDBCResultColumn();
-        tjdbcResultColumn.setColumnName(getColumnName());
-        tjdbcResultColumn.setColumnType(columnType.asTJDBCColumnType());
-        tjdbcResultColumn.setColumnClassName(getColumnClassName());
-        tjdbcResultColumn.setColumnValue(getColumnValue());
-        return tjdbcResultColumn;
-    }
-
-    /**
      * 从TJDBCResultColumn中解析出JDBCResultColumn对象
+     *
      * @param tjdbcResultColumn
      * @return
      */
@@ -42,5 +30,19 @@ public class JDBCResultColumn {
                 .columnClassName(tjdbcResultColumn.getColumnClassName())
                 .columnValue(tjdbcResultColumn.getColumnValue())
                 .build();
+    }
+
+    /**
+     * 将JDBCResultColumn转化成TJDBCResultColumn
+     *
+     * @return
+     */
+    public TJDBCResultColumn asTJDBCResultColumn() {
+        TJDBCResultColumn tjdbcResultColumn = new TJDBCResultColumn();
+        tjdbcResultColumn.setColumnName(getColumnName());
+        tjdbcResultColumn.setColumnType(columnType.asTJDBCColumnType());
+        tjdbcResultColumn.setColumnClassName(getColumnClassName());
+        tjdbcResultColumn.setColumnValue(getColumnValue());
+        return tjdbcResultColumn;
     }
 }

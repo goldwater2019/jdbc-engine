@@ -17,16 +17,6 @@ import java.util.List;
 public class JDBCResultRow {
     private List<JDBCResultColumn> columnList;
 
-    public TJDBCRsultRow asTJDBCRsultRow() {
-        TJDBCRsultRow tjdbcRsultRow = new TJDBCRsultRow();
-        List<TJDBCResultColumn>columnList = new LinkedList<>();
-        for (JDBCResultColumn jdbcResultColumn : getColumnList()) {
-            columnList.add(jdbcResultColumn.asTJDBCResultColumn());
-        }
-        tjdbcRsultRow.setColumnList(columnList);
-        return tjdbcRsultRow;
-    }
-
     public static JDBCResultRow parseFromTJDBCRsultRow(TJDBCRsultRow tjdbcRsultRow) {
         List<TJDBCResultColumn> columnList = tjdbcRsultRow.getColumnList();
         List<JDBCResultColumn> jdbcResultColumns = new LinkedList<>();
@@ -36,5 +26,15 @@ public class JDBCResultRow {
         return JDBCResultRow.builder()
                 .columnList(jdbcResultColumns)
                 .build();
+    }
+
+    public TJDBCRsultRow asTJDBCRsultRow() {
+        TJDBCRsultRow tjdbcRsultRow = new TJDBCRsultRow();
+        List<TJDBCResultColumn> columnList = new LinkedList<>();
+        for (JDBCResultColumn jdbcResultColumn : getColumnList()) {
+            columnList.add(jdbcResultColumn.asTJDBCResultColumn());
+        }
+        tjdbcRsultRow.setColumnList(columnList);
+        return tjdbcRsultRow;
     }
 }

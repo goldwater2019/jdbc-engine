@@ -1,9 +1,20 @@
 package com.ane56.engine.jdbc.executor.pool.connection;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.alibaba.druid.pool.DruidPooledConnection;
+import com.ane56.engine.jdbc.enumeration.JDBCColumnType;
 import com.ane56.engine.jdbc.model.JDBCCatalog;
+import com.ane56.engine.jdbc.model.JDBCResultColumn;
+import com.ane56.engine.jdbc.model.JDBCResultRow;
+import com.ane56.engine.jdbc.model.JDBCResultSet;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -102,4 +113,43 @@ public class PooledDataSourceManager {
         name2catalog.put(catalog.getName(), catalog);
     }
 
+    /**
+     * 将查询结果封装成一个JDBCResultSet的对象
+     *
+     * @param catalogName
+     * @param sqlStatement
+     * @return
+     */
+    public JDBCResultSet query(String catalogName, String sqlStatement) throws SQLException {
+        DruidDataSource dataSource = getName2source().get(catalogName);
+        if (dataSource == null) {
+            return null;
+        }
+        DruidPooledConnection connection = dataSource.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sqlStatement);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        List<JDBCResultRow> jdbcResultRowList = new LinkedList<>();
+        while (resultSet.next()) {
+            List<JDBCResultColumn> jdbcResultColumnList = new LinkedList<>();
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            int columnCount = metaData.getColumnCount();
+            for (int i = 1; i <= columnCount; i++) {
+                JDBCResultColumn resultColumn = JDBCResultColumn.builder()
+                        .columnValue(resultSet.getString(i))
+                        .columnClassName(metaData.getColumnClassName(i))
+                        .columnName(metaData.getColumnLabel(i))
+                        .columnType(JDBCColumnType.findByValue(metaData.getColumnType(i)))
+                        .build();
+                jdbcResultColumnList.add(resultColumn);
+            }
+            jdbcResultRowList.add(
+                    JDBCResultRow.builder()
+                            .columnList(jdbcResultColumnList)
+                            .build()
+            );
+        }
+        return JDBCResultSet.builder()
+                .resultRowList(jdbcResultRowList)
+                .build();
+    }
 }

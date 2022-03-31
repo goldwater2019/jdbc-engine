@@ -15,17 +15,17 @@ public class JDBCResultRef {
     private JDBCOperationRef jdbcOperationRef;
     private JDBCResultSet jdbcResultSet;
 
-    public TJDBCResultRef asTJDBCResultRef() {
-        TJDBCResultRef tjdbcResultRef = new TJDBCResultRef();
-        tjdbcResultRef.setResultSet(jdbcResultSet.asTJDBCResultSet());
-        tjdbcResultRef.setOperationRef(jdbcOperationRef.asTJDBCOperationRef());
-        return tjdbcResultRef;
-    }
-
     public static JDBCResultRef parseFromTJDBCResultRef(TJDBCResultRef tjdbcResultRef) {
         return JDBCResultRef.builder()
                 .jdbcResultSet(JDBCResultSet.parseFromTJDBCResultSet(tjdbcResultRef.getResultSet()))
                 .jdbcOperationRef(JDBCOperationRef.parseFromTJDBCOperationRef(tjdbcResultRef.getOperationRef()))
                 .build();
+    }
+
+    public TJDBCResultRef asTJDBCResultRef() {
+        TJDBCResultRef tjdbcResultRef = new TJDBCResultRef();
+        tjdbcResultRef.setResultSet(jdbcResultSet.asTJDBCResultSet());
+        tjdbcResultRef.setOperationRef(jdbcOperationRef.asTJDBCOperationRef());
+        return tjdbcResultRef;
     }
 }

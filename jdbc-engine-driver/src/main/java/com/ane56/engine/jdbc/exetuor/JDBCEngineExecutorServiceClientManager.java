@@ -6,9 +6,7 @@ import com.ane56.engine.jdbc.model.JDBCEngineExecutorRef;
 import com.ane56.engine.jdbc.model.JDBCOperationRef;
 import com.ane56.engine.jdbc.model.JDBCResultRef;
 import com.ane56.engine.jdbc.model.thrift.JDBCEngineExecutorServiceClientSuite;
-import com.ane56.engine.jdbc.thrit.service.JDBCEngineDriverService;
 import com.ane56.engine.jdbc.thrit.service.JDBCEngineExecutorService;
-import com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef;
 import com.ane56.engine.jdbc.thrit.struct.TJDBCResultRef;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,11 +29,9 @@ import java.util.UUID;
 @Builder
 public class JDBCEngineExecutorServiceClientManager {
 
-    private JDBCEngineExecutorRefManager jdbcEngineExecutorRefManager;
-
     private static final int TIMEOUT = 10 * 1000;
-
     private static volatile JDBCEngineExecutorServiceClientManager singleton;
+    private JDBCEngineExecutorRefManager jdbcEngineExecutorRefManager;
 
     public JDBCEngineExecutorServiceClientManager(String driverHost, int driverPort, int timeout, int poolSize) {
         if (jdbcEngineExecutorRefManager == null) {
@@ -99,10 +95,9 @@ public class JDBCEngineExecutorServiceClientManager {
 
 
     /**
-     *
-     * @param catalogName                   : 待查询的catalogName
-     * @param querySQL                      : 执行的SQL
-     * @param jdbcEngineExecutorRef         : 对应到那个jdbcExecutor进行执行
+     * @param catalogName           : 待查询的catalogName
+     * @param querySQL              : 执行的SQL
+     * @param jdbcEngineExecutorRef : 对应到那个jdbcExecutor进行执行
      * @return
      * @throws InterruptedException
      * @throws TException

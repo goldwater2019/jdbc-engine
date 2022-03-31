@@ -12,17 +12,17 @@ public enum JDBCQueryStatus {
         this.value = value;
     }
 
-    public TJDBCQueryStatus asTJDBCQueryStatus() {
-        if (this.value == 0) {
-            return TJDBCQueryStatus.OK;
-        }
-        return TJDBCQueryStatus.FAILED;
-    }
-
     public static JDBCQueryStatus parseFromTJDBCQueryStatus(TJDBCQueryStatus tjdbcQueryStatus) {
         if (tjdbcQueryStatus == TJDBCQueryStatus.OK) {
             return JDBCQueryStatus.OK;
         }
         return JDBCQueryStatus.FAILED;
+    }
+
+    public TJDBCQueryStatus asTJDBCQueryStatus() {
+        if (this.value == 0) {
+            return TJDBCQueryStatus.OK;
+        }
+        return TJDBCQueryStatus.FAILED;
     }
 }
