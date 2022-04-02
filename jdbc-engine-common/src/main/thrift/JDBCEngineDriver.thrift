@@ -17,5 +17,10 @@ service JDBCEngineDriverService {
     /**
      *  add catalog
      **/
-     bool addCatalog(1: TJDBCEngineStruct.TJDBCCatalog jdbcCatalog)
+     bool addCatalog(1: TJDBCEngineStruct.TJDBCCatalog jdbcCatalog),
+
+     /**
+      * 数据查询
+      **/
+     TJDBCEngineStruct.TJDBCResultRef query(1: string querySQL)
 }

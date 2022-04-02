@@ -48,7 +48,7 @@ public class ExecutorClientTest {
         public JDBCResultRef call() {
             JDBCEngineExecutorRef engineExecutorRef = JDBCEngineExecutorRef.builder()
                     .executorRefId(UUID.randomUUID())
-                    .host("192.168.66.75")
+                    .host("127.0.0.1")
                     .port(8889)
                     .build();
             String querySQL = "select * from tx_dev.bd_center_center_month;";
