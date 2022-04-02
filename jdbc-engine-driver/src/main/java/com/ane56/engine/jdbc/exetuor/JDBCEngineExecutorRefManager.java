@@ -74,8 +74,8 @@ public class JDBCEngineExecutorRefManager {
      * @return
      */
     public UUID pickupUUID() {
-        return simpleLoadBalancePickup();
-//        return randomPickup();
+//        return simpleLoadBalancePickup();
+        return randomPickup();
     }
 
     private UUID randomPickup() {
