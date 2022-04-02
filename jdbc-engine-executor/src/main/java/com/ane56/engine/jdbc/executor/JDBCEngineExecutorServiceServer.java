@@ -4,7 +4,6 @@ import com.ane56.engine.jdbc.driver.JDBCEngineDriverServiceClientManager;
 import com.ane56.engine.jdbc.executor.impl.JDBCEngineExecutorServiceImpl;
 import com.ane56.engine.jdbc.executor.pool.connection.PooledDataSourceManager;
 import com.ane56.engine.jdbc.model.JDBCCatalog;
-import com.ane56.engine.jdbc.model.JDBCEngineExecutorRef;
 import com.ane56.engine.jdbc.model.thrift.JDBCEngineDriverServiceClientSuite;
 import com.ane56.engine.jdbc.thrit.service.JDBCEngineDriverService;
 import com.ane56.engine.jdbc.thrit.service.JDBCEngineExecutorService;
@@ -42,6 +41,7 @@ import java.util.concurrent.TimeUnit;
 @NoArgsConstructor
 public class JDBCEngineExecutorServiceServer {
     private static final int retryTimes = 3;
+    private static final UUID ENGINE_REF_ID = UUID.randomUUID();
     private static volatile JDBCEngineExecutorServiceServer singleton;
     private String driverHost;
     private int driverPort;
@@ -50,7 +50,6 @@ public class JDBCEngineExecutorServiceServer {
     private PooledDataSourceManager pooledDataSourceManager;
     private ScheduledExecutorService heartBeatExecutorService;
     private ScheduledExecutorService refreshCatalogExecutorService;
-    private static final UUID ENGINE_REF_ID=UUID.randomUUID();
 
     /**
      * 构造方法
@@ -79,7 +78,7 @@ public class JDBCEngineExecutorServiceServer {
             synchronized (JDBCEngineExecutorServiceServer.class) {
                 if (singleton == null) {
                     // TODO 关闭随机端口
-                    singleton = new JDBCEngineExecutorServiceServer("127.0.0.1", 8888, 8889); //Math.abs(new Random().nextInt()) % 10000 + 5000);
+                    singleton = new JDBCEngineExecutorServiceServer("127.0.0.1", 8888, Math.abs(new Random().nextInt()) % 10000 + 5000);
                 }
             }
         }

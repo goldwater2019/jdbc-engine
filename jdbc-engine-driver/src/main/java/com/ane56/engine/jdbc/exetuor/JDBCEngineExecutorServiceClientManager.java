@@ -11,7 +11,6 @@ import com.ane56.engine.jdbc.thrit.struct.TJDBCResultRef;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TCompactProtocol;
@@ -126,7 +125,6 @@ public class JDBCEngineExecutorServiceClientManager {
         startTime = System.currentTimeMillis();
         TJDBCResultRef tjdbcResultRef = client.query(jdbcOperationRef.asTJDBCOperationRef());
         log.info("client query costs: " + (System.currentTimeMillis() - startTime));
-        startTime = System.currentTimeMillis();
         JDBCResultRef jdbcResultRef = JDBCResultRef.parseFromTJDBCResultRef(tjdbcResultRef);
         close(tTransport);
         jdbcEngineExecutorRefManager.accessJDBCEngineRef(jdbcEngineExecutorRef);  // 更新最新的接入时间

@@ -16,7 +16,6 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TException;
 
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.SQLException;
@@ -68,7 +67,7 @@ public class JDBCEngineExecutorServiceImpl implements JDBCEngineExecutorService.
             jdbcResultSet = pooledDataSourceManager.query(jdbcOperationRef.getCatalogName(), jdbcOperationRef.getSqlStatement());
         } catch (SQLException e) {
             operationRef.setQueryStatus(JDBCQueryStatus.FAILED);
-            StringWriter   sw=new StringWriter();
+            StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw, true));
             operationRef.setMessage(sw.toString());  // TODO 更详细的错误收集
         }

@@ -74,7 +74,8 @@ public class JDBCEngineExecutorRefManager {
      * @return
      */
     public UUID pickupUUID() {
-        return randomPickup();
+        return simpleLoadBalancePickup();
+//        return randomPickup();
     }
 
     private UUID randomPickup() {
@@ -89,6 +90,21 @@ public class JDBCEngineExecutorRefManager {
             index += 1;
         }
         return null;
+    }
+
+    public UUID simpleLoadBalancePickup() {
+        long currentTimeMillis = System.currentTimeMillis();
+        long maxIdleTime = 0;
+        UUID pickedUpUUID = null;
+        for (Map.Entry<UUID, JDBCEngineExecutorRef> uuidjdbcEngineExecutorRefEntry : uuid2jdbcEngineExecutorRefs.entrySet()) {
+            JDBCEngineExecutorRef uuidjdbcEngineExecutorRefEntryValue = uuidjdbcEngineExecutorRefEntry.getValue();
+            long lastAccessTime = uuidjdbcEngineExecutorRefEntryValue.getLastAccessTime();
+            if (maxIdleTime < lastAccessTime - currentTimeMillis) {
+                pickedUpUUID = uuidjdbcEngineExecutorRefEntry.getKey();
+                maxIdleTime = lastAccessTime - currentTimeMillis;
+            }
+        }
+        return pickedUpUUID;
     }
 
 

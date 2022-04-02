@@ -35,8 +35,7 @@ public class JDBCResultRef {
         tjdbcResultRef.setOperationRef(jdbcOperationRef.asTJDBCOperationRef());
         if (jdbcOperationRef.getQueryStatus() == JDBCQueryStatus.FAILED) {
             tjdbcResultRef.setResultSet(null);
-        }
-        else {
+        } else {
             tjdbcResultRef.setResultSet(jdbcResultSet.asTJDBCResultSet());
         }
         return tjdbcResultRef;
