@@ -35,17 +35,17 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.jmeter</groupId>
-            <artifactId>ApacheJMeter_core</artifactId>
-            <version>5.4.3</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.apache.jmeter</groupId>-->
+<!--            <artifactId>ApacheJMeter_core</artifactId>-->
+<!--            <version>5.4.3</version>-->
+<!--        </dependency>-->
 
-        <dependency>
-            <groupId>org.apache.jmeter</groupId>
-            <artifactId>ApacheJMeter_java</artifactId>
-            <version>5.4.3</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.apache.jmeter</groupId>-->
+<!--            <artifactId>ApacheJMeter_java</artifactId>-->
+<!--            <version>5.4.3</version>-->
+<!--        </dependency>-->
 
         <!-- slf4j -->
         <dependency>
@@ -191,7 +191,7 @@
                     <!-- MainClass in mainfest make a executable jar -->
                     <archive>
                         <manifest>
-                            <mainClass>com.ane56.engine.jdbc.jmeter.JDBCEngineExecutorQueryJMeter</mainClass>
+                            <mainClass>com.ane56.engine.jdbc.driver.JDBCEngineDriverServiceServer</mainClass>
                         </manifest>
                         <!--                        本地调试时注释-->
                         <!--                        &lt;!&ndash; (配置文件外置目录) &ndash;&gt;-->
