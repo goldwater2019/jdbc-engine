@@ -96,7 +96,7 @@ public class JDBCEngineDriverServiceClientManager {
     }
 
 
-    public JDBCEngineDriverServiceClientSuite getAvailableClient() throws InterruptedException {
+    public JDBCEngineDriverServiceClientSuite innerGetAvailableClient() throws InterruptedException {
         //使用非阻塞方式，按块的大小进行传输，类似于Java中的NIO。记得调用close释放资源
         try {
             TTransport transport = new TFramedTransport(new TSocket(driverHost, driverPort, timeout));
@@ -112,5 +112,25 @@ public class JDBCEngineDriverServiceClientManager {
             e.printStackTrace();
         }
         return null;
+    }
+
+
+    public JDBCEngineDriverServiceClientSuite getAvailableClient(){
+        int errorCnt = 0;
+        boolean isError = true;
+        JDBCEngineDriverServiceClientSuite jdbcEngineDriverServiceClientSuite = null;
+        while (isError) {
+            try {
+                jdbcEngineDriverServiceClientSuite = innerGetAvailableClient();
+                isError = false;
+            } catch (InterruptedException e) {
+                errorCnt += 1;
+                if (errorCnt == 3) {
+                    e.printStackTrace();
+                    break;
+                }
+            }
+        }
+        return jdbcEngineDriverServiceClientSuite;
     }
 }

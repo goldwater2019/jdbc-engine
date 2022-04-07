@@ -149,6 +149,9 @@ public class JDBCEngineExecutorServiceServer {
             JDBCEngineDriverServiceClientSuite availableClient = null;
             try {
                 availableClient = jdbcEngineDriverServiceClientManager.getAvailableClient();
+                if (availableClient == null) {
+                    throw new InterruptedException("get availed client failed, failed more then 3 times");
+                }
                 JDBCEngineDriverService.Client client = availableClient.getClient();
                 TTransport tTransport = availableClient.getTTransport();
                 TJDBCEngineExecutor tJdbcEngineExecutor = new TJDBCEngineExecutor();
@@ -190,6 +193,9 @@ public class JDBCEngineExecutorServiceServer {
                 }
                 pooledDataSourceManager.checkDataSources();
                 jdbcEngineDriverServiceClientManager.close(tTransport);
+                if (availableClient == null) {
+                    throw new InterruptedException("get availed client failed, failed more then 3 times");
+                }
             } catch (InterruptedException | TException e) {
                 e.printStackTrace();
             }

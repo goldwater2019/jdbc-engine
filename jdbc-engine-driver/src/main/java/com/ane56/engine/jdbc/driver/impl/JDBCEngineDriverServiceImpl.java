@@ -31,9 +31,9 @@ public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService.Ifac
         long startTime = System.currentTimeMillis();
         checkInitialStatus();
         boolean result = jdbcEngineExecutorRefManager.heartbeat(jdbcEngineExecutor);
-        log.info("heartBeat : " + (System.currentTimeMillis() - startTime) + " ms, body: " + jdbcEngineExecutorRefManager.getUuid2jdbcEngineExecutorRefs().get(
-                UUID.fromString(jdbcEngineExecutor.getExecutorRefId())
-        ));
+//        log.info("heartBeat : " + (System.currentTimeMillis() - startTime) + " ms, body: " + jdbcEngineExecutorRefManager.getUuid2jdbcEngineExecutorRefs().get(
+//                UUID.fromString(jdbcEngineExecutor.getExecutorRefId())
+//        ));
         return result;
     }
 
@@ -48,7 +48,7 @@ public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService.Ifac
         long startTime = System.currentTimeMillis();
         checkInitialStatus();
         List<TJDBCCatalog> result = jdbcCatalogManager.getCatalogs();
-        log.info("getCatalogs : " + (System.currentTimeMillis() - startTime) + " ms");
+//        log.info("getCatalogs : " + (System.currentTimeMillis() - startTime) + " ms");
         return result;
     }
 
@@ -73,7 +73,7 @@ public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService.Ifac
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        log.info(jdbcResultRef.toString());
+//        log.info(jdbcResultRef.toString());
         log.info("duration: " + (jdbcResultRef.getJdbcOperationRef().getEndTime() - jdbcResultRef.getJdbcOperationRef().getStartTime()));
         return jdbcResultRef.asTJDBCResultRef();
     }

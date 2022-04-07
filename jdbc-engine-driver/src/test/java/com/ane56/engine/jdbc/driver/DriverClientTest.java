@@ -29,15 +29,11 @@ public class DriverClientTest {
     public void testDriverQuery() throws InterruptedException, TException, ExecutionException {
         long startTime = System.currentTimeMillis();
         ExecutorService executorService = Executors.newFixedThreadPool(32);
-        int maxIterationNum = 1000;
-        List<Future<JDBCResultRef>> jdbcResultRefFeatureList = new LinkedList<>();
+        int maxIterationNum = 10000;
         for (int i = 0; i < maxIterationNum; i++) {
-            Future<JDBCResultRef> jdbcResultRefFuture = executorService.submit(new AsyncQuery());
-            jdbcResultRefFeatureList.add(jdbcResultRefFuture);
+            executorService.submit(new SyncQuery());
         }
-        for (Future<JDBCResultRef> jdbcResultRefFuture : jdbcResultRefFeatureList) {
-            JDBCResultRef jdbcResultRef = jdbcResultRefFuture.get();
-        }
+        Thread.sleep(100000L);
         System.out.println(System.currentTimeMillis() - startTime);
     }
 
@@ -50,6 +46,9 @@ public class DriverClientTest {
             JDBCResultRef jdbcResultRef = null;
             try {
                 JDBCEngineDriverServiceClientSuite availableClient = jdbcEngineDriverServiceClientManager.getAvailableClient();
+                if (availableClient == null) {
+                    throw new InterruptedException("get available client suite failed 3 times");
+                }
                 JDBCEngineDriverService.Client client = availableClient.getClient();
                 jdbcResultRef = JDBCResultRef.parseFromTJDBCResultRef(client.query(querySQL));
                 log.info(jdbcResultRef.toString());
@@ -61,6 +60,31 @@ public class DriverClientTest {
                 e.printStackTrace();
             }
             return jdbcResultRef;
+        }
+    }
+
+    public class SyncQuery implements Runnable {
+
+        @Override
+        public void run() {
+            String querySQL = "select * from tx_dev.bd_center_center_month;";
+//            String querySQL = "";
+            JDBCResultRef jdbcResultRef = null;
+            try {
+                JDBCEngineDriverServiceClientSuite availableClient = jdbcEngineDriverServiceClientManager.getAvailableClient();
+                if (availableClient == null) {
+                    throw new InterruptedException("get available client suite failed 3 times");
+                }
+                JDBCEngineDriverService.Client client = availableClient.getClient();
+                jdbcResultRef = JDBCResultRef.parseFromTJDBCResultRef(client.query(querySQL));
+                log.info(jdbcResultRef.toString());
+                log.info("duration: " + (jdbcResultRef.getJdbcOperationRef().getEndTime() - jdbcResultRef.getJdbcOperationRef().getStartTime()));
+                jdbcEngineDriverServiceClientManager.close(availableClient.getTTransport());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (TException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
