@@ -14,3 +14,9 @@ fi
 cp jdbc-engine-common/target/*-jar-with-dependencies.jar jar/jdbc-engine-common.jar
 cp jdbc-engine-driver/target/*-jar-with-dependencies.jar jar/jdbc-engine-driver.jar
 cp jdbc-engine-executor/target/*-jar-with-dependencies.jar jar/jdbc-engine-executor.jar
+
+if [ ! -d "target/" ];then
+  mkdir target
+fi
+
+tar -zcvf target/jdbc-engine.tgz ../jdbc-engine/bin ../jdbc-engine/jar
