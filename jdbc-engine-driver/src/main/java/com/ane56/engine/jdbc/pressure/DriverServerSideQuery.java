@@ -2,9 +2,11 @@ package com.ane56.engine.jdbc.pressure;
 
 import com.ane56.engine.jdbc.client.JDBCEngineDriverServiceClientManager;
 import com.ane56.engine.jdbc.config.JDBCEngineConfig;
+import com.ane56.engine.jdbc.model.JDBCCatalog;
 import com.ane56.engine.jdbc.model.JDBCResultRef;
 import com.ane56.engine.jdbc.model.thrift.JDBCEngineDriverServiceClientSuite;
 import com.ane56.engine.jdbc.thrit.service.JDBCEngineDriverService;
+import com.ane56.engine.jdbc.thrit.struct.TJDBCCatalog;
 import com.ane56.engine.jdbc.utils.PathUtils;
 import com.ane56.engine.jdbc.utils.ZkUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +14,6 @@ import org.apache.thrift.TException;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.*;
 
@@ -35,7 +36,19 @@ public class DriverServerSideQuery {
         for (String childPath : childrenUnderZNodePath) {
             System.out.println(childPath);
         }
-        Thread.sleep(10000L);
+
+        if (jdbcEngineDriverServiceClientManager == null) {
+            jdbcEngineDriverServiceClientManager = JDBCEngineDriverServiceClientManager.getInstance();
+        }
+
+        JDBCEngineDriverServiceClientSuite availableClientV2 = jdbcEngineDriverServiceClientManager.getAvailableClientV2();
+        JDBCEngineDriverService.Client v2Client = availableClientV2.getClient();
+        List<TJDBCCatalog> catalogs = v2Client.getCatalogs();
+        for (TJDBCCatalog catalog : catalogs) {
+            log.info("catalog: " + JDBCCatalog.parseFromTJDBCCatalog(catalog));
+        }
+        jdbcEngineDriverServiceClientManager.close(availableClientV2.getTTransport());
+
         log.info("close zk client");
         zkUtils.changeRunningStatus(false);
     }

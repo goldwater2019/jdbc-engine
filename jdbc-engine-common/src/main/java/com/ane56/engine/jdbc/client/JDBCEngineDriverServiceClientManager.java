@@ -1,9 +1,12 @@
 package com.ane56.engine.jdbc.client;
 
+import com.ane56.engine.jdbc.config.JDBCEngineConfig;
+import com.ane56.engine.jdbc.exception.JDBCEngineException;
 import com.ane56.engine.jdbc.model.JDBCEngineExecutorRef;
 import com.ane56.engine.jdbc.model.thrift.JDBCEngineDriverServiceClientSuite;
 import com.ane56.engine.jdbc.thrit.service.JDBCEngineDriverService;
 import com.ane56.engine.jdbc.thrit.struct.TJDBCCatalog;
+import com.ane56.engine.jdbc.utils.ZkUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,11 +28,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 @Builder
 public class JDBCEngineDriverServiceClientManager {
     private static volatile JDBCEngineDriverServiceClientManager singleton;
-    Map<JDBCEngineDriverService.Client, TTransport> client2tTransport;
 
     private int driverPort;
     private String driverHost;
@@ -41,16 +42,28 @@ public class JDBCEngineDriverServiceClientManager {
         setDriverPort(driverPort);
         setDriverHost(driverHost);
         setTimeout(timeout);
-        if (client2tTransport == null) {
-            client2tTransport = new ConcurrentHashMap<>();
+    }
+
+    public JDBCEngineDriverServiceClientManager() {
+        setTimeout(JDBCEngineConfig.jdbcEngineDriverTimeout);
+    }
+
+    public static JDBCEngineDriverServiceClientManager getInstance() {
+        if (singleton == null) {
+            synchronized (JDBCEngineDriverServiceClientManager.class) {
+                if (singleton == null) {
+                    singleton = new JDBCEngineDriverServiceClientManager();
+                }
+            }
         }
+        return singleton;
     }
 
     public static JDBCEngineDriverServiceClientManager getInstance(String driverHost, int driverPort) {
         if (singleton == null) {
             synchronized (JDBCEngineDriverServiceClientManager.class) {
                 if (singleton == null) {
-                    singleton = new JDBCEngineDriverServiceClientManager(driverHost, driverPort, 10 * 1000, 8);
+                    singleton = new JDBCEngineDriverServiceClientManager();
                 }
             }
         }
@@ -142,10 +155,34 @@ public class JDBCEngineDriverServiceClientManager {
 
     /**
      * 1. 使用ZkUtils 获得可用的driver端的host和port
+     * 2. 选举一个driverUri
+     * 3. 创建一个client
      * @return
      */
-    public JDBCEngineDriverServiceClientSuite getAvailableClientV2() {
-       return null;
+    public JDBCEngineDriverServiceClientSuite getAvailableClientV2() throws Exception {
+       // 1. 获得可用的driver的列表
+        List<String> availableDriverUris = ZkUtils.getInstance(JDBCEngineConfig.haZookeeperQuorum).getAvailableDriverUris();
+        // 2. 获得可用的driver uri, e.g. 127.0.0.1:8080
+        String driverUri = pickupOneUri(availableDriverUris);
+        String[] split = driverUri.split(":");
+        String driverHost  =split[0];
+        int driverPort = Integer.parseInt(split[1]);
+        return innerGetAvailableClientV2(driverHost, driverPort);
+    }
+
+    /**
+     * 从多分driveUri中选举一个作为provider
+     * @param availableDriverUris
+     * @return
+     * @throws JDBCEngineException
+     */
+    private String pickupOneUri(List<String> availableDriverUris) throws JDBCEngineException {
+        if (availableDriverUris == null || availableDriverUris.isEmpty()) {
+            throw new JDBCEngineException("no driver uri avaiable");
+        }
+        Random random = new Random();
+        int index = Math.abs(random.nextInt()) % availableDriverUris.size();
+        return availableDriverUris.get(index);
     }
 
 

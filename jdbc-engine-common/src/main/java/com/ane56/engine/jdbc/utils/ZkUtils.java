@@ -1,5 +1,6 @@
 package com.ane56.engine.jdbc.utils;
 
+import com.ane56.engine.jdbc.config.JDBCEngineConfig;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.curator.framework.CuratorFramework;
@@ -136,5 +137,16 @@ public class ZkUtils {
             children.add(p);
         }
         return children;
+    }
+
+    /**
+     * 获得可用的driver端的连接信息列表
+     * @return
+     * @throws Exception
+     */
+    public List<String> getAvailableDriverUris() throws Exception {
+        changeRunningStatus(true);
+        List<String> childrenUnderZNodePath = getChildrenUnderZNodePath(JDBCEngineConfig.haZookeeperDriverUriPath);
+        return childrenUnderZNodePath;
     }
 }

@@ -7,4 +7,6 @@ public class JDBCEngineConfig {
     public static String haZookeeperQuorum = "10.10.106.102:2181";
 
     public static String haZookeeperDriverUriPath = "/engine/jdbc/driver/uri";
+
+    public static int jdbcEngineDriverTimeout = 10000;
 }
