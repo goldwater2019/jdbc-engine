@@ -10,7 +10,6 @@ import com.ane56.engine.jdbc.thrit.struct.TJDBCCatalog;
 import com.ane56.engine.jdbc.utils.PathUtils;
 import com.ane56.engine.jdbc.utils.ZkUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.thrift.TException;
 
 import java.util.LinkedList;
 import java.util.List;

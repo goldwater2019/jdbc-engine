@@ -2,7 +2,6 @@ package com.ane56.engine.jdbc.executor;
 
 
 import com.ane56.engine.jdbc.client.JDBCEngineExecutorServiceClientManager;
-import com.ane56.engine.jdbc.model.JDBCEngineExecutorRef;
 import com.ane56.engine.jdbc.model.JDBCResultRef;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TException;
@@ -11,7 +10,6 @@ import org.junit.Test;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.*;
 
 @Slf4j

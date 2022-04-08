@@ -52,7 +52,6 @@ public class JDBCEngineExecutorServiceServer {
 
     /**
      * 构造方法
-     *
      */
     private JDBCEngineExecutorServiceServer(int servicePort) {
         setServicePort(servicePort);
@@ -62,7 +61,6 @@ public class JDBCEngineExecutorServiceServer {
     /**
      * 单例方法
      * TODO 自增端口
-     *
      */
     public static JDBCEngineExecutorServiceServer getInstance() {
         if (singleton == null) {

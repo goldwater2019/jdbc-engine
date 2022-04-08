@@ -4,7 +4,6 @@ import com.ane56.engine.jdbc.catalog.JDBCCatalogManager;
 import com.ane56.engine.jdbc.client.JDBCEngineExecutorRefManager;
 import com.ane56.engine.jdbc.client.JDBCEngineExecutorServiceClientManager;
 import com.ane56.engine.jdbc.model.JDBCCatalog;
-import com.ane56.engine.jdbc.model.JDBCEngineExecutorRef;
 import com.ane56.engine.jdbc.model.JDBCResultRef;
 import com.ane56.engine.jdbc.thrit.service.JDBCEngineDriverService;
 import com.ane56.engine.jdbc.thrit.struct.TJDBCCatalog;

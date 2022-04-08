@@ -75,6 +75,7 @@ public class ZkUtils {
 
     /**
      * 创建临时有序的节点
+     *
      * @param zNodePath
      * @param message
      * @throws Exception
@@ -89,6 +90,7 @@ public class ZkUtils {
 
     /**
      * 创建临时节点
+     *
      * @param zNodePath
      * @throws Exception
      */
@@ -98,6 +100,7 @@ public class ZkUtils {
 
     /**
      * 创建临时节点
+     *
      * @param zNodePath
      * @param message
      * @throws Exception
@@ -141,6 +144,7 @@ public class ZkUtils {
 
     /**
      * 获得可用的driver端的连接信息列表
+     *
      * @return
      * @throws Exception
      */
@@ -153,6 +157,7 @@ public class ZkUtils {
 
     /**
      * 获得可用的executor端的连接信息
+     *
      * @return
      * @throws Exception
      */

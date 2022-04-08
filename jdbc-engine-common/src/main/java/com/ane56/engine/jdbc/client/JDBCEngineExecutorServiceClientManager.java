@@ -3,7 +3,6 @@ package com.ane56.engine.jdbc.client;
 import com.ane56.engine.jdbc.config.JDBCEngineConfig;
 import com.ane56.engine.jdbc.enumeration.JDBCQueryStatus;
 import com.ane56.engine.jdbc.exception.JDBCEngineException;
-import com.ane56.engine.jdbc.model.JDBCEngineExecutorRef;
 import com.ane56.engine.jdbc.model.JDBCOperationRef;
 import com.ane56.engine.jdbc.model.JDBCResultRef;
 import com.ane56.engine.jdbc.model.thrift.JDBCEngineExecutorServiceClientSuite;
@@ -72,6 +71,7 @@ public class JDBCEngineExecutorServiceClientManager {
 
     /**
      * 选择一个合适的uri作为实际连接的executorUri
+     *
      * @param availableExecutorUris
      * @return
      * @throws JDBCEngineException
@@ -124,8 +124,8 @@ public class JDBCEngineExecutorServiceClientManager {
 
 
     /**
-     * @param catalogName           : 待查询的catalogName
-     * @param querySQL              : 执行的SQL
+     * @param catalogName : 待查询的catalogName
+     * @param querySQL    : 执行的SQL
      * @return
      * @throws InterruptedException
      * @throws TException
