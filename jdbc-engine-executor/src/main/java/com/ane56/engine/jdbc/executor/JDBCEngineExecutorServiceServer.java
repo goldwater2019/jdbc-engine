@@ -1,6 +1,6 @@
 package com.ane56.engine.jdbc.executor;
 
-import com.ane56.engine.jdbc.driver.JDBCEngineDriverServiceClientManager;
+import com.ane56.engine.jdbc.client.JDBCEngineDriverServiceClientManager;
 import com.ane56.engine.jdbc.executor.impl.JDBCEngineExecutorServiceImpl;
 import com.ane56.engine.jdbc.executor.pool.connection.PooledDataSourceManager;
 import com.ane56.engine.jdbc.model.JDBCCatalog;
