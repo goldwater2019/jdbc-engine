@@ -4,3 +4,12 @@
 **/*.iml
 
 jar/*
+
+logs
+logs/**
+
+pid
+pid/**
+
+target
+target/**
