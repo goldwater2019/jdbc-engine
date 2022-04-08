@@ -53,17 +53,17 @@ public class DriverServerSideQuery {
     }
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
-        String driverHost = null;
-        Integer driverPort = null;
+//        String driverHost = null;
+//        Integer driverPort = null;
         Integer maxIterationNum = null;
         Integer threadNum = null;
         for (String arg : args) {
-            if (arg.startsWith("--driverHost")) {
-                driverHost = arg.trim().split("=")[1];
-            }
-            if (arg.startsWith("--driverPort")) {
-                driverPort = Integer.parseInt(arg.trim().split("=")[1]);
-            }
+//            if (arg.startsWith("--driverHost")) {
+//                driverHost = arg.trim().split("=")[1];
+//            }
+//            if (arg.startsWith("--driverPort")) {
+//                driverPort = Integer.parseInt(arg.trim().split("=")[1]);
+//            }
             if (arg.startsWith("--maxIterationNum")) {
                 maxIterationNum = Integer.parseInt(arg.trim().split("=")[1]);
             }
@@ -71,12 +71,12 @@ public class DriverServerSideQuery {
                 threadNum = Integer.parseInt(arg.trim().split("=")[1]);
             }
         }
-        if (driverHost == null) {
-            driverHost = "127.0.0.1";
-        }
-        if (driverPort == null) {
-            driverPort = 8888;
-        }
+//        if (driverHost == null) {
+//            driverHost = "127.0.0.1";
+//        }
+//        if (driverPort == null) {
+//            driverPort = 8888;
+//        }
         if (maxIterationNum == null) {
             maxIterationNum = 1000;
         }
@@ -84,8 +84,8 @@ public class DriverServerSideQuery {
             threadNum = 32;
         }
 
-        log.info("driver host: " + driverHost);
-        log.info("driver port: " + driverPort);
+//        log.info("driver host: " + driverHost);
+//        log.info("driver port: " + driverPort);
         log.info("max iteration num: " + maxIterationNum);
         log.info("thread num: " + threadNum);
 
