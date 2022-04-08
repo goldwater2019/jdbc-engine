@@ -23,7 +23,7 @@ public class DriverClientTest {
     @Before
     public void beforeTest() {
         if (jdbcEngineDriverServiceClientManager == null) {
-            jdbcEngineDriverServiceClientManager = JDBCEngineDriverServiceClientManager.getInstance("127.0.0.1", 8888);
+            jdbcEngineDriverServiceClientManager = JDBCEngineDriverServiceClientManager.getInstance();
         }
     }
 
@@ -58,7 +58,7 @@ public class DriverClientTest {
                 jdbcEngineDriverServiceClientManager.close(availableClient.getTTransport());
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            } catch (TException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             return jdbcResultRef;
@@ -84,7 +84,7 @@ public class DriverClientTest {
                 jdbcEngineDriverServiceClientManager.close(availableClient.getTTransport());
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            } catch (TException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

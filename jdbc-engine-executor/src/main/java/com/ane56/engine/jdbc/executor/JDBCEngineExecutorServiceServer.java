@@ -98,7 +98,7 @@ public class JDBCEngineExecutorServiceServer {
      */
     private void checkInitialStatus() {
         if (jdbcEngineDriverServiceClientManager == null) {
-            jdbcEngineDriverServiceClientManager = JDBCEngineDriverServiceClientManager.getInstance(driverHost, driverPort);
+            jdbcEngineDriverServiceClientManager = JDBCEngineDriverServiceClientManager.getInstance();
         }
         if (pooledDataSourceManager == null) {
             pooledDataSourceManager = PooledDataSourceManager.getInstance();
@@ -163,7 +163,7 @@ public class JDBCEngineExecutorServiceServer {
 //                log.info("calling heartBeat interface: " + JDBCEngineExecutorRef.parseFromTJDBCEngineDriver(tJdbcEngineExecutor));
 
                 jdbcEngineDriverServiceClientManager.close(tTransport);
-            } catch (InterruptedException | TException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -196,7 +196,7 @@ public class JDBCEngineExecutorServiceServer {
                 if (availableClient == null) {
                     throw new InterruptedException("get availed client failed, failed more then 3 times");
                 }
-            } catch (InterruptedException | TException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

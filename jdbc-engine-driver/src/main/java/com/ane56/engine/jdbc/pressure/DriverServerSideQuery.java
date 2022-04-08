@@ -41,7 +41,7 @@ public class DriverServerSideQuery {
             jdbcEngineDriverServiceClientManager = JDBCEngineDriverServiceClientManager.getInstance();
         }
 
-        JDBCEngineDriverServiceClientSuite availableClientV2 = jdbcEngineDriverServiceClientManager.getAvailableClientV2();
+        JDBCEngineDriverServiceClientSuite availableClientV2 = jdbcEngineDriverServiceClientManager.getAvailableClient();
         JDBCEngineDriverService.Client v2Client = availableClientV2.getClient();
         List<TJDBCCatalog> catalogs = v2Client.getCatalogs();
         for (TJDBCCatalog catalog : catalogs) {
@@ -91,7 +91,7 @@ public class DriverServerSideQuery {
         log.info("thread num: " + threadNum);
 
         if (jdbcEngineDriverServiceClientManager == null) {
-            jdbcEngineDriverServiceClientManager = JDBCEngineDriverServiceClientManager.getInstance(driverHost, driverPort);
+            jdbcEngineDriverServiceClientManager = JDBCEngineDriverServiceClientManager.getInstance();
         }
 
         long startTime = System.currentTimeMillis();
@@ -130,9 +130,7 @@ public class DriverServerSideQuery {
                 log.info(jdbcResultRef.toString());
                 log.info("duration: " + (jdbcResultRef.getJdbcOperationRef().getEndTime() - jdbcResultRef.getJdbcOperationRef().getStartTime()));
                 jdbcEngineDriverServiceClientManager.close(availableClient.getTTransport());
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (TException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             return jdbcResultRef;
