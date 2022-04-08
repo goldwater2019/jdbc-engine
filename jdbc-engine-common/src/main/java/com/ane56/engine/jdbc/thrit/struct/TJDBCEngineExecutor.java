@@ -108,7 +108,9 @@ public class TJDBCEngineExecutor implements org.apache.thrift.TBase<TJDBCEngineE
         this.host = null;
     }
 
-    /** Returns true if field host is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field host is set (has been assigned a value) and false otherwise
+     */
     public boolean isSetHost() {
         return this.host != null;
     }
@@ -133,7 +135,9 @@ public class TJDBCEngineExecutor implements org.apache.thrift.TBase<TJDBCEngineE
         __isset_bitfield = org.apache.thrift.EncodingUtils.clearBit(__isset_bitfield, __PORT_ISSET_ID);
     }
 
-    /** Returns true if field port is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field port is set (has been assigned a value) and false otherwise
+     */
     public boolean isSetPort() {
         return org.apache.thrift.EncodingUtils.testBit(__isset_bitfield, __PORT_ISSET_ID);
     }
@@ -156,7 +160,9 @@ public class TJDBCEngineExecutor implements org.apache.thrift.TBase<TJDBCEngineE
         this.prefix = null;
     }
 
-    /** Returns true if field prefix is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field prefix is set (has been assigned a value) and false otherwise
+     */
     public boolean isSetPrefix() {
         return this.prefix != null;
     }
@@ -181,7 +187,9 @@ public class TJDBCEngineExecutor implements org.apache.thrift.TBase<TJDBCEngineE
         this.executorRefId = null;
     }
 
-    /** Returns true if field executorRefId is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field executorRefId is set (has been assigned a value) and false otherwise
+     */
     public boolean isSetExecutorRefId() {
         return this.executorRefId != null;
     }
@@ -248,7 +256,9 @@ public class TJDBCEngineExecutor implements org.apache.thrift.TBase<TJDBCEngineE
         throw new java.lang.IllegalStateException();
     }
 
-    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise
+     */
     public boolean isSet(_Fields field) {
         if (field == null) {
             throw new java.lang.IllegalArgumentException();
@@ -463,7 +473,9 @@ public class TJDBCEngineExecutor implements org.apache.thrift.TBase<TJDBCEngineE
         }
     }
 
-    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    /**
+     * The set of fields this struct contains, along with convenience methods for finding and manipulating them.
+     */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
         HOST((short) 1, "host"),
         PORT((short) 2, "port"),

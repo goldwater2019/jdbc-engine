@@ -84,7 +84,9 @@ public class TJDBCResultRef implements org.apache.thrift.TBase<TJDBCResultRef, T
         this.resultSet = null;
     }
 
-    /** Returns true if field resultSet is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field resultSet is set (has been assigned a value) and false otherwise
+     */
     public boolean isSetResultSet() {
         return this.resultSet != null;
     }
@@ -109,7 +111,9 @@ public class TJDBCResultRef implements org.apache.thrift.TBase<TJDBCResultRef, T
         this.operationRef = null;
     }
 
-    /** Returns true if field operationRef is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field operationRef is set (has been assigned a value) and false otherwise
+     */
     public boolean isSetOperationRef() {
         return this.operationRef != null;
     }
@@ -154,7 +158,9 @@ public class TJDBCResultRef implements org.apache.thrift.TBase<TJDBCResultRef, T
         throw new java.lang.IllegalStateException();
     }
 
-    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise
+     */
     public boolean isSet(_Fields field) {
         if (field == null) {
             throw new java.lang.IllegalArgumentException();
@@ -313,7 +319,9 @@ public class TJDBCResultRef implements org.apache.thrift.TBase<TJDBCResultRef, T
         }
     }
 
-    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    /**
+     * The set of fields this struct contains, along with convenience methods for finding and manipulating them.
+     */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
         RESULT_SET((short) 1, "resultSet"),
         OPERATION_REF((short) 2, "operationRef");

@@ -1,5 +1,4 @@
-package com.ane56.engine.jdbc.exetuor;
-
+package com.ane56.engine.jdbc.client;
 
 import com.ane56.engine.jdbc.enumeration.JDBCQueryStatus;
 import com.ane56.engine.jdbc.model.JDBCEngineExecutorRef;

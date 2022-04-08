@@ -59,7 +59,6 @@ public class TJDBCOperationRef implements org.apache.thrift.TBase<TJDBCOperation
     public @org.apache.thrift.annotation.Nullable
     TJDBCResultSet tJDBCResultSet; // required
     /**
-     *
      * @see com.ane56.engine.jdbc.thrit.enumeration.TJDBCQueryStatus
      */
     public @org.apache.thrift.annotation.Nullable
@@ -156,7 +155,9 @@ public class TJDBCOperationRef implements org.apache.thrift.TBase<TJDBCOperation
         __isset_bitfield = org.apache.thrift.EncodingUtils.clearBit(__isset_bitfield, __STARTTIME_ISSET_ID);
     }
 
-    /** Returns true if field startTime is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field startTime is set (has been assigned a value) and false otherwise
+     */
     public boolean isSetStartTime() {
         return org.apache.thrift.EncodingUtils.testBit(__isset_bitfield, __STARTTIME_ISSET_ID);
     }
@@ -179,7 +180,9 @@ public class TJDBCOperationRef implements org.apache.thrift.TBase<TJDBCOperation
         __isset_bitfield = org.apache.thrift.EncodingUtils.clearBit(__isset_bitfield, __ENDTIME_ISSET_ID);
     }
 
-    /** Returns true if field endTime is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field endTime is set (has been assigned a value) and false otherwise
+     */
     public boolean isSetEndTime() {
         return org.apache.thrift.EncodingUtils.testBit(__isset_bitfield, __ENDTIME_ISSET_ID);
     }
@@ -202,7 +205,9 @@ public class TJDBCOperationRef implements org.apache.thrift.TBase<TJDBCOperation
         this.catalogName = null;
     }
 
-    /** Returns true if field catalogName is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field catalogName is set (has been assigned a value) and false otherwise
+     */
     public boolean isSetCatalogName() {
         return this.catalogName != null;
     }
@@ -227,7 +232,9 @@ public class TJDBCOperationRef implements org.apache.thrift.TBase<TJDBCOperation
         this.operationRefId = null;
     }
 
-    /** Returns true if field operationRefId is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field operationRefId is set (has been assigned a value) and false otherwise
+     */
     public boolean isSetOperationRefId() {
         return this.operationRefId != null;
     }
@@ -252,7 +259,9 @@ public class TJDBCOperationRef implements org.apache.thrift.TBase<TJDBCOperation
         this.sqlStatement = null;
     }
 
-    /** Returns true if field sqlStatement is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field sqlStatement is set (has been assigned a value) and false otherwise
+     */
     public boolean isSetSqlStatement() {
         return this.sqlStatement != null;
     }
@@ -277,7 +286,9 @@ public class TJDBCOperationRef implements org.apache.thrift.TBase<TJDBCOperation
         this.tJDBCResultSet = null;
     }
 
-    /** Returns true if field tJDBCResultSet is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field tJDBCResultSet is set (has been assigned a value) and false otherwise
+     */
     public boolean isSetTJDBCResultSet() {
         return this.tJDBCResultSet != null;
     }
@@ -289,7 +300,6 @@ public class TJDBCOperationRef implements org.apache.thrift.TBase<TJDBCOperation
     }
 
     /**
-     *
      * @see com.ane56.engine.jdbc.thrit.enumeration.TJDBCQueryStatus
      */
     @org.apache.thrift.annotation.Nullable
@@ -298,7 +308,6 @@ public class TJDBCOperationRef implements org.apache.thrift.TBase<TJDBCOperation
     }
 
     /**
-     *
      * @see com.ane56.engine.jdbc.thrit.enumeration.TJDBCQueryStatus
      */
     public TJDBCOperationRef setQueryStatus(@org.apache.thrift.annotation.Nullable com.ane56.engine.jdbc.thrit.enumeration.TJDBCQueryStatus queryStatus) {
@@ -310,7 +319,9 @@ public class TJDBCOperationRef implements org.apache.thrift.TBase<TJDBCOperation
         this.queryStatus = null;
     }
 
-    /** Returns true if field queryStatus is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field queryStatus is set (has been assigned a value) and false otherwise
+     */
     public boolean isSetQueryStatus() {
         return this.queryStatus != null;
     }
@@ -335,7 +346,9 @@ public class TJDBCOperationRef implements org.apache.thrift.TBase<TJDBCOperation
         this.message = null;
     }
 
-    /** Returns true if field message is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field message is set (has been assigned a value) and false otherwise
+     */
     public boolean isSetMessage() {
         return this.message != null;
     }
@@ -446,7 +459,9 @@ public class TJDBCOperationRef implements org.apache.thrift.TBase<TJDBCOperation
         throw new java.lang.IllegalStateException();
     }
 
-    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise
+     */
     public boolean isSet(_Fields field) {
         if (field == null) {
             throw new java.lang.IllegalArgumentException();
@@ -787,7 +802,9 @@ public class TJDBCOperationRef implements org.apache.thrift.TBase<TJDBCOperation
         }
     }
 
-    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    /**
+     * The set of fields this struct contains, along with convenience methods for finding and manipulating them.
+     */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
         START_TIME((short) 1, "startTime"),
         END_TIME((short) 2, "endTime"),
@@ -796,7 +813,6 @@ public class TJDBCOperationRef implements org.apache.thrift.TBase<TJDBCOperation
         SQL_STATEMENT((short) 5, "sqlStatement"),
         T_JDBCRESULT_SET((short) 6, "tJDBCResultSet"),
         /**
-         *
          * @see com.ane56.engine.jdbc.thrit.enumeration.TJDBCQueryStatus
          */
         QUERY_STATUS((short) 7, "queryStatus"),

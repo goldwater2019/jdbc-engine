@@ -94,7 +94,9 @@ public class TJDBCRsultRow implements org.apache.thrift.TBase<TJDBCRsultRow, TJD
         this.columnList = null;
     }
 
-    /** Returns true if field columnList is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field columnList is set (has been assigned a value) and false otherwise
+     */
     public boolean isSetColumnList() {
         return this.columnList != null;
     }
@@ -128,7 +130,9 @@ public class TJDBCRsultRow implements org.apache.thrift.TBase<TJDBCRsultRow, TJD
         throw new java.lang.IllegalStateException();
     }
 
-    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise
+     */
     public boolean isSet(_Fields field) {
         if (field == null) {
             throw new java.lang.IllegalArgumentException();
@@ -248,7 +252,9 @@ public class TJDBCRsultRow implements org.apache.thrift.TBase<TJDBCRsultRow, TJD
         }
     }
 
-    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    /**
+     * The set of fields this struct contains, along with convenience methods for finding and manipulating them.
+     */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
         COLUMN_LIST((short) 1, "columnList");
 

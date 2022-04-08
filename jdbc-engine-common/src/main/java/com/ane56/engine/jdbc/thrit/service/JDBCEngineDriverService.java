@@ -16,20 +16,17 @@ public class JDBCEngineDriverService {
         /**
          * 心跳
          *
-         *
          * @param jdbcEngineExecutor
          */
         public boolean heartBeat(com.ane56.engine.jdbc.thrit.struct.TJDBCEngineExecutor jdbcEngineExecutor) throws org.apache.thrift.TException;
 
         /**
          * 获得相应的catalogs
-         *
          */
         public java.util.List<com.ane56.engine.jdbc.thrit.struct.TJDBCCatalog> getCatalogs() throws org.apache.thrift.TException;
 
         /**
          * add catalog
-         *
          *
          * @param jdbcCatalog
          */
@@ -37,7 +34,6 @@ public class JDBCEngineDriverService {
 
         /**
          * 数据查询
-         *
          *
          * @param querySQL
          */
@@ -767,7 +763,9 @@ public class JDBCEngineDriverService {
             this.jdbcEngineExecutor = null;
         }
 
-        /** Returns true if field jdbcEngineExecutor is set (has been assigned a value) and false otherwise */
+        /**
+         * Returns true if field jdbcEngineExecutor is set (has been assigned a value) and false otherwise
+         */
         public boolean isSetJdbcEngineExecutor() {
             return this.jdbcEngineExecutor != null;
         }
@@ -801,7 +799,9 @@ public class JDBCEngineDriverService {
             throw new java.lang.IllegalStateException();
         }
 
-        /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+        /**
+         * Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise
+         */
         public boolean isSet(_Fields field) {
             if (field == null) {
                 throw new java.lang.IllegalArgumentException();
@@ -924,7 +924,9 @@ public class JDBCEngineDriverService {
             }
         }
 
-        /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+        /**
+         * The set of fields this struct contains, along with convenience methods for finding and manipulating them.
+         */
         public enum _Fields implements org.apache.thrift.TFieldIdEnum {
             JDBC_ENGINE_EXECUTOR((short) 1, "jdbcEngineExecutor");
 
@@ -1137,7 +1139,9 @@ public class JDBCEngineDriverService {
             __isset_bitfield = org.apache.thrift.EncodingUtils.clearBit(__isset_bitfield, __SUCCESS_ISSET_ID);
         }
 
-        /** Returns true if field success is set (has been assigned a value) and false otherwise */
+        /**
+         * Returns true if field success is set (has been assigned a value) and false otherwise
+         */
         public boolean isSetSuccess() {
             return org.apache.thrift.EncodingUtils.testBit(__isset_bitfield, __SUCCESS_ISSET_ID);
         }
@@ -1169,7 +1173,9 @@ public class JDBCEngineDriverService {
             throw new java.lang.IllegalStateException();
         }
 
-        /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+        /**
+         * Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise
+         */
         public boolean isSet(_Fields field) {
             if (field == null) {
                 throw new java.lang.IllegalArgumentException();
@@ -1285,7 +1291,9 @@ public class JDBCEngineDriverService {
             }
         }
 
-        /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+        /**
+         * The set of fields this struct contains, along with convenience methods for finding and manipulating them.
+         */
         public enum _Fields implements org.apache.thrift.TFieldIdEnum {
             SUCCESS((short) 0, "success");
 
@@ -1475,7 +1483,9 @@ public class JDBCEngineDriverService {
             throw new java.lang.IllegalStateException();
         }
 
-        /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+        /**
+         * Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise
+         */
         public boolean isSet(_Fields field) {
             if (field == null) {
                 throw new java.lang.IllegalArgumentException();
@@ -1563,7 +1573,9 @@ public class JDBCEngineDriverService {
             }
         }
 
-        /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+        /**
+         * The set of fields this struct contains, along with convenience methods for finding and manipulating them.
+         */
         public enum _Fields implements org.apache.thrift.TFieldIdEnum {
             ;
 
@@ -1765,7 +1777,9 @@ public class JDBCEngineDriverService {
             this.success = null;
         }
 
-        /** Returns true if field success is set (has been assigned a value) and false otherwise */
+        /**
+         * Returns true if field success is set (has been assigned a value) and false otherwise
+         */
         public boolean isSetSuccess() {
             return this.success != null;
         }
@@ -1799,7 +1813,9 @@ public class JDBCEngineDriverService {
             throw new java.lang.IllegalStateException();
         }
 
-        /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+        /**
+         * Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise
+         */
         public boolean isSet(_Fields field) {
             if (field == null) {
                 throw new java.lang.IllegalArgumentException();
@@ -1919,7 +1935,9 @@ public class JDBCEngineDriverService {
             }
         }
 
-        /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+        /**
+         * The set of fields this struct contains, along with convenience methods for finding and manipulating them.
+         */
         public enum _Fields implements org.apache.thrift.TFieldIdEnum {
             SUCCESS((short) 0, "success");
 
@@ -2158,7 +2176,9 @@ public class JDBCEngineDriverService {
             this.jdbcCatalog = null;
         }
 
-        /** Returns true if field jdbcCatalog is set (has been assigned a value) and false otherwise */
+        /**
+         * Returns true if field jdbcCatalog is set (has been assigned a value) and false otherwise
+         */
         public boolean isSetJdbcCatalog() {
             return this.jdbcCatalog != null;
         }
@@ -2192,7 +2212,9 @@ public class JDBCEngineDriverService {
             throw new java.lang.IllegalStateException();
         }
 
-        /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+        /**
+         * Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise
+         */
         public boolean isSet(_Fields field) {
             if (field == null) {
                 throw new java.lang.IllegalArgumentException();
@@ -2315,7 +2337,9 @@ public class JDBCEngineDriverService {
             }
         }
 
-        /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+        /**
+         * The set of fields this struct contains, along with convenience methods for finding and manipulating them.
+         */
         public enum _Fields implements org.apache.thrift.TFieldIdEnum {
             JDBC_CATALOG((short) 1, "jdbcCatalog");
 
@@ -2528,7 +2552,9 @@ public class JDBCEngineDriverService {
             __isset_bitfield = org.apache.thrift.EncodingUtils.clearBit(__isset_bitfield, __SUCCESS_ISSET_ID);
         }
 
-        /** Returns true if field success is set (has been assigned a value) and false otherwise */
+        /**
+         * Returns true if field success is set (has been assigned a value) and false otherwise
+         */
         public boolean isSetSuccess() {
             return org.apache.thrift.EncodingUtils.testBit(__isset_bitfield, __SUCCESS_ISSET_ID);
         }
@@ -2560,7 +2586,9 @@ public class JDBCEngineDriverService {
             throw new java.lang.IllegalStateException();
         }
 
-        /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+        /**
+         * Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise
+         */
         public boolean isSet(_Fields field) {
             if (field == null) {
                 throw new java.lang.IllegalArgumentException();
@@ -2676,7 +2704,9 @@ public class JDBCEngineDriverService {
             }
         }
 
-        /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+        /**
+         * The set of fields this struct contains, along with convenience methods for finding and manipulating them.
+         */
         public enum _Fields implements org.apache.thrift.TFieldIdEnum {
             SUCCESS((short) 0, "success");
 
@@ -2885,7 +2915,9 @@ public class JDBCEngineDriverService {
             this.querySQL = null;
         }
 
-        /** Returns true if field querySQL is set (has been assigned a value) and false otherwise */
+        /**
+         * Returns true if field querySQL is set (has been assigned a value) and false otherwise
+         */
         public boolean isSetQuerySQL() {
             return this.querySQL != null;
         }
@@ -2919,7 +2951,9 @@ public class JDBCEngineDriverService {
             throw new java.lang.IllegalStateException();
         }
 
-        /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+        /**
+         * Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise
+         */
         public boolean isSet(_Fields field) {
             if (field == null) {
                 throw new java.lang.IllegalArgumentException();
@@ -3039,7 +3073,9 @@ public class JDBCEngineDriverService {
             }
         }
 
-        /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+        /**
+         * The set of fields this struct contains, along with convenience methods for finding and manipulating them.
+         */
         public enum _Fields implements org.apache.thrift.TFieldIdEnum {
             QUERY_SQL((short) 1, "querySQL");
 
@@ -3248,7 +3284,9 @@ public class JDBCEngineDriverService {
             this.success = null;
         }
 
-        /** Returns true if field success is set (has been assigned a value) and false otherwise */
+        /**
+         * Returns true if field success is set (has been assigned a value) and false otherwise
+         */
         public boolean isSetSuccess() {
             return this.success != null;
         }
@@ -3282,7 +3320,9 @@ public class JDBCEngineDriverService {
             throw new java.lang.IllegalStateException();
         }
 
-        /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+        /**
+         * Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise
+         */
         public boolean isSet(_Fields field) {
             if (field == null) {
                 throw new java.lang.IllegalArgumentException();
@@ -3405,7 +3445,9 @@ public class JDBCEngineDriverService {
             }
         }
 
-        /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+        /**
+         * The set of fields this struct contains, along with convenience methods for finding and manipulating them.
+         */
         public enum _Fields implements org.apache.thrift.TFieldIdEnum {
             SUCCESS((short) 0, "success");
 

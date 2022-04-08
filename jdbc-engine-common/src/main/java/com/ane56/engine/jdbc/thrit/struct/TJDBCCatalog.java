@@ -117,7 +117,9 @@ public class TJDBCCatalog implements org.apache.thrift.TBase<TJDBCCatalog, TJDBC
         this.name = null;
     }
 
-    /** Returns true if field name is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field name is set (has been assigned a value) and false otherwise
+     */
     public boolean isSetName() {
         return this.name != null;
     }
@@ -142,7 +144,9 @@ public class TJDBCCatalog implements org.apache.thrift.TBase<TJDBCCatalog, TJDBC
         this.driver = null;
     }
 
-    /** Returns true if field driver is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field driver is set (has been assigned a value) and false otherwise
+     */
     public boolean isSetDriver() {
         return this.driver != null;
     }
@@ -167,7 +171,9 @@ public class TJDBCCatalog implements org.apache.thrift.TBase<TJDBCCatalog, TJDBC
         this.url = null;
     }
 
-    /** Returns true if field url is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field url is set (has been assigned a value) and false otherwise
+     */
     public boolean isSetUrl() {
         return this.url != null;
     }
@@ -192,7 +198,9 @@ public class TJDBCCatalog implements org.apache.thrift.TBase<TJDBCCatalog, TJDBC
         this.username = null;
     }
 
-    /** Returns true if field username is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field username is set (has been assigned a value) and false otherwise
+     */
     public boolean isSetUsername() {
         return this.username != null;
     }
@@ -217,7 +225,9 @@ public class TJDBCCatalog implements org.apache.thrift.TBase<TJDBCCatalog, TJDBC
         this.password = null;
     }
 
-    /** Returns true if field password is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field password is set (has been assigned a value) and false otherwise
+     */
     public boolean isSetPassword() {
         return this.password != null;
     }
@@ -295,7 +305,9 @@ public class TJDBCCatalog implements org.apache.thrift.TBase<TJDBCCatalog, TJDBC
         throw new java.lang.IllegalStateException();
     }
 
-    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise
+     */
     public boolean isSet(_Fields field) {
         if (field == null) {
             throw new java.lang.IllegalArgumentException();
@@ -547,7 +559,9 @@ public class TJDBCCatalog implements org.apache.thrift.TBase<TJDBCCatalog, TJDBC
         }
     }
 
-    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    /**
+     * The set of fields this struct contains, along with convenience methods for finding and manipulating them.
+     */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
         NAME((short) 1, "name"),
         DRIVER((short) 2, "driver"),

@@ -37,7 +37,6 @@ public class TJDBCResultColumn implements org.apache.thrift.TBase<TJDBCResultCol
     public @org.apache.thrift.annotation.Nullable
     java.lang.String columnName; // required
     /**
-     *
      * @see com.ane56.engine.jdbc.thrit.enumeration.TJDBCColumnType
      */
     public @org.apache.thrift.annotation.Nullable
@@ -110,7 +109,9 @@ public class TJDBCResultColumn implements org.apache.thrift.TBase<TJDBCResultCol
         this.columnName = null;
     }
 
-    /** Returns true if field columnName is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field columnName is set (has been assigned a value) and false otherwise
+     */
     public boolean isSetColumnName() {
         return this.columnName != null;
     }
@@ -122,7 +123,6 @@ public class TJDBCResultColumn implements org.apache.thrift.TBase<TJDBCResultCol
     }
 
     /**
-     *
      * @see com.ane56.engine.jdbc.thrit.enumeration.TJDBCColumnType
      */
     @org.apache.thrift.annotation.Nullable
@@ -131,7 +131,6 @@ public class TJDBCResultColumn implements org.apache.thrift.TBase<TJDBCResultCol
     }
 
     /**
-     *
      * @see com.ane56.engine.jdbc.thrit.enumeration.TJDBCColumnType
      */
     public TJDBCResultColumn setColumnType(@org.apache.thrift.annotation.Nullable com.ane56.engine.jdbc.thrit.enumeration.TJDBCColumnType columnType) {
@@ -143,7 +142,9 @@ public class TJDBCResultColumn implements org.apache.thrift.TBase<TJDBCResultCol
         this.columnType = null;
     }
 
-    /** Returns true if field columnType is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field columnType is set (has been assigned a value) and false otherwise
+     */
     public boolean isSetColumnType() {
         return this.columnType != null;
     }
@@ -168,7 +169,9 @@ public class TJDBCResultColumn implements org.apache.thrift.TBase<TJDBCResultCol
         this.columnClassName = null;
     }
 
-    /** Returns true if field columnClassName is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field columnClassName is set (has been assigned a value) and false otherwise
+     */
     public boolean isSetColumnClassName() {
         return this.columnClassName != null;
     }
@@ -193,7 +196,9 @@ public class TJDBCResultColumn implements org.apache.thrift.TBase<TJDBCResultCol
         this.columnValue = null;
     }
 
-    /** Returns true if field columnValue is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field columnValue is set (has been assigned a value) and false otherwise
+     */
     public boolean isSetColumnValue() {
         return this.columnValue != null;
     }
@@ -260,7 +265,9 @@ public class TJDBCResultColumn implements org.apache.thrift.TBase<TJDBCResultCol
         throw new java.lang.IllegalStateException();
     }
 
-    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    /**
+     * Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise
+     */
     public boolean isSet(_Fields field) {
         if (field == null) {
             throw new java.lang.IllegalArgumentException();
@@ -479,11 +486,12 @@ public class TJDBCResultColumn implements org.apache.thrift.TBase<TJDBCResultCol
         }
     }
 
-    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    /**
+     * The set of fields this struct contains, along with convenience methods for finding and manipulating them.
+     */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
         COLUMN_NAME((short) 1, "columnName"),
         /**
-         *
          * @see com.ane56.engine.jdbc.thrit.enumeration.TJDBCColumnType
          */
         COLUMN_TYPE((short) 2, "columnType"),

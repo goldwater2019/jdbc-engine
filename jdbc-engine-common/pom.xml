@@ -21,10 +21,17 @@
         <scala.version>2.12.5</scala.version>
         <scla.binary.version>2.12</scla.binary.version>
         <libthrift.version>0.16.0</libthrift.version>
+        <curator.version>5.2.0</curator.version>
     </properties>
 
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-framework</artifactId>
+            <version>${curator.version}</version>
+        </dependency>
 
         <!-- slf4j -->
         <dependency>

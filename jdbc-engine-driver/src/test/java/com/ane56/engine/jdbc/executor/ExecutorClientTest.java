@@ -1,7 +1,7 @@
 package com.ane56.engine.jdbc.executor;
 
 
-import com.ane56.engine.jdbc.exetuor.JDBCEngineExecutorServiceClientManager;
+import com.ane56.engine.jdbc.client.JDBCEngineExecutorServiceClientManager;
 import com.ane56.engine.jdbc.model.JDBCEngineExecutorRef;
 import com.ane56.engine.jdbc.model.JDBCResultRef;
 import lombok.extern.slf4j.Slf4j;

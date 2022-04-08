@@ -18,7 +18,6 @@ public class JDBCEngineExecutorService {
          * 请求时绑定starttime
          * 结束时绑定endtime
          *
-         *
          * @param jdbcOperationRef
          */
         public com.ane56.engine.jdbc.thrit.struct.TJDBCResultRef query(com.ane56.engine.jdbc.thrit.struct.TJDBCOperationRef jdbcOperationRef) throws org.apache.thrift.TException;
@@ -316,7 +315,9 @@ public class JDBCEngineExecutorService {
             this.jdbcOperationRef = null;
         }
 
-        /** Returns true if field jdbcOperationRef is set (has been assigned a value) and false otherwise */
+        /**
+         * Returns true if field jdbcOperationRef is set (has been assigned a value) and false otherwise
+         */
         public boolean isSetJdbcOperationRef() {
             return this.jdbcOperationRef != null;
         }
@@ -350,7 +351,9 @@ public class JDBCEngineExecutorService {
             throw new java.lang.IllegalStateException();
         }
 
-        /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+        /**
+         * Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise
+         */
         public boolean isSet(_Fields field) {
             if (field == null) {
                 throw new java.lang.IllegalArgumentException();
@@ -473,7 +476,9 @@ public class JDBCEngineExecutorService {
             }
         }
 
-        /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+        /**
+         * The set of fields this struct contains, along with convenience methods for finding and manipulating them.
+         */
         public enum _Fields implements org.apache.thrift.TFieldIdEnum {
             JDBC_OPERATION_REF((short) 1, "jdbcOperationRef");
 
@@ -684,7 +689,9 @@ public class JDBCEngineExecutorService {
             this.success = null;
         }
 
-        /** Returns true if field success is set (has been assigned a value) and false otherwise */
+        /**
+         * Returns true if field success is set (has been assigned a value) and false otherwise
+         */
         public boolean isSetSuccess() {
             return this.success != null;
         }
@@ -718,7 +725,9 @@ public class JDBCEngineExecutorService {
             throw new java.lang.IllegalStateException();
         }
 
-        /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+        /**
+         * Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise
+         */
         public boolean isSet(_Fields field) {
             if (field == null) {
                 throw new java.lang.IllegalArgumentException();
@@ -841,7 +850,9 @@ public class JDBCEngineExecutorService {
             }
         }
 
-        /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+        /**
+         * The set of fields this struct contains, along with convenience methods for finding and manipulating them.
+         */
         public enum _Fields implements org.apache.thrift.TFieldIdEnum {
             SUCCESS((short) 0, "success");
 

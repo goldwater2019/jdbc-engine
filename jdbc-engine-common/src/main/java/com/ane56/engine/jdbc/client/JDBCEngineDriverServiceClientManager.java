@@ -1,5 +1,4 @@
-package com.ane56.engine.jdbc.driver;
-
+package com.ane56.engine.jdbc.client;
 
 import com.ane56.engine.jdbc.model.JDBCEngineExecutorRef;
 import com.ane56.engine.jdbc.model.thrift.JDBCEngineDriverServiceClientSuite;
@@ -115,9 +114,15 @@ public class JDBCEngineDriverServiceClientManager {
     }
 
 
-    public JDBCEngineDriverServiceClientSuite getAvailableClient(){
-        int errorCnt = 0;
+    /**
+     * TODO 使用连接池的方式提高性能
+     * 重试三次
+     *
+     * @return
+     */
+    public JDBCEngineDriverServiceClientSuite getAvailableClient() {
         boolean isError = true;
+        int errorCnt = 0;
         JDBCEngineDriverServiceClientSuite jdbcEngineDriverServiceClientSuite = null;
         while (isError) {
             try {

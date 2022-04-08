@@ -1,4 +1,4 @@
-package com.ane56.engine.jdbc.exetuor;
+package com.ane56.engine.jdbc.client;
 
 import com.ane56.engine.jdbc.model.JDBCEngineExecutorRef;
 import com.ane56.engine.jdbc.thrit.struct.TJDBCEngineExecutor;
