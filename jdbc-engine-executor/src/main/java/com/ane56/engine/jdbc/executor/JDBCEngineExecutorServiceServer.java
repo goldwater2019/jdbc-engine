@@ -1,6 +1,7 @@
 package com.ane56.engine.jdbc.executor;
 
 import com.ane56.engine.jdbc.client.JDBCEngineDriverServiceClientManager;
+import com.ane56.engine.jdbc.config.JDBCEngineConfig;
 import com.ane56.engine.jdbc.executor.impl.JDBCEngineExecutorServiceImpl;
 import com.ane56.engine.jdbc.executor.pool.connection.PooledDataSourceManager;
 import com.ane56.engine.jdbc.model.JDBCCatalog;
@@ -8,14 +9,14 @@ import com.ane56.engine.jdbc.model.thrift.JDBCEngineDriverServiceClientSuite;
 import com.ane56.engine.jdbc.thrit.service.JDBCEngineDriverService;
 import com.ane56.engine.jdbc.thrit.service.JDBCEngineExecutorService;
 import com.ane56.engine.jdbc.thrit.struct.TJDBCCatalog;
-import com.ane56.engine.jdbc.thrit.struct.TJDBCEngineExecutor;
 import com.ane56.engine.jdbc.utils.NetUtils;
+import com.ane56.engine.jdbc.utils.PathUtils;
+import com.ane56.engine.jdbc.utils.ZkUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.thrift.TException;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.TProcessorFactory;
 import org.apache.thrift.protocol.TCompactProtocol;
@@ -43,8 +44,6 @@ public class JDBCEngineExecutorServiceServer {
     private static final int retryTimes = 3;
     private static final UUID ENGINE_REF_ID = UUID.randomUUID();
     private static volatile JDBCEngineExecutorServiceServer singleton;
-    private String driverHost;
-    private int driverPort;
     private int servicePort;
     private JDBCEngineDriverServiceClientManager jdbcEngineDriverServiceClientManager;
     private PooledDataSourceManager pooledDataSourceManager;
@@ -54,43 +53,35 @@ public class JDBCEngineExecutorServiceServer {
     /**
      * 构造方法
      *
-     * @param driverHost
-     * @param driverPort
-     * @param servicePort
      */
-    private JDBCEngineExecutorServiceServer(String driverHost, int driverPort, int servicePort) {
-        setDriverHost(driverHost);
-        setDriverPort(driverPort);
+    private JDBCEngineExecutorServiceServer(int servicePort) {
         setServicePort(servicePort);
         checkInitialStatus();
     }
 
     /**
      * 单例方法
+     * TODO 自增端口
      *
-     * @param driverHost
-     * @param driverPort
-     * @param servicePort
-     * @return
      */
-    public static JDBCEngineExecutorServiceServer getInstance(String driverHost, int driverPort, int servicePort) {
+    public static JDBCEngineExecutorServiceServer getInstance() {
         if (singleton == null) {
             synchronized (JDBCEngineExecutorServiceServer.class) {
                 if (singleton == null) {
                     // TODO 关闭随机端口
-                    singleton = new JDBCEngineExecutorServiceServer("127.0.0.1", 8888, Math.abs(new Random().nextInt()) % 10000 + 5000);
+                    singleton = new JDBCEngineExecutorServiceServer(Math.abs(new Random().nextInt()) % 10000 + 5000);
                 }
             }
         }
         return singleton;
     }
 
-    public static void main(String[] args) throws TTransportException {
-        String driverHost = "127.0.0.1";
-        int driverPort = 8888;
-        int servicePort = 8889;
-        JDBCEngineExecutorServiceServer jdbcEngineExecutorServiceServer = JDBCEngineExecutorServiceServer.getInstance(driverHost, driverPort, servicePort);
+    public static void main(String[] args) throws Exception {
+        JDBCEngineExecutorServiceServer jdbcEngineExecutorServiceServer = JDBCEngineExecutorServiceServer.getInstance();
+        jdbcEngineExecutorServiceServer.heartBeat();
         jdbcEngineExecutorServiceServer.invoke();
+        ZkUtils zkUtils = ZkUtils.getInstance(JDBCEngineConfig.haZookeeperQuorum);
+        zkUtils.changeRunningStatus(false);
     }
 
     /**
@@ -103,10 +94,6 @@ public class JDBCEngineExecutorServiceServer {
         if (pooledDataSourceManager == null) {
             pooledDataSourceManager = PooledDataSourceManager.getInstance();
         }
-        if (heartBeatExecutorService == null) {
-            heartBeatExecutorService = Executors.newSingleThreadScheduledExecutor();
-            heartBeatExecutorService.scheduleAtFixedRate(new HeartBeatRunnable(), 0L, 1000L, TimeUnit.MILLISECONDS);
-        }
         if (refreshCatalogExecutorService == null) {
             refreshCatalogExecutorService = Executors.newSingleThreadScheduledExecutor();
             refreshCatalogExecutorService.scheduleAtFixedRate(new RefreshCatalogs(), 2000L, 10000L, TimeUnit.MILLISECONDS);
@@ -117,10 +104,7 @@ public class JDBCEngineExecutorServiceServer {
         // 非阻塞式的，配合TFramedTransport使用
         TNonblockingServerTransport serverTransport = new TNonblockingServerSocket(servicePort);
         // 关联处理器与Service服务的实现
-        TProcessor processor = new JDBCEngineExecutorService.Processor<JDBCEngineExecutorService.Iface>(new JDBCEngineExecutorServiceImpl(
-                driverHost,
-                driverPort
-        ));
+        TProcessor processor = new JDBCEngineExecutorService.Processor<JDBCEngineExecutorService.Iface>(new JDBCEngineExecutorServiceImpl());
         // 目前Thrift提供的最高级的模式，可并发处理客户端请求
         TThreadedSelectorServer.Args args = new TThreadedSelectorServer.Args(serverTransport);
         args.processor(processor);
@@ -143,30 +127,16 @@ public class JDBCEngineExecutorServiceServer {
     /**
      * 定时上报心跳
      */
-    private class HeartBeatRunnable implements Runnable {
-        @Override
-        public void run() {
-            JDBCEngineDriverServiceClientSuite availableClient = null;
-            try {
-                availableClient = jdbcEngineDriverServiceClientManager.getAvailableClient();
-                if (availableClient == null) {
-                    throw new InterruptedException("get availed client failed, failed more then 3 times");
-                }
-                JDBCEngineDriverService.Client client = availableClient.getClient();
-                TTransport tTransport = availableClient.getTTransport();
-                TJDBCEngineExecutor tJdbcEngineExecutor = new TJDBCEngineExecutor();
-                tJdbcEngineExecutor.setHost(NetUtils.getInetHostAddress());
-                tJdbcEngineExecutor.setPort(servicePort);
-                tJdbcEngineExecutor.setExecutorRefId(ENGINE_REF_ID.toString());
-                tJdbcEngineExecutor.setPrefix("");
-                client.heartBeat(tJdbcEngineExecutor);
-//                log.info("calling heartBeat interface: " + JDBCEngineExecutorRef.parseFromTJDBCEngineDriver(tJdbcEngineExecutor));
-
-                jdbcEngineDriverServiceClientManager.close(tTransport);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+    private void heartBeat() throws Exception {
+        ZkUtils zkUtils = ZkUtils.getInstance(JDBCEngineConfig.haZookeeperQuorum);
+        zkUtils.createEphemeralNode(
+                PathUtils.checkAndCombinePath(
+                        JDBCEngineConfig.haZookeeperExecutorUriPath,
+                        String.join(":",
+                                NetUtils.getInetHostAddress(),
+                                String.valueOf(servicePort))
+                )
+        );
     }
 
     /**
@@ -176,7 +146,7 @@ public class JDBCEngineExecutorServiceServer {
 
         @Override
         public void run() {
-            JDBCEngineDriverServiceClientSuite availableClient = null;
+            JDBCEngineDriverServiceClientSuite availableClient;
             try {
                 availableClient = jdbcEngineDriverServiceClientManager.getAvailableClient();
                 JDBCEngineDriverService.Client client = availableClient.getClient();
@@ -193,9 +163,6 @@ public class JDBCEngineExecutorServiceServer {
                 }
                 pooledDataSourceManager.checkDataSources();
                 jdbcEngineDriverServiceClientManager.close(tTransport);
-                if (availableClient == null) {
-                    throw new InterruptedException("get availed client failed, failed more then 3 times");
-                }
             } catch (Exception e) {
                 e.printStackTrace();
             }

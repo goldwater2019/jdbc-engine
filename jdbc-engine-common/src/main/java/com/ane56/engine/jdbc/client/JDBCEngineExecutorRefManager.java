@@ -39,8 +39,6 @@ public class JDBCEngineExecutorRefManager {
     /**
      * 添加相应的executor
      *
-     * @param jdbcEngineExecutorRef
-     * @return
      */
     public boolean upsertJDBCEngineExecutorRef(JDBCEngineExecutorRef jdbcEngineExecutorRef) {
         uuid2jdbcEngineExecutorRefs.put(jdbcEngineExecutorRef.getExecutorRefId(), jdbcEngineExecutorRef);
@@ -51,8 +49,6 @@ public class JDBCEngineExecutorRefManager {
     /**
      * 处理心跳
      *
-     * @param tjdbcEngineExecutor
-     * @return
      */
     public boolean heartbeat(TJDBCEngineExecutor tjdbcEngineExecutor) {
         return upsertJDBCEngineExecutorRef(JDBCEngineExecutorRef.parseFromTJDBCEngineDriver(tjdbcEngineExecutor));
@@ -71,7 +67,6 @@ public class JDBCEngineExecutorRefManager {
      * TODO 添加负载均衡选举
      * 选择一个UUID
      *
-     * @return
      */
     public UUID pickupUUID() {
 //        return simpleLoadBalancePickup();
@@ -112,7 +107,6 @@ public class JDBCEngineExecutorRefManager {
      * 修改最新的接入时间
      * 开始query的时候和结束query的时候都接入
      *
-     * @param jdbcEngineExecutorRef
      */
     public void accessJDBCEngineRef(JDBCEngineExecutorRef jdbcEngineExecutorRef) {
         UUID executorRefId = jdbcEngineExecutorRef.getExecutorRefId();

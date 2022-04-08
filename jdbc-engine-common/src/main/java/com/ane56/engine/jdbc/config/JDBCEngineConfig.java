@@ -8,5 +8,8 @@ public class JDBCEngineConfig {
 
     public static String haZookeeperDriverUriPath = "/engine/jdbc/driver/uri";
 
+    public static String haZookeeperExecutorUriPath = "/engine/jdbc/executor/uri";
+
+
     public static int jdbcEngineDriverTimeout = 10000;
 }

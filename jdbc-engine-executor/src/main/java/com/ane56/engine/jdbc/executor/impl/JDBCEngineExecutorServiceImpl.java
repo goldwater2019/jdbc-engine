@@ -12,9 +12,7 @@ import com.ane56.engine.jdbc.thrit.struct.TJDBCResultRef;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.thrift.TException;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -30,27 +28,21 @@ import java.util.UUID;
 
 @Slf4j
 @AllArgsConstructor
-@NoArgsConstructor
 @Data
 @Builder
 public class JDBCEngineExecutorServiceImpl implements JDBCEngineExecutorService.Iface {
 
-    private String driverHost;
-    private int driverPort;
-
     private JDBCEngineDriverServiceClientManager jdbcEngineDriverServiceClientManager;
     private PooledDataSourceManager pooledDataSourceManager;
 
-    public JDBCEngineExecutorServiceImpl(String driverHost, int driverPort) {
-        setDriverHost(driverHost);
-        setDriverPort(driverPort);
-        checkInitialStatus(driverHost, driverPort);
+    public JDBCEngineExecutorServiceImpl() {
+        checkInitialStatus();
     }
 
     @Override
-    public TJDBCResultRef query(TJDBCOperationRef jdbcOperationRef) throws TException {
+    public TJDBCResultRef query(TJDBCOperationRef jdbcOperationRef) {
         long startTime = System.currentTimeMillis();
-        checkInitialStatus(getDriverHost(), getDriverPort());
+        checkInitialStatus();
         JDBCOperationRef operationRef = JDBCOperationRef.builder()
                 .startTime(jdbcOperationRef.getStartTime())
                 .endTime(jdbcOperationRef.getEndTime())
@@ -79,9 +71,9 @@ public class JDBCEngineExecutorServiceImpl implements JDBCEngineExecutorService.
         return jdbcResultRef.asTJDBCResultRef();
     }
 
-    private void checkInitialStatus(String driverHost, int driverPort) {
+    private void checkInitialStatus() {
         if (jdbcEngineDriverServiceClientManager == null) {
-            jdbcEngineDriverServiceClientManager = JDBCEngineDriverServiceClientManager.getInstance(driverHost, driverPort);
+            jdbcEngineDriverServiceClientManager = JDBCEngineDriverServiceClientManager.getInstance();
         }
         if (pooledDataSourceManager == null) {
             pooledDataSourceManager = PooledDataSourceManager.getInstance();
