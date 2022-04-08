@@ -9,6 +9,7 @@ import org.apache.zookeeper.CreateMode;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -70,11 +71,41 @@ public class ZkUtils {
         client.close();
     }
 
+
+    /**
+     * 创建临时有序的节点
+     * @param zNodePath
+     * @param message
+     * @throws Exception
+     */
     public void createEphemeralSequentialNode(String zNodePath, String message) throws Exception {
         changeRunningStatus(true);
         client.create()
                 .creatingParentContainersIfNeeded()
                 .withMode(CreateMode.EPHEMERAL_SEQUENTIAL)
+                .forPath(zNodePath, message.getBytes(StandardCharsets.UTF_8));
+    }
+
+    /**
+     * 创建临时节点
+     * @param zNodePath
+     * @throws Exception
+     */
+    public void createEphemeralNode(String zNodePath) throws Exception {
+        createEphemeralNode(zNodePath, "");
+    }
+
+    /**
+     * 创建临时节点
+     * @param zNodePath
+     * @param message
+     * @throws Exception
+     */
+    public void createEphemeralNode(String zNodePath, String message) throws Exception {
+        changeRunningStatus(true);
+        client.create()
+                .creatingParentContainersIfNeeded()
+                .withMode(CreateMode.EPHEMERAL)
                 .forPath(zNodePath, message.getBytes(StandardCharsets.UTF_8));
     }
 
@@ -88,12 +119,22 @@ public class ZkUtils {
     public Map<String, String> getDataWithEphemeralSequentialNodes(String parentPath) throws Exception {
         changeRunningStatus(true);
         Map<String, String> result = new HashMap<>();
-        List<String> strings = client.getChildren().forPath(parentPath);
+        List<String> strings = getChildrenUnderZNodePath(parentPath);
         for (String string : strings) {
             String zNodePath = String.join("/", parentPath, string);
             byte[] bytes = client.getData().forPath(zNodePath);
             result.put(zNodePath, new String(bytes));
         }
         return result;
+    }
+
+    public List<String> getChildrenUnderZNodePath(String parentPath) throws Exception {
+        changeRunningStatus(true);
+        List<String> children = new LinkedList<>();
+        List<String> path = client.getChildren().forPath(parentPath);
+        for (String p : path) {
+            children.add(p);
+        }
+        return children;
     }
 }

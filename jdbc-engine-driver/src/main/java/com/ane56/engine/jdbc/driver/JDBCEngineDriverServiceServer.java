@@ -1,9 +1,11 @@
 package com.ane56.engine.jdbc.driver;
 
 
+import com.ane56.engine.jdbc.config.JDBCEngineConfig;
 import com.ane56.engine.jdbc.driver.impl.JDBCEngineDriverServiceImpl;
 import com.ane56.engine.jdbc.thrit.service.JDBCEngineDriverService;
 import com.ane56.engine.jdbc.utils.NetUtils;
+import com.ane56.engine.jdbc.utils.PathUtils;
 import com.ane56.engine.jdbc.utils.ZkUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TProcessor;
@@ -21,7 +23,6 @@ import java.util.concurrent.Executors;
 
 @Slf4j
 public class JDBCEngineDriverServiceServer {
-    private static final String zkDriverUriPrefix = "/engine/jdbc/driver/uri";
     private static volatile JDBCEngineDriverServiceServer singleton;
     private static int servicePort = 8888;
 
@@ -37,14 +38,16 @@ public class JDBCEngineDriverServiceServer {
     }
 
     public static void main(String[] args) throws Exception {
-        String zkConnectionStr = "10.10.106.102:2181";
         String driverHost = NetUtils.getInetHostAddress();
         // TODO 使用随机端口暂时替代, 后面使用+1的方式来启动服务
         int nextInt = new Random().nextInt();
         servicePort = Math.abs(nextInt % 5000 + 5000);
         String uri = String.join(":", driverHost, String.valueOf(servicePort));
-        ZkUtils zkUtils = ZkUtils.getInstance(zkConnectionStr);
-        zkUtils.createEphemeralSequentialNode(zkDriverUriPrefix, uri);
+        ZkUtils zkUtils = ZkUtils.getInstance(JDBCEngineConfig.haZookeeperQuorum);
+        zkUtils.createEphemeralNode(
+                PathUtils.checkAndCombinePath(JDBCEngineConfig.haZookeeperDriverUriPath, driverHost + ":" +
+                        servicePort)
+        );
         JDBCEngineDriverServiceServer jdbcEngineDriverServiceServer = JDBCEngineDriverServiceServer.getInstance();
         jdbcEngineDriverServiceServer.invoke();
         zkUtils.changeRunningStatus(false);

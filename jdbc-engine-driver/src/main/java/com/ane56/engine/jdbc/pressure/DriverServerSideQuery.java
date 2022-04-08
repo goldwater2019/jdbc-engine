@@ -1,9 +1,11 @@
 package com.ane56.engine.jdbc.pressure;
 
 import com.ane56.engine.jdbc.client.JDBCEngineDriverServiceClientManager;
+import com.ane56.engine.jdbc.config.JDBCEngineConfig;
 import com.ane56.engine.jdbc.model.JDBCResultRef;
 import com.ane56.engine.jdbc.model.thrift.JDBCEngineDriverServiceClientSuite;
 import com.ane56.engine.jdbc.thrit.service.JDBCEngineDriverService;
+import com.ane56.engine.jdbc.utils.PathUtils;
 import com.ane56.engine.jdbc.utils.ZkUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TException;
@@ -11,6 +13,7 @@ import org.apache.thrift.TException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.*;
 
 
@@ -19,15 +22,18 @@ public class DriverServerSideQuery {
     private static JDBCEngineDriverServiceClientManager jdbcEngineDriverServiceClientManager;
 
     public static void main(String[] args) throws Exception {
-        String jdbcEngineDriverPath = "/engine/jdbc/driver";
-        ZkUtils zkUtils = ZkUtils.getInstance("10.10.106.102:2181");
+        ZkUtils zkUtils = ZkUtils.getInstance(JDBCEngineConfig.haZookeeperQuorum);
         for (int i = 0; i < 0; i++) {
-            zkUtils.createEphemeralSequentialNode(jdbcEngineDriverPath + "/uri", "localhost:8888");
+            Random random = new Random();
+            int port = Math.abs(random.nextInt() % 5000 + 5000);
+            zkUtils.createEphemeralNode(
+                    PathUtils.checkAndCombinePath(JDBCEngineConfig.haZookeeperDriverUriPath, "localhost:" + port)
+            );
         }
         Thread.sleep(1000L);
-        Map<String, String> dataWithEphemeralSequentialNodes = zkUtils.getDataWithEphemeralSequentialNodes(jdbcEngineDriverPath);
-        for (Map.Entry<String, String> stringStringEntry : dataWithEphemeralSequentialNodes.entrySet()) {
-            log.info("zNodePath: " + stringStringEntry.getKey() + ", zNodeValue: " + stringStringEntry.getValue());
+        List<String> childrenUnderZNodePath = zkUtils.getChildrenUnderZNodePath(JDBCEngineConfig.haZookeeperDriverUriPath);
+        for (String childPath : childrenUnderZNodePath) {
+            System.out.println(childPath);
         }
         Thread.sleep(10000L);
         log.info("close zk client");
