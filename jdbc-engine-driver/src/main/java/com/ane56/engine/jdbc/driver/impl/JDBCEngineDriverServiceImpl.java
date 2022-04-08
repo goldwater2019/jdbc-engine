@@ -64,12 +64,11 @@ public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService.Ifac
     @Override
     public TJDBCResultRef query(String querySQL) throws TException {
         checkInitialStatus();
-        JDBCEngineExecutorRef jdbcEngineExecutorRef = jdbcEngineExecutorRefManager.pickupOneEngine();
 
         JDBCResultRef jdbcResultRef = null;
         try {
-            jdbcResultRef = jdbcEngineExecutorServiceClientManager.query("starrocks", querySQL, jdbcEngineExecutorRef);
-        } catch (InterruptedException e) {
+            jdbcResultRef = jdbcEngineExecutorServiceClientManager.query("starrocks", querySQL);
+        } catch (Exception e) {
             e.printStackTrace();
         }
 //        log.info(jdbcResultRef.toString());

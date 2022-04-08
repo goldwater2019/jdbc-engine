@@ -108,6 +108,7 @@ public class JDBCEngineExecutorRefManager {
      * 开始query的时候和结束query的时候都接入
      *
      */
+    @Deprecated
     public void accessJDBCEngineRef(JDBCEngineExecutorRef jdbcEngineExecutorRef) {
         UUID executorRefId = jdbcEngineExecutorRef.getExecutorRefId();
         JDBCEngineExecutorRef jdbcEngineExecutorRef1 = uuid2jdbcEngineExecutorRefs.get(executorRefId);

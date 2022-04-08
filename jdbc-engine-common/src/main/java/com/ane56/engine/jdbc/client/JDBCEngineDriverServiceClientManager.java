@@ -29,17 +29,7 @@ import java.util.UUID;
 public class JDBCEngineDriverServiceClientManager {
     private static volatile JDBCEngineDriverServiceClientManager singleton;
 
-    private int driverPort;
-    private String driverHost;
     private int timeout;
-    private int poolSize;
-
-    public JDBCEngineDriverServiceClientManager(String driverHost, int driverPort, int timeout, int poolSize) {
-        setPoolSize(poolSize);
-        setDriverPort(driverPort);
-        setDriverHost(driverHost);
-        setTimeout(timeout);
-    }
 
     public JDBCEngineDriverServiceClientManager() {
         setTimeout(JDBCEngineConfig.jdbcEngineDriverTimeout);
@@ -66,7 +56,7 @@ public class JDBCEngineDriverServiceClientManager {
     private void testHeartbeat(JDBCEngineDriverService.Client client) throws TException {
         Random random = new Random();
         JDBCEngineExecutorRef jdbcEngineExecutorRef = JDBCEngineExecutorRef.builder()
-                .host(driverHost)
+                .host("127.0.0.1")
                 .executorRefId(UUID.randomUUID())
                 .port(random.nextInt())
                 .prefixPath("/dev")

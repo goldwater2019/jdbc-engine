@@ -149,4 +149,16 @@ public class ZkUtils {
         List<String> childrenUnderZNodePath = getChildrenUnderZNodePath(JDBCEngineConfig.haZookeeperDriverUriPath);
         return childrenUnderZNodePath;
     }
+
+
+    /**
+     * 获得可用的executor端的连接信息
+     * @return
+     * @throws Exception
+     */
+    public List<String> getAvailableExecutorUris() throws Exception {
+        changeRunningStatus(true);
+        List<String> childrenUnderZNodePath = getChildrenUnderZNodePath(JDBCEngineConfig.haZookeeperExecutorUriPath);
+        return childrenUnderZNodePath;
+    }
 }

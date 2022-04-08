@@ -22,7 +22,7 @@ import java.util.concurrent.*;
 public class DriverServerSideQuery {
     private static JDBCEngineDriverServiceClientManager jdbcEngineDriverServiceClientManager;
 
-    public static void main(String[] args) throws Exception {
+    public static void main02(String[] args) throws Exception {
         ZkUtils zkUtils = ZkUtils.getInstance(JDBCEngineConfig.haZookeeperQuorum);
         for (int i = 0; i < 0; i++) {
             Random random = new Random();
@@ -53,7 +53,7 @@ public class DriverServerSideQuery {
         zkUtils.changeRunningStatus(false);
     }
 
-    public static void main01(String[] args) throws ExecutionException, InterruptedException {
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
         String driverHost = null;
         Integer driverPort = null;
         Integer maxIterationNum = null;

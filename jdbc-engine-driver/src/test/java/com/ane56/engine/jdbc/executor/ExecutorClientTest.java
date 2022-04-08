@@ -37,7 +37,7 @@ public class ExecutorClientTest {
             jdbcResultRefFeatureList.add(jdbcResultRefFuture);
         }
         for (Future<JDBCResultRef> jdbcResultRefFuture : jdbcResultRefFeatureList) {
-            JDBCResultRef jdbcResultRef = jdbcResultRefFuture.get();
+            jdbcResultRefFuture.get();
         }
         System.out.println(System.currentTimeMillis() - startTime);
     }
@@ -46,22 +46,17 @@ public class ExecutorClientTest {
 
         @Override
         public JDBCResultRef call() {
-            JDBCEngineExecutorRef engineExecutorRef = JDBCEngineExecutorRef.builder()
-                    .executorRefId(UUID.randomUUID())
-                    .host("127.0.0.1")
-                    .port(8889)
-                    .build();
             String querySQL = "select * from tx_dev.bd_center_center_month;";
 //            String querySQL = "";
             JDBCResultRef jdbcResultRef = null;
             try {
-                jdbcResultRef = jdbcEngineExecutorServiceClientManager.query("starrocks", querySQL, engineExecutorRef);
+                jdbcResultRef = jdbcEngineExecutorServiceClientManager.query("starrocks", querySQL);
                 log.info(jdbcResultRef.toString());
                 log.info("duration: " + (jdbcResultRef.getJdbcOperationRef().getEndTime() - jdbcResultRef.getJdbcOperationRef().getStartTime()));
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            } catch (TException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             return jdbcResultRef;
