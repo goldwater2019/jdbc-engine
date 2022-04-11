@@ -9,18 +9,26 @@ import com.ane56.engine.jdbc.thrit.service.JDBCEngineDriverService;
 import com.ane56.engine.jdbc.thrit.struct.TJDBCCatalog;
 import com.ane56.engine.jdbc.thrit.struct.TJDBCEngineExecutor;
 import com.ane56.engine.jdbc.thrit.struct.TJDBCResultRef;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TException;
 
 import java.util.List;
 
+@Data
 @Slf4j
 public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService.Iface {
     private JDBCCatalogManager jdbcCatalogManager;
     private JDBCEngineExecutorRefManager jdbcEngineExecutorRefManager;
     private JDBCEngineExecutorServiceClientManager jdbcEngineExecutorServiceClientManager;
+    private String jDBCEngineDriverServiceConfigPath;
 
     public JDBCEngineDriverServiceImpl() {
+        checkInitialStatus();
+    }
+
+    public JDBCEngineDriverServiceImpl(String jDBCEngineDriverServiceConfigPath) {
+        setJDBCEngineDriverServiceConfigPath(jDBCEngineDriverServiceConfigPath);
         checkInitialStatus();
     }
 

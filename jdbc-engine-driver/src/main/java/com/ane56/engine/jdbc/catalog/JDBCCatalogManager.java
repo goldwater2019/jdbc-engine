@@ -13,7 +13,6 @@ public class JDBCCatalogManager {
     private static volatile JDBCCatalogManager singleton;
     private Map<String, JDBCCatalog> name2jdbcCatalogs = new ConcurrentHashMap<>();
 
-    ;
 
     private JDBCCatalogManager() {
     }
