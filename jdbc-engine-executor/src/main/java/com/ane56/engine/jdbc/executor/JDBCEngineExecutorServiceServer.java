@@ -107,10 +107,11 @@ public class JDBCEngineExecutorServiceServer {
     }
 
     public void invoke() throws TTransportException {
+        String configDir = configMap.getOrDefault("jdbc.engine.driver.config.path", "C:/workspace/jdbc-engine/conf");
         // 非阻塞式的，配合TFramedTransport使用
         TNonblockingServerTransport serverTransport = new TNonblockingServerSocket(servicePort);
         // 关联处理器与Service服务的实现
-        TProcessor processor = new JDBCEngineExecutorService.Processor<JDBCEngineExecutorService.Iface>(new JDBCEngineExecutorServiceImpl());
+        TProcessor processor = new JDBCEngineExecutorService.Processor<JDBCEngineExecutorService.Iface>(new JDBCEngineExecutorServiceImpl(configDir));
         // 目前Thrift提供的最高级的模式，可并发处理客户端请求
         TThreadedSelectorServer.Args args = new TThreadedSelectorServer.Args(serverTransport);
         args.processor(processor);

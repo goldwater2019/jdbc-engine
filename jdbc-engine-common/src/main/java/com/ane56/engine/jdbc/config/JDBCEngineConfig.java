@@ -1,8 +1,10 @@
 package com.ane56.engine.jdbc.config;
 
+import com.ane56.engine.jdbc.utils.PropertiesUtils;
 import lombok.Data;
 
 import java.io.File;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Data
@@ -21,6 +23,7 @@ public class JDBCEngineConfig {
 
     public JDBCEngineConfig(String configPath) {
         setConfigPath(configPath);
+        setConfigMap(new LinkedHashMap<>());
         loadGetOrDefaultAsMap();
     }
 
@@ -51,7 +54,10 @@ public class JDBCEngineConfig {
             if (!absolutePath.endsWith("jdbc-engine-default.conf")) {
                 continue;
             }
-            // TODO 读取文件中的数据
+            Map<String, String> stringStringMap = PropertiesUtils.loadConfAsMap(absolutePath);
+            for (Map.Entry<String, String> stringStringEntry : stringStringMap.entrySet()) {
+                getConfigMap().put(stringStringEntry.getKey(), stringStringEntry.getValue());
+            }
         }
 
         // haZookeeperQuorum

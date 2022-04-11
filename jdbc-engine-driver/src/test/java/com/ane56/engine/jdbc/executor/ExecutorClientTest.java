@@ -16,11 +16,12 @@ import java.util.concurrent.*;
 public class ExecutorClientTest {
 
     private JDBCEngineExecutorServiceClientManager jdbcEngineExecutorServiceClientManager;
+    private String jdbcEngineConfDir = "C:/workspace/jdbc-engine/conf";
 
     @Before
     public void beforeTest() {
         if (jdbcEngineExecutorServiceClientManager == null) {
-            jdbcEngineExecutorServiceClientManager = JDBCEngineExecutorServiceClientManager.getInstance();
+            jdbcEngineExecutorServiceClientManager = JDBCEngineExecutorServiceClientManager.getInstance(jdbcEngineConfDir);
         }
     }
 

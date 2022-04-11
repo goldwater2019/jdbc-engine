@@ -46,7 +46,7 @@ public class PropertiesUtils {
     }
 
     public static void main(String[] args) {
-        Map<String, String> stringStringMap = loadConfAsMap("C:/workspace/jdbc-engine/conf/jdbc-engine-defualt.conf");
+        Map<String, String> stringStringMap = loadConfAsMap("C:/workspace/jdbc-engine/conf/jdbc-engine-default.conf");
         for (Map.Entry<String, String> stringStringEntry : stringStringMap.entrySet()) {
             System.out.println("key: " + stringStringEntry.getKey() + ", value: " + stringStringEntry.getValue());
         }

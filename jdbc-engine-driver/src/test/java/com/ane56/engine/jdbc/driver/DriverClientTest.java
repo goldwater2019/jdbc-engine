@@ -17,11 +17,12 @@ import java.util.concurrent.Executors;
 public class DriverClientTest {
 
     private JDBCEngineDriverServiceClientManager jdbcEngineDriverServiceClientManager;
+    private String jdbcEngineConfDir = "C:/workspace/jdbc-engine/conf";
 
     @Before
     public void beforeTest() {
         if (jdbcEngineDriverServiceClientManager == null) {
-            jdbcEngineDriverServiceClientManager = JDBCEngineDriverServiceClientManager.getInstance();
+            jdbcEngineDriverServiceClientManager = JDBCEngineDriverServiceClientManager.getInstance(jdbcEngineConfDir);
         }
     }
 

@@ -88,7 +88,7 @@ public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService.Ifac
             jdbcEngineExecutorRefManager = JDBCEngineExecutorRefManager.getInstance();
         }
         if (jdbcEngineExecutorServiceClientManager == null) {
-            jdbcEngineExecutorServiceClientManager = JDBCEngineExecutorServiceClientManager.getInstance();
+            jdbcEngineExecutorServiceClientManager = JDBCEngineExecutorServiceClientManager.getInstance(jDBCEngineDriverServiceConfigPath);
         }
     }
 }

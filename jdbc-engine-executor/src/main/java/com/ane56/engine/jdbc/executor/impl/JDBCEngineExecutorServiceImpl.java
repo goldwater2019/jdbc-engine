@@ -34,8 +34,10 @@ public class JDBCEngineExecutorServiceImpl implements JDBCEngineExecutorService.
 
     private JDBCEngineDriverServiceClientManager jdbcEngineDriverServiceClientManager;
     private PooledDataSourceManager pooledDataSourceManager;
+    private String jdbcConfDir;
 
-    public JDBCEngineExecutorServiceImpl() {
+    public JDBCEngineExecutorServiceImpl(String jdbcConfDir) {
+        setJdbcConfDir(jdbcConfDir);
         checkInitialStatus();
     }
 
@@ -73,7 +75,7 @@ public class JDBCEngineExecutorServiceImpl implements JDBCEngineExecutorService.
 
     private void checkInitialStatus() {
         if (jdbcEngineDriverServiceClientManager == null) {
-            jdbcEngineDriverServiceClientManager = JDBCEngineDriverServiceClientManager.getInstance();
+            jdbcEngineDriverServiceClientManager = JDBCEngineDriverServiceClientManager.getInstance(getJdbcConfDir());
         }
         if (pooledDataSourceManager == null) {
             pooledDataSourceManager = PooledDataSourceManager.getInstance();
