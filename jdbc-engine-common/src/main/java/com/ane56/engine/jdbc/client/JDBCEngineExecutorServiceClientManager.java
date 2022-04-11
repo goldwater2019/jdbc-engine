@@ -35,18 +35,20 @@ public class JDBCEngineExecutorServiceClientManager {
     private static final int TIMEOUT = 10 * 1000;
     private static volatile JDBCEngineExecutorServiceClientManager singleton;
     private JDBCEngineExecutorRefManager jdbcEngineExecutorRefManager;
+    private String configDir;
 
-    public JDBCEngineExecutorServiceClientManager() {
+    public JDBCEngineExecutorServiceClientManager(String configDir) {
+        setConfigDir(configDir);
         if (jdbcEngineExecutorRefManager == null) {
             jdbcEngineExecutorRefManager = JDBCEngineExecutorRefManager.getInstance();
         }
     }
 
-    public static JDBCEngineExecutorServiceClientManager getInstance() {
+    public static JDBCEngineExecutorServiceClientManager getInstance(String configDir) {
         if (singleton == null) {
             synchronized (JDBCEngineExecutorServiceClientManager.class) {
                 if (singleton == null) {
-                    singleton = new JDBCEngineExecutorServiceClientManager();
+                    singleton = new JDBCEngineExecutorServiceClientManager(configDir);
                 }
             }
         }
@@ -113,7 +115,7 @@ public class JDBCEngineExecutorServiceClientManager {
     public JDBCEngineExecutorServiceClientSuite getAvailableClient() throws Exception {
 
         // 1. 获得可用的executor的列表
-        List<String> availableExecutorUris = ZkUtils.getInstance(JDBCEngineConfig.haZookeeperQuorum).getAvailableExecutorUris();
+        List<String> availableExecutorUris = ZkUtils.getInstance(getConfigDir()).getAvailableExecutorUris();
         // 2. 获得可用的driver uri, e.g. 127.0.0.1:8080
         String executorUri = pickupOneUri(availableExecutorUris);
         String[] split = executorUri.split(":");

@@ -27,9 +27,7 @@ import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
 import org.apache.thrift.transport.layered.TFramedTransport;
 
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -49,6 +47,7 @@ public class JDBCEngineExecutorServiceServer {
     private PooledDataSourceManager pooledDataSourceManager;
     private ScheduledExecutorService heartBeatExecutorService;
     private ScheduledExecutorService refreshCatalogExecutorService;
+    private static Map<String, String> configMap = new HashMap<>();
 
     /**
      * 构造方法
@@ -75,10 +74,18 @@ public class JDBCEngineExecutorServiceServer {
     }
 
     public static void main(String[] args) throws Exception {
+        for (String arg : args) {
+            if (arg.startsWith("--config-dir")) {
+                String configDir = arg.split("=")[1];
+                configMap.put("jdbc.engine.driver.config.path", configDir);
+            }
+        }
+        // TODO driver和executor两侧, configDir相关配置的默认项
+        String configDir = configMap.getOrDefault("jdbc.engine.driver.config.path", "C:/workspace/jdbc-engine/conf");
         JDBCEngineExecutorServiceServer jdbcEngineExecutorServiceServer = JDBCEngineExecutorServiceServer.getInstance();
         jdbcEngineExecutorServiceServer.heartBeat();
         jdbcEngineExecutorServiceServer.invoke();
-        ZkUtils zkUtils = ZkUtils.getInstance(JDBCEngineConfig.haZookeeperQuorum);
+        ZkUtils zkUtils = ZkUtils.getInstance(configDir);
         zkUtils.changeRunningStatus(false);
     }
 
@@ -87,7 +94,8 @@ public class JDBCEngineExecutorServiceServer {
      */
     private void checkInitialStatus() {
         if (jdbcEngineDriverServiceClientManager == null) {
-            jdbcEngineDriverServiceClientManager = JDBCEngineDriverServiceClientManager.getInstance();
+            String configDir = configMap.getOrDefault("jdbc.engine.driver.config.path", "C:/workspace/jdbc-engine/conf");
+            jdbcEngineDriverServiceClientManager = JDBCEngineDriverServiceClientManager.getInstance(configDir);
         }
         if (pooledDataSourceManager == null) {
             pooledDataSourceManager = PooledDataSourceManager.getInstance();
@@ -126,10 +134,11 @@ public class JDBCEngineExecutorServiceServer {
      * 定时上报心跳
      */
     private void heartBeat() throws Exception {
-        ZkUtils zkUtils = ZkUtils.getInstance(JDBCEngineConfig.haZookeeperQuorum);
+        String configDir = configMap.getOrDefault("jdbc.engine.driver.config.path", "C:/workspace/jdbc-engine/conf");
+        ZkUtils zkUtils = ZkUtils.getInstance(configDir);
         zkUtils.createEphemeralNode(
                 PathUtils.checkAndCombinePath(
-                        JDBCEngineConfig.haZookeeperExecutorUriPath,
+                        JDBCEngineConfig.getInstance(configDir).getHaZookeeperExecutorUriPath(),
                         String.join(":",
                                 NetUtils.getInetHostAddress(),
                                 String.valueOf(servicePort))

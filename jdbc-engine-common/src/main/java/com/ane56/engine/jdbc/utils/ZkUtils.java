@@ -21,22 +21,31 @@ public class ZkUtils {
     private String connectionStr;
     private CuratorFramework client;
     private volatile boolean isRunning;
+    private String configDir;
 
-    private ZkUtils(String connectionStr) {
-        setConnectionStr(connectionStr);
+
+    /**
+     * 传入配置项文件路径, 获得所有的数据
+     *
+     * @param configDir
+     */
+    private ZkUtils(String configDir) {
+        setConfigDir(configDir);
+        JDBCEngineConfig jdbcEngineConfig = JDBCEngineConfig.getInstance(configDir);
+        setConnectionStr(jdbcEngineConfig.getHaZookeeperQuorum());
         client = CuratorFrameworkFactory.builder()
-                .connectString("bdtnode10:2181")
+                .connectString(connectionStr)
                 .sessionTimeoutMs(5000)
                 .retryPolicy(new ExponentialBackoffRetry(1000, 3))
                 .build();
         isRunning = false;
     }
 
-    public static ZkUtils getInstance(String connectionStr) {
+    public static ZkUtils getInstance(String configDir) {
         if (singleton == null) {
             synchronized (ZkUtils.class) {
                 if (singleton == null) {
-                    singleton = new ZkUtils(connectionStr);
+                    singleton = new ZkUtils(configDir);
                 }
             }
         }
@@ -150,7 +159,9 @@ public class ZkUtils {
      */
     public List<String> getAvailableDriverUris() throws Exception {
         changeRunningStatus(true);
-        List<String> childrenUnderZNodePath = getChildrenUnderZNodePath(JDBCEngineConfig.haZookeeperDriverUriPath);
+        List<String> childrenUnderZNodePath = getChildrenUnderZNodePath(JDBCEngineConfig.getInstance(
+                getConfigDir()
+        ).getHaZookeeperDriverUriPath());
         return childrenUnderZNodePath;
     }
 
@@ -163,7 +174,9 @@ public class ZkUtils {
      */
     public List<String> getAvailableExecutorUris() throws Exception {
         changeRunningStatus(true);
-        List<String> childrenUnderZNodePath = getChildrenUnderZNodePath(JDBCEngineConfig.haZookeeperExecutorUriPath);
+        List<String> childrenUnderZNodePath = getChildrenUnderZNodePath(JDBCEngineConfig.getInstance(
+                getConfigDir()
+        ).getHaZookeeperExecutorUriPath());
         return childrenUnderZNodePath;
     }
 }

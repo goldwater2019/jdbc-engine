@@ -49,14 +49,16 @@ public class JDBCEngineDriverServiceServer {
             }
         }
 
+        String configDir = configMap.get("jdbc.engine.driver.config.path");// , "C:/workspace/jdbc-engine/conf");
+
         String driverHost = NetUtils.getInetHostAddress();
         // TODO 使用随机端口暂时替代, 后面使用+1的方式来启动服务
         int nextInt = new Random().nextInt();
         servicePort = Math.abs(nextInt % 5000 + 5000);
         String uri = String.join(":", driverHost, String.valueOf(servicePort));
-        ZkUtils zkUtils = ZkUtils.getInstance(JDBCEngineConfig.haZookeeperQuorum);
+        ZkUtils zkUtils = ZkUtils.getInstance(configDir);
         zkUtils.createEphemeralNode(
-                PathUtils.checkAndCombinePath(JDBCEngineConfig.haZookeeperDriverUriPath, driverHost + ":" +
+                PathUtils.checkAndCombinePath(JDBCEngineConfig.getInstance(configDir).getHaZookeeperDriverUriPath(), driverHost + ":" +
                         servicePort)
         );
         JDBCEngineDriverServiceServer jdbcEngineDriverServiceServer = JDBCEngineDriverServiceServer.getInstance();

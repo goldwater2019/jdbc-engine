@@ -31,15 +31,21 @@ public class JDBCEngineDriverServiceClientManager {
 
     private int timeout;
 
-    public JDBCEngineDriverServiceClientManager() {
-        setTimeout(JDBCEngineConfig.jdbcEngineDriverTimeout);
+    private String configDir;
+
+    public JDBCEngineDriverServiceClientManager(String configDir) {
+        setConfigDir(configDir);
+        setTimeout(JDBCEngineConfig.getInstance(
+                getConfigDir()
+        ).getJdbcEngineDriverTimeout()
+        );
     }
 
-    public static JDBCEngineDriverServiceClientManager getInstance() {
+    public static JDBCEngineDriverServiceClientManager getInstance(String configDir) {
         if (singleton == null) {
             synchronized (JDBCEngineDriverServiceClientManager.class) {
                 if (singleton == null) {
-                    singleton = new JDBCEngineDriverServiceClientManager();
+                    singleton = new JDBCEngineDriverServiceClientManager(configDir);
                 }
             }
         }
@@ -91,7 +97,7 @@ public class JDBCEngineDriverServiceClientManager {
      */
     public JDBCEngineDriverServiceClientSuite getAvailableClient() throws Exception {
         // 1. 获得可用的driver的列表
-        List<String> availableDriverUris = ZkUtils.getInstance(JDBCEngineConfig.haZookeeperQuorum).getAvailableDriverUris();
+        List<String> availableDriverUris = ZkUtils.getInstance(getConfigDir()).getAvailableDriverUris();
         // 2. 获得可用的driver uri, e.g. 127.0.0.1:8080
         String driverUri = pickupOneUri(availableDriverUris);
         String[] split = driverUri.split(":");

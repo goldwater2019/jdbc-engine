@@ -20,24 +20,27 @@ import java.util.concurrent.*;
 @Slf4j
 public class DriverServerSideQuery {
     private static JDBCEngineDriverServiceClientManager jdbcEngineDriverServiceClientManager;
+    private static String jDBCEngineConfigDir = "C:/workspace/jdbc-engine/conf";
 
     public static void main02(String[] args) throws Exception {
-        ZkUtils zkUtils = ZkUtils.getInstance(JDBCEngineConfig.haZookeeperQuorum);
+        ZkUtils zkUtils = ZkUtils.getInstance(jDBCEngineConfigDir);
         for (int i = 0; i < 0; i++) {
             Random random = new Random();
             int port = Math.abs(random.nextInt() % 5000 + 5000);
             zkUtils.createEphemeralNode(
-                    PathUtils.checkAndCombinePath(JDBCEngineConfig.haZookeeperDriverUriPath, "localhost:" + port)
+                    PathUtils.checkAndCombinePath(JDBCEngineConfig.getInstance(jDBCEngineConfigDir)
+                            .getHaZookeeperDriverUriPath(), "localhost:" + port)
             );
         }
         Thread.sleep(1000L);
-        List<String> childrenUnderZNodePath = zkUtils.getChildrenUnderZNodePath(JDBCEngineConfig.haZookeeperDriverUriPath);
+        List<String> childrenUnderZNodePath = zkUtils.getChildrenUnderZNodePath(JDBCEngineConfig.getInstance(jDBCEngineConfigDir)
+                .getHaZookeeperDriverUriPath());
         for (String childPath : childrenUnderZNodePath) {
             System.out.println(childPath);
         }
 
         if (jdbcEngineDriverServiceClientManager == null) {
-            jdbcEngineDriverServiceClientManager = JDBCEngineDriverServiceClientManager.getInstance();
+            jdbcEngineDriverServiceClientManager = JDBCEngineDriverServiceClientManager.getInstance(jDBCEngineConfigDir);
         }
 
         JDBCEngineDriverServiceClientSuite availableClientV2 = jdbcEngineDriverServiceClientManager.getAvailableClient();
@@ -90,7 +93,7 @@ public class DriverServerSideQuery {
         log.info("thread num: " + threadNum);
 
         if (jdbcEngineDriverServiceClientManager == null) {
-            jdbcEngineDriverServiceClientManager = JDBCEngineDriverServiceClientManager.getInstance();
+            jdbcEngineDriverServiceClientManager = JDBCEngineDriverServiceClientManager.getInstance(jDBCEngineConfigDir);
         }
 
         long startTime = System.currentTimeMillis();
