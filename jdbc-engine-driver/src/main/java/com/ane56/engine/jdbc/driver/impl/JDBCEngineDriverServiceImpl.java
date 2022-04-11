@@ -23,10 +23,6 @@ public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService.Ifac
     private JDBCEngineExecutorServiceClientManager jdbcEngineExecutorServiceClientManager;
     private String jDBCEngineDriverServiceConfigPath;
 
-    public JDBCEngineDriverServiceImpl() {
-        checkInitialStatus();
-    }
-
     public JDBCEngineDriverServiceImpl(String jDBCEngineDriverServiceConfigPath) {
         setJDBCEngineDriverServiceConfigPath(jDBCEngineDriverServiceConfigPath);
         checkInitialStatus();
@@ -85,7 +81,7 @@ public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService.Ifac
 
     public void checkInitialStatus() {
         if (jdbcCatalogManager == null) {
-            jdbcCatalogManager = JDBCCatalogManager.getInstance();
+            jdbcCatalogManager = JDBCCatalogManager.getInstance(jDBCEngineDriverServiceConfigPath);
             jdbcCatalogManager.loadOrDefaultCatalogs();
         }
         if (jdbcEngineExecutorRefManager == null) {

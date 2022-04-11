@@ -2,26 +2,39 @@ package com.ane56.engine.jdbc.catalog;
 
 import com.ane56.engine.jdbc.model.JDBCCatalog;
 import com.ane56.engine.jdbc.thrit.struct.TJDBCCatalog;
+import com.ane56.engine.jdbc.utils.PropertiesUtils;
+import com.ane56.engine.jdbc.utils.StringUtils;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Data
+@Slf4j
 public class JDBCCatalogManager {
 
     private static volatile JDBCCatalogManager singleton;
     private Map<String, JDBCCatalog> name2jdbcCatalogs = new ConcurrentHashMap<>();
+    private String jDBCEngineDriverServiceConfigPath;
 
 
     private JDBCCatalogManager() {
     }
 
-    public static JDBCCatalogManager getInstance() {
+    private JDBCCatalogManager(String jDBCEngineDriverServiceConfigPath) {
+        setJDBCEngineDriverServiceConfigPath(jDBCEngineDriverServiceConfigPath);
+    }
+
+    public static JDBCCatalogManager getInstance(String jDBCEngineDriverServiceConfigPath) {
         if (singleton == null) {
             synchronized (JDBCCatalogManager.class) {
                 if (singleton == null) {
-                    singleton = new JDBCCatalogManager();
+                    singleton = new JDBCCatalogManager(jDBCEngineDriverServiceConfigPath);
                 }
             }
         }
@@ -60,14 +73,58 @@ public class JDBCCatalogManager {
      * 加载默认的配置
      */
     public void loadOrDefaultCatalogs() {
-        JDBCCatalog jdbcCatalog = JDBCCatalog.builder()
-                .driverClass("com.mysql.cj.jdbc.Driver")
-                .name("starrocks")
-                .password("anetx")
-                .uri("jdbc:mysql://10.10.230.2:9030/tx_dev")
-                .username("anetx")
-                .build();
+        if (jDBCEngineDriverServiceConfigPath == null) {
+            // no-ops
+            log.error("There is no specific config path, no ops for load or default catalogs");
+            // TODO 抛出错误
+            return;
+        }
 
-        upsertJDBCCatalog(jdbcCatalog);
+        File file = new File(jDBCEngineDriverServiceConfigPath);
+        if (!file.isDirectory()) {
+            // TODO 抛出--config-dir 不是文件夹的错误
+        }
+        if (!file.exists()) {
+            // TODO 抛出配置项不存在得异常
+        }
+        File[] files = file.listFiles();
+        for (File configFile : files) {
+            String absolutePath = configFile.getAbsolutePath();
+            String name = configFile.getName();
+            if (!name.endsWith("catalog.properties")) {
+                continue;
+            }
+            Map<String, String> stringStringMap = null;
+            try {
+                stringStringMap = PropertiesUtils.loadAsMap(absolutePath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            JDBCCatalog jdbcCatalog = JDBCCatalog.builder()
+                    .driverClass(stringStringMap.getOrDefault("catalog.jdbc.driver.classname", ""))
+                    .name(stringStringMap.getOrDefault("catalog.name", ""))
+                    .password(stringStringMap.getOrDefault("catalog.jdbc.password", ""))
+                    .uri(stringStringMap.getOrDefault("catalog.jdbc.url", ""))
+                    .username(stringStringMap.getOrDefault("catalog.jdbc.username", ""))
+                    .build();
+
+            if (StringUtils.isBlank(jdbcCatalog.getDriverClass())) {
+                continue;
+            }
+            if (StringUtils.isBlank(jdbcCatalog.getName())) {
+                continue;
+            }
+            if (StringUtils.isBlank(jdbcCatalog.getPassword())) {
+                continue;
+            }
+            if (StringUtils.isBlank(jdbcCatalog.getUri())) {
+                continue;
+            }
+            if (StringUtils.isBlank(jdbcCatalog.getUsername())) {
+                continue;
+            }
+            upsertJDBCCatalog(jdbcCatalog);
+        }
+        log.info("loadOrDefaultCatalogs successfully");
     }
 }

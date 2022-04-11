@@ -17,6 +17,8 @@ import org.apache.thrift.transport.TNonblockingServerTransport;
 import org.apache.thrift.transport.TTransportException;
 import org.apache.thrift.transport.layered.TFramedTransport;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -25,6 +27,7 @@ import java.util.concurrent.Executors;
 public class JDBCEngineDriverServiceServer {
     private static volatile JDBCEngineDriverServiceServer singleton;
     private static int servicePort = 8888;
+    private static Map<String, String> configMap = new HashMap<>();
 
     public static JDBCEngineDriverServiceServer getInstance() {
         if (singleton == null) {
@@ -38,6 +41,14 @@ public class JDBCEngineDriverServiceServer {
     }
 
     public static void main(String[] args) throws Exception {
+
+        for (String arg : args) {
+            if (arg.startsWith("--config-dir")) {
+                String configDir = arg.split("=")[1];
+                configMap.put("jdbc.engine.driver.config.path", configDir);
+            }
+        }
+
         String driverHost = NetUtils.getInetHostAddress();
         // TODO 使用随机端口暂时替代, 后面使用+1的方式来启动服务
         int nextInt = new Random().nextInt();
@@ -54,10 +65,11 @@ public class JDBCEngineDriverServiceServer {
     }
 
     public void invoke() throws TTransportException {
+        String configPath = configMap.get("jdbc.engine.driver.config.path"); // , "C:/workspace/jdbc-engine/conf");
         // 非阻塞式的，配合TFramedTransport使用
         TNonblockingServerTransport serverTransport = new TNonblockingServerSocket(servicePort);
         // 关联处理器与Service服务的实现
-        TProcessor processor = new JDBCEngineDriverService.Processor<JDBCEngineDriverService.Iface>(new JDBCEngineDriverServiceImpl());
+        TProcessor processor = new JDBCEngineDriverService.Processor<JDBCEngineDriverService.Iface>(new JDBCEngineDriverServiceImpl(configPath));
         // 目前Thrift提供的最高级的模式，可并发处理客户端请求
         TThreadedSelectorServer.Args args = new TThreadedSelectorServer.Args(serverTransport);
         args.processor(processor);
