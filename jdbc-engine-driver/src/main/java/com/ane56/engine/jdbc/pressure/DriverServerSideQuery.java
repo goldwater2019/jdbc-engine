@@ -120,7 +120,7 @@ public class DriverServerSideQuery {
 
         @Override
         public JDBCResultRef call() {
-            String querySQL = "select * from engine.t_click_logs limit 100,2";
+            String querySQL = "select * from aliyun.engine.t_click_logs limit 100,2";
 //            String querySQL = "";
             JDBCResultRef jdbcResultRef = null;
             try {
