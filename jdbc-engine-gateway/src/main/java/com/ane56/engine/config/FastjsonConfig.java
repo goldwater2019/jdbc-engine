@@ -17,6 +17,7 @@ public class FastjsonConfig extends WebMvcConfigurationSupport {
 
     /**
      * 使用阿里 fastjson 作为 JSON MessageConverter
+     *
      * @param converters
      */
     @Override

@@ -32,8 +32,8 @@ import java.util.UUID;
 @Slf4j
 public class JDBCEngineExecutorServiceClientManager {
 
-    private int timeout;
     private static volatile JDBCEngineExecutorServiceClientManager singleton;
+    private int timeout;
     private JDBCEngineExecutorRefManager jdbcEngineExecutorRefManager;
     private String configDir;
 

@@ -144,10 +144,11 @@ public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService.Ifac
 
     /**
      * convert original sql into real sql, e.g.
-     *      input:
-     *          select * from aliyun.engine.t_click_logs limit 100, 2
-     *      output:
-     *          (aliyun, select * from engine.t_click_logs limit 100, 2)
+     * input:
+     * select * from aliyun.engine.t_click_logs limit 100, 2
+     * output:
+     * (aliyun, select * from engine.t_click_logs limit 100, 2)
+     *
      * @param originalSQL
      * @return
      */
@@ -159,7 +160,7 @@ public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService.Ifac
             int index = originalSQL.indexOf(catalogName);
             if (index > -1) {
                 isKicked = true;
-                result.put(catalogName, originalSQL.replace(catalogName +".", ""));
+                result.put(catalogName, originalSQL.replace(catalogName + ".", ""));
                 break;
             }
         }

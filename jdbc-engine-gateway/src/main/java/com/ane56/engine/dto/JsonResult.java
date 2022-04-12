@@ -1,6 +1,9 @@
 package com.ane56.engine.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @AllArgsConstructor
 @Builder

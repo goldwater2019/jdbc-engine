@@ -26,6 +26,7 @@ public class DriverServerSideQuery {
 
     /**
      * parse config parameters from args
+     *
      * @param args
      */
     public static void parseConfig(String[] args) {
