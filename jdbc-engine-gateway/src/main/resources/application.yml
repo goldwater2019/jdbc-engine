@@ -1,0 +1,6 @@
+engine:
+  jdbc:
+    config-dir: C:/workspace/jdbc-engine/conf
+
+server:
+  port: 8080

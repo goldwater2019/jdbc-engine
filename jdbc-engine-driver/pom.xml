@@ -6,7 +6,7 @@
 
     <parent>
         <artifactId>kyuubi-jdbc-engine</artifactId>
-        <groupId>com.lambda.bigdata</groupId>
+        <groupId>com.ane56.engine</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <artifactId>jdbc-engine-driver</artifactId>
@@ -14,16 +14,6 @@
     <packaging>jar</packaging>
 
     <properties>
-        <junit.version>5.6.2</junit.version>
-        <maven.plugin.build.helper.version>3.2.0</maven.plugin.build.helper.version>
-        <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss z</maven.build.timestamp.format>
-        <lombok.version>1.18.20</lombok.version>
-        <scala.version>2.12.5</scala.version>
-        <scla.binary.version>2.12</scla.binary.version>
-        <libthrift.version>0.16.0</libthrift.version>
-        <junit.version>4.12</junit.version>
-        <slf4j.version>1.7.32</slf4j.version>
-        <curator.version>5.2.0</curator.version>
     </properties>
 
 
@@ -43,18 +33,6 @@
             <artifactId>curator-framework</artifactId>
             <version>${curator.version}</version>
         </dependency>
-
-        <!--        <dependency>-->
-        <!--            <groupId>org.apache.jmeter</groupId>-->
-        <!--            <artifactId>ApacheJMeter_core</artifactId>-->
-        <!--            <version>5.4.3</version>-->
-        <!--        </dependency>-->
-
-        <!--        <dependency>-->
-        <!--            <groupId>org.apache.jmeter</groupId>-->
-        <!--            <artifactId>ApacheJMeter_java</artifactId>-->
-        <!--            <version>5.4.3</version>-->
-        <!--        </dependency>-->
 
         <!-- slf4j -->
         <dependency>
@@ -99,39 +77,15 @@
             <version>4.1.65.Final</version>
         </dependency>
         <dependency>
-            <groupId>com.lambda.bigdata</groupId>
+            <groupId>com.ane56.engine</groupId>
             <artifactId>jdbc-engine-common</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
 
-        <!--        <dependency>-->
-        <!--            <groupId>org.apache.hive</groupId>-->
-        <!--            <artifactId>hive-jdbc</artifactId>-->
-        <!--            <version>2.3.7</version>-->
-        <!--        </dependency>-->
-
     </dependencies>
 
     <build>
-        <!--        <finalName>spark-core</finalName>-->
-        <!--        <sourceDirectory>src/main/scala</sourceDirectory>-->
-        <!--        <testSourceDirectory>src/test/scala</testSourceDirectory>-->
-        <!--        <outputDirectory>target</outputDirectory>-->
-        <!--        &lt;!&ndash;        本地调试时注释&ndash;&gt;-->
-        <!--        &lt;!&ndash;        <resources>&ndash;&gt;-->
-        <!--        &lt;!&ndash;            &lt;!&ndash; 控制资源文件的拷贝 &ndash;&gt;&ndash;&gt;-->
-        <!--        &lt;!&ndash;            <resource>&ndash;&gt;-->
-        <!--        &lt;!&ndash;                &lt;!&ndash; 本任用的idea 打包时需要修改src/main/java/resources 为 src/main/resources  否则配置文件打包不到,运行时又需要改回去,否则无法运行&ndash;&gt;&ndash;&gt;-->
-        <!--        &lt;!&ndash;                <directory>src/main/resources</directory>&ndash;&gt;-->
-        <!--        &lt;!&ndash;                <includes>&ndash;&gt;-->
-        <!--        &lt;!&ndash;                    <include>**/*.properties</include>&ndash;&gt;-->
-        <!--        &lt;!&ndash;                    <include>**/*.xml</include>&ndash;&gt;-->
-        <!--        &lt;!&ndash;                </includes>&ndash;&gt;-->
-        <!--        &lt;!&ndash;                <filtering>false</filtering>&ndash;&gt;-->
-        <!--        &lt;!&ndash;                <targetPath>${project.build.directory}/config</targetPath>&ndash;&gt;-->
-        <!--        &lt;!&ndash;            </resource>&ndash;&gt;-->
-        <!--        &lt;!&ndash;        </resources>&ndash;&gt;-->
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -217,12 +171,6 @@
                         <manifest>
                             <mainClass>com.ane56.engine.jdbc.driver.JDBCEngineDriverServiceServer</mainClass>
                         </manifest>
-                        <!--                        本地调试时注释-->
-                        <!--                        &lt;!&ndash; (配置文件外置目录) &ndash;&gt;-->
-                        <!--                        <manifestEntries>-->
-                        <!--                            <Class-Path>config/</Class-Path>-->
-                        <!--                            <Class-Path>src/main/resources/</Class-Path>-->
-                        <!--                        </manifestEntries>-->
                     </archive>
                 </configuration>
                 <executions>
