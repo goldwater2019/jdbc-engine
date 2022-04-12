@@ -2,6 +2,7 @@ package com.ane56.engine.jdbc.executor;
 
 
 import com.ane56.engine.jdbc.client.JDBCEngineExecutorServiceClientManager;
+import com.ane56.engine.jdbc.exception.JDBCEngineException;
 import com.ane56.engine.jdbc.model.JDBCResultRef;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TException;
@@ -19,7 +20,7 @@ public class ExecutorClientTest {
     private String jdbcEngineConfDir = "C:/workspace/jdbc-engine/conf";
 
     @Before
-    public void beforeTest() {
+    public void beforeTest() throws JDBCEngineException {
         if (jdbcEngineExecutorServiceClientManager == null) {
             jdbcEngineExecutorServiceClientManager = JDBCEngineExecutorServiceClientManager.getInstance(jdbcEngineConfDir);
         }

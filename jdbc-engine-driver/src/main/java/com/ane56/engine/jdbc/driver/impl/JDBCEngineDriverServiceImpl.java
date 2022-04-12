@@ -3,9 +3,12 @@ package com.ane56.engine.jdbc.driver.impl;
 import com.ane56.engine.jdbc.catalog.JDBCCatalogManager;
 import com.ane56.engine.jdbc.client.JDBCEngineExecutorRefManager;
 import com.ane56.engine.jdbc.client.JDBCEngineExecutorServiceClientManager;
+import com.ane56.engine.jdbc.enumeration.JDBCQueryStatus;
 import com.ane56.engine.jdbc.exception.JDBCEngineException;
 import com.ane56.engine.jdbc.model.JDBCCatalog;
+import com.ane56.engine.jdbc.model.JDBCOperationRef;
 import com.ane56.engine.jdbc.model.JDBCResultRef;
+import com.ane56.engine.jdbc.model.JDBCResultSet;
 import com.ane56.engine.jdbc.thrit.service.JDBCEngineDriverService;
 import com.ane56.engine.jdbc.thrit.struct.TJDBCCatalog;
 import com.ane56.engine.jdbc.thrit.struct.TJDBCEngineExecutor;
@@ -14,7 +17,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TException;
 
-import java.util.List;
+import java.util.*;
 
 @Data
 @Slf4j
@@ -87,7 +90,37 @@ public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService.Ifac
 
         JDBCResultRef jdbcResultRef = null;
         try {
-            jdbcResultRef = jdbcEngineExecutorServiceClientManager.query("starrocks", querySQL);
+            // TODO parse catalog and convert the original sql as real sql
+            Map<String, String> stringStringMap = convertSQL(querySQL);
+            if (stringStringMap.size() == 0) {
+                // TODO return error msg directly
+
+                JDBCResultSet jdbcResultSet = JDBCResultSet.builder()
+                        .resultRowList(new LinkedList<>())
+                        .build();
+
+                JDBCOperationRef jdbcOperationRef = JDBCOperationRef.builder()
+                        .queryStatus(JDBCQueryStatus.FAILED)
+                        .message("no catalog specified,expected a catalog name before dbname, query sql: " + querySQL)
+                        .sqlStatement(querySQL)
+                        .startTime(System.currentTimeMillis())
+                        .endTime(System.currentTimeMillis())
+                        .operationRefId(UUID.randomUUID())
+                        .build();
+
+                jdbcResultRef = JDBCResultRef.builder()
+                        .jdbcOperationRef(jdbcOperationRef)
+                        .jdbcResultSet(jdbcResultSet)
+                        .build();
+            } else {
+                String catalog = null;
+                String sql = null;
+                for (Map.Entry<String, String> stringStringEntry : stringStringMap.entrySet()) {
+                    catalog = stringStringEntry.getKey();
+                    sql = stringStringEntry.getValue();
+                }
+                jdbcResultRef = jdbcEngineExecutorServiceClientManager.query(catalog, sql);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -108,4 +141,29 @@ public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService.Ifac
             jdbcEngineExecutorServiceClientManager = JDBCEngineExecutorServiceClientManager.getInstance(jDBCEngineDriverServiceConfigPath);
         }
     }
+
+    /**
+     * convert original sql into real sql, e.g.
+     *      input:
+     *          select * from aliyun.engine.t_click_logs limit 100, 2
+     *      output:
+     *          (aliyun, select * from engine.t_click_logs limit 100, 2)
+     * @param originalSQL
+     * @return
+     */
+    private Map<String, String> convertSQL(String originalSQL) {
+        Map<String, String> result = new HashMap<>();
+        boolean isKicked = false;
+        Map<String, JDBCCatalog> name2jdbcCatalogs = jdbcCatalogManager.getName2jdbcCatalogs();
+        for (String catalogName : name2jdbcCatalogs.keySet()) {
+            int index = originalSQL.indexOf(catalogName);
+            if (index > -1) {
+                isKicked = true;
+                result.put(catalogName, originalSQL.replace(catalogName +".", ""));
+                break;
+            }
+        }
+        return result;
+    }
+
 }

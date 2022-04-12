@@ -17,6 +17,7 @@ public class JDBCEngineConfig {
     private String haZookeeperDriverUriPath;
     private String haZookeeperExecutorUriPath;
     private int jdbcEngineDriverTimeout;
+    private int jdbcEngineExecutorTimeout;
     private Map<String, String> configMap;
     private String configPath;
 
@@ -72,7 +73,11 @@ public class JDBCEngineConfig {
         );
         // jdbcEngineDriverTimeout
         setJdbcEngineDriverTimeout(
-                Integer.valueOf(configMap.getOrDefault("", "10000"))
+                Integer.parseInt(configMap.getOrDefault("jdbc.engine.driver.client.timeout", "10000"))
+        );
+        // hdbcEngineExecutorTimeout
+        setJdbcEngineExecutorTimeout(
+                Integer.parseInt(configMap.getOrDefault("jdbc.engine.executor.client.timeout", "10000"))
         );
     }
 }

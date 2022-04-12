@@ -120,7 +120,7 @@ public class DriverServerSideQuery {
 
         @Override
         public JDBCResultRef call() {
-            String querySQL = "select name, count(1) as uv from engine.t_click_logs group by name;";
+            String querySQL = "select * from engine.t_click_logs limit 100,2";
 //            String querySQL = "";
             JDBCResultRef jdbcResultRef = null;
             try {

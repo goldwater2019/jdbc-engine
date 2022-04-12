@@ -1,5 +1,6 @@
 package com.ane56.engine.jdbc.client;
 
+import com.ane56.engine.jdbc.config.JDBCEngineConfig;
 import com.ane56.engine.jdbc.enumeration.JDBCQueryStatus;
 import com.ane56.engine.jdbc.exception.JDBCEngineException;
 import com.ane56.engine.jdbc.model.JDBCOperationRef;
@@ -31,19 +32,23 @@ import java.util.UUID;
 @Slf4j
 public class JDBCEngineExecutorServiceClientManager {
 
-    private static final int TIMEOUT = 10 * 1000;
+    private int timeout;
     private static volatile JDBCEngineExecutorServiceClientManager singleton;
     private JDBCEngineExecutorRefManager jdbcEngineExecutorRefManager;
     private String configDir;
 
-    public JDBCEngineExecutorServiceClientManager(String configDir) {
+    public JDBCEngineExecutorServiceClientManager(String configDir) throws JDBCEngineException {
         setConfigDir(configDir);
         if (jdbcEngineExecutorRefManager == null) {
             jdbcEngineExecutorRefManager = JDBCEngineExecutorRefManager.getInstance();
         }
+        setTimeout(JDBCEngineConfig.getInstance(
+                        getConfigDir()
+                ).getJdbcEngineExecutorTimeout()
+        );
     }
 
-    public static JDBCEngineExecutorServiceClientManager getInstance(String configDir) {
+    public static JDBCEngineExecutorServiceClientManager getInstance(String configDir) throws JDBCEngineException {
         if (singleton == null) {
             synchronized (JDBCEngineExecutorServiceClientManager.class) {
                 if (singleton == null) {
@@ -89,7 +94,7 @@ public class JDBCEngineExecutorServiceClientManager {
     public JDBCEngineExecutorServiceClientSuite innerGetAvailableClient(String executorHost, int executorPort) {
         //使用非阻塞方式，按块的大小进行传输，类似于Java中的NIO。记得调用close释放资源
         try {
-            TTransport transport = new TFramedTransport(new TSocket(executorHost, executorPort, TIMEOUT));
+            TTransport transport = new TFramedTransport(new TSocket(executorHost, executorPort, getTimeout()));
             //高效率的、密集的二进制编码格式进行数据传输协议
             TProtocol protocol = new TCompactProtocol(transport);
             JDBCEngineExecutorService.Client client = new JDBCEngineExecutorService.Client(protocol);
