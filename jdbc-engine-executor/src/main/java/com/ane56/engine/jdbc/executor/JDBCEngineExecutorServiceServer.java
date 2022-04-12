@@ -81,7 +81,8 @@ public class JDBCEngineExecutorServiceServer {
                 configMap.put("jdbc.engine.driver.config.path", configDir);
             }
         }
-        String configDir = configMap.getOrDefault("jdbc.engine.driver.config.path", "C:/workspace/jdbc-engine/conf");
+        // TODO get default config path via env
+        String configDir = configMap.get("jdbc.engine.driver.config.path");
         JDBCEngineExecutorServiceServer jdbcEngineExecutorServiceServer = JDBCEngineExecutorServiceServer.getInstance();
         jdbcEngineExecutorServiceServer.heartBeat();
         jdbcEngineExecutorServiceServer.invoke();

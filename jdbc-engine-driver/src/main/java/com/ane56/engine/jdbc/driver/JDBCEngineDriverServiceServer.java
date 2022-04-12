@@ -49,6 +49,7 @@ public class JDBCEngineDriverServiceServer {
             }
         }
 
+        // TODO get default config path via env
         String configDir = configMap.get("jdbc.engine.driver.config.path");// , "C:/workspace/jdbc-engine/conf");
 
         String driverHost = NetUtils.getInetHostAddress();

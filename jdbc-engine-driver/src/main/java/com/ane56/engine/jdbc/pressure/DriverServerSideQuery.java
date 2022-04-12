@@ -21,9 +21,24 @@ import java.util.concurrent.*;
 @Slf4j
 public class DriverServerSideQuery {
     private static JDBCEngineDriverServiceClientManager jdbcEngineDriverServiceClientManager;
-    private static String jDBCEngineConfigDir = "C:/workspace/jdbc-engine/conf";
+    private static String jDBCEngineConfigDir;
+
+
+    /**
+     * parse config parameters from args
+     * @param args
+     */
+    public static void parseConfig(String[] args) {
+        for (String arg : args) {
+            if (arg.startsWith("--config-dir")) {
+                String configDir = arg.split("=")[1];
+                jDBCEngineConfigDir = configDir;
+            }
+        }
+    }
 
     public static void main02(String[] args) throws Exception {
+        parseConfig(args);
         ZkUtils zkUtils = ZkUtils.getInstance(jDBCEngineConfigDir);
         for (int i = 0; i < 0; i++) {
             Random random = new Random();
@@ -57,17 +72,10 @@ public class DriverServerSideQuery {
     }
 
     public static void main(String[] args) throws ExecutionException, InterruptedException, JDBCEngineException {
-//        String driverHost = null;
-//        Integer driverPort = null;
+        parseConfig(args);
         Integer maxIterationNum = null;
         Integer threadNum = null;
         for (String arg : args) {
-//            if (arg.startsWith("--driverHost")) {
-//                driverHost = arg.trim().split("=")[1];
-//            }
-//            if (arg.startsWith("--driverPort")) {
-//                driverPort = Integer.parseInt(arg.trim().split("=")[1]);
-//            }
             if (arg.startsWith("--maxIterationNum")) {
                 maxIterationNum = Integer.parseInt(arg.trim().split("=")[1]);
             }
@@ -75,12 +83,6 @@ public class DriverServerSideQuery {
                 threadNum = Integer.parseInt(arg.trim().split("=")[1]);
             }
         }
-//        if (driverHost == null) {
-//            driverHost = "127.0.0.1";
-//        }
-//        if (driverPort == null) {
-//            driverPort = 8888;
-//        }
         if (maxIterationNum == null) {
             maxIterationNum = 1000;
         }
@@ -88,8 +90,6 @@ public class DriverServerSideQuery {
             threadNum = 32;
         }
 
-//        log.info("driver host: " + driverHost);
-//        log.info("driver port: " + driverPort);
         log.info("max iteration num: " + maxIterationNum);
         log.info("thread num: " + threadNum);
 
@@ -120,7 +120,7 @@ public class DriverServerSideQuery {
 
         @Override
         public JDBCResultRef call() {
-            String querySQL = "select * from tx_dev.bd_center_center_month;";
+            String querySQL = "select name, count(1) as uv from engine.t_click_logs group by name;";
 //            String querySQL = "";
             JDBCResultRef jdbcResultRef = null;
             try {
