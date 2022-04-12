@@ -3,6 +3,7 @@ package com.ane56.engine.jdbc.driver.impl;
 import com.ane56.engine.jdbc.catalog.JDBCCatalogManager;
 import com.ane56.engine.jdbc.client.JDBCEngineExecutorRefManager;
 import com.ane56.engine.jdbc.client.JDBCEngineExecutorServiceClientManager;
+import com.ane56.engine.jdbc.exception.JDBCEngineException;
 import com.ane56.engine.jdbc.model.JDBCCatalog;
 import com.ane56.engine.jdbc.model.JDBCResultRef;
 import com.ane56.engine.jdbc.thrit.service.JDBCEngineDriverService;
@@ -25,13 +26,21 @@ public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService.Ifac
 
     public JDBCEngineDriverServiceImpl(String jDBCEngineDriverServiceConfigPath) {
         setJDBCEngineDriverServiceConfigPath(jDBCEngineDriverServiceConfigPath);
-        checkInitialStatus();
+        try {
+            checkInitialStatus();
+        } catch (JDBCEngineException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public boolean heartBeat(TJDBCEngineExecutor jdbcEngineExecutor) throws TException {
         long startTime = System.currentTimeMillis();
-        checkInitialStatus();
+        try {
+            checkInitialStatus();
+        } catch (JDBCEngineException e) {
+            e.printStackTrace();
+        }
         boolean result = jdbcEngineExecutorRefManager.heartbeat(jdbcEngineExecutor);
 //        log.info("heartBeat : " + (System.currentTimeMillis() - startTime) + " ms, body: " + jdbcEngineExecutorRefManager.getUuid2jdbcEngineExecutorRefs().get(
 //                UUID.fromString(jdbcEngineExecutor.getExecutorRefId())
@@ -48,7 +57,11 @@ public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService.Ifac
     @Override
     public List<TJDBCCatalog> getCatalogs() throws TException {
         long startTime = System.currentTimeMillis();
-        checkInitialStatus();
+        try {
+            checkInitialStatus();
+        } catch (JDBCEngineException e) {
+            e.printStackTrace();
+        }
         List<TJDBCCatalog> result = jdbcCatalogManager.getCatalogs();
 //        log.info("getCatalogs : " + (System.currentTimeMillis() - startTime) + " ms");
         return result;
@@ -66,7 +79,11 @@ public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService.Ifac
      */
     @Override
     public TJDBCResultRef query(String querySQL) throws TException {
-        checkInitialStatus();
+        try {
+            checkInitialStatus();
+        } catch (JDBCEngineException e) {
+            e.printStackTrace();
+        }
 
         JDBCResultRef jdbcResultRef = null;
         try {
@@ -79,7 +96,7 @@ public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService.Ifac
         return jdbcResultRef.asTJDBCResultRef();
     }
 
-    public void checkInitialStatus() {
+    public void checkInitialStatus() throws JDBCEngineException {
         if (jdbcCatalogManager == null) {
             jdbcCatalogManager = JDBCCatalogManager.getInstance(jDBCEngineDriverServiceConfigPath);
             jdbcCatalogManager.loadOrDefaultCatalogs();

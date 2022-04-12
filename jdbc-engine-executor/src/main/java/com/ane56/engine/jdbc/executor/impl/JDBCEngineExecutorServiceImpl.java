@@ -68,7 +68,7 @@ public class JDBCEngineExecutorServiceImpl implements JDBCEngineExecutorService.
             operationRef.setQueryStatus(JDBCQueryStatus.FAILED);
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw, true));
-            operationRef.setMessage(sw.toString());  // TODO 更详细的错误收集
+            operationRef.setMessage(sw.toString());
         }
         operationRef.setEndTime(System.currentTimeMillis());
         JDBCResultRef jdbcResultRef = JDBCResultRef.builder()

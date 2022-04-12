@@ -1,5 +1,6 @@
 package com.ane56.engine.jdbc.catalog;
 
+import com.ane56.engine.jdbc.exception.JDBCEngineException;
 import com.ane56.engine.jdbc.model.JDBCCatalog;
 import com.ane56.engine.jdbc.thrit.struct.TJDBCCatalog;
 import com.ane56.engine.jdbc.utils.PropertiesUtils;
@@ -72,20 +73,19 @@ public class JDBCCatalogManager {
     /**
      * 加载默认的配置
      */
-    public void loadOrDefaultCatalogs() {
+    public void loadOrDefaultCatalogs() throws JDBCEngineException {
         if (jDBCEngineDriverServiceConfigPath == null) {
             // no-ops
             log.error("There is no specific config path, no ops for load or default catalogs");
-            // TODO 抛出错误
-            return;
+            throw new JDBCEngineException("There is no specific config path, no ops for load or default catalogs");
         }
 
         File file = new File(jDBCEngineDriverServiceConfigPath);
         if (!file.isDirectory()) {
-            // TODO 抛出--config-dir 不是文件夹的错误
+            throw new JDBCEngineException(String.format("%s not a directory, expect --conf-dir is a directory", jDBCEngineDriverServiceConfigPath));
         }
         if (!file.exists()) {
-            // TODO 抛出配置项不存在得异常
+            throw new JDBCEngineException(String.format("%s not exists, expect --conf-dir is a directory", jDBCEngineDriverServiceConfigPath));
         }
         File[] files = file.listFiles();
         for (File configFile : files) {

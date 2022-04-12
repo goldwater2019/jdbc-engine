@@ -81,7 +81,6 @@ public class JDBCEngineExecutorServiceServer {
                 configMap.put("jdbc.engine.driver.config.path", configDir);
             }
         }
-        // TODO driver和executor两侧, configDir相关配置的默认项
         String configDir = configMap.getOrDefault("jdbc.engine.driver.config.path", "C:/workspace/jdbc-engine/conf");
         JDBCEngineExecutorServiceServer jdbcEngineExecutorServiceServer = JDBCEngineExecutorServiceServer.getInstance();
         jdbcEngineExecutorServiceServer.heartBeat();
