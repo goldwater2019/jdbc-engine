@@ -11,16 +11,14 @@ import java.util.Map;
 @Data
 public class JDBCEngineConfig {
 
+    private static volatile JDBCEngineConfig singleton;
     // kyuubi.ha.zookeeper.quorum
     private String haZookeeperQuorum;
     private String haZookeeperDriverUriPath;
     private String haZookeeperExecutorUriPath;
     private int jdbcEngineDriverTimeout;
-
     private Map<String, String> configMap;
     private String configPath;
-
-    private static volatile JDBCEngineConfig singleton;
 
     public JDBCEngineConfig(String configPath) throws JDBCEngineException {
         setConfigPath(configPath);

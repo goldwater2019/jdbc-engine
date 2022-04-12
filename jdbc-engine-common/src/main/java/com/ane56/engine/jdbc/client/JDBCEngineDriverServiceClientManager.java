@@ -36,8 +36,8 @@ public class JDBCEngineDriverServiceClientManager {
     public JDBCEngineDriverServiceClientManager(String configDir) throws JDBCEngineException {
         setConfigDir(configDir);
         setTimeout(JDBCEngineConfig.getInstance(
-                getConfigDir()
-        ).getJdbcEngineDriverTimeout()
+                        getConfigDir()
+                ).getJdbcEngineDriverTimeout()
         );
     }
 

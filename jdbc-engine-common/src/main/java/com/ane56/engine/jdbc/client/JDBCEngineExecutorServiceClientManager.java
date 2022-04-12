@@ -1,6 +1,5 @@
 package com.ane56.engine.jdbc.client;
 
-import com.ane56.engine.jdbc.config.JDBCEngineConfig;
 import com.ane56.engine.jdbc.enumeration.JDBCQueryStatus;
 import com.ane56.engine.jdbc.exception.JDBCEngineException;
 import com.ane56.engine.jdbc.model.JDBCOperationRef;

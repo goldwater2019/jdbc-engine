@@ -43,12 +43,12 @@ public class JDBCEngineExecutorServiceServer {
     private static final int retryTimes = 3;
     private static final UUID ENGINE_REF_ID = UUID.randomUUID();
     private static volatile JDBCEngineExecutorServiceServer singleton;
+    private static Map<String, String> configMap = new HashMap<>();
     private int servicePort;
     private JDBCEngineDriverServiceClientManager jdbcEngineDriverServiceClientManager;
     private PooledDataSourceManager pooledDataSourceManager;
     private ScheduledExecutorService heartBeatExecutorService;
     private ScheduledExecutorService refreshCatalogExecutorService;
-    private static Map<String, String> configMap = new HashMap<>();
 
     /**
      * 构造方法

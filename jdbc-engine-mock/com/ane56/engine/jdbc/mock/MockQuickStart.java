@@ -1,10 +1,13 @@
 package com.ane56.engine.jdbc.mock;
 
 import com.ane56.engine.jdbc.entity.ClickLog;
-import com.github.javafaker.*;
+import com.github.javafaker.Faker;
 import lombok.extern.slf4j.Slf4j;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
