@@ -2,6 +2,7 @@ package com.ane56.engine.jdbc.pressure;
 
 import com.ane56.engine.jdbc.client.JDBCEngineDriverServiceClientManager;
 import com.ane56.engine.jdbc.config.JDBCEngineConfig;
+import com.ane56.engine.jdbc.exception.JDBCEngineException;
 import com.ane56.engine.jdbc.model.JDBCCatalog;
 import com.ane56.engine.jdbc.model.JDBCResultRef;
 import com.ane56.engine.jdbc.model.thrift.JDBCEngineDriverServiceClientSuite;
@@ -55,7 +56,7 @@ public class DriverServerSideQuery {
         zkUtils.changeRunningStatus(false);
     }
 
-    public static void main(String[] args) throws ExecutionException, InterruptedException {
+    public static void main(String[] args) throws ExecutionException, InterruptedException, JDBCEngineException {
 //        String driverHost = null;
 //        Integer driverPort = null;
         Integer maxIterationNum = null;

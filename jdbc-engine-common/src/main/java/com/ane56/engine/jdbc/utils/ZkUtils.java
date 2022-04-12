@@ -1,6 +1,7 @@
 package com.ane56.engine.jdbc.utils;
 
 import com.ane56.engine.jdbc.config.JDBCEngineConfig;
+import com.ane56.engine.jdbc.exception.JDBCEngineException;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.curator.framework.CuratorFramework;
@@ -29,7 +30,7 @@ public class ZkUtils {
      *
      * @param configDir
      */
-    private ZkUtils(String configDir) {
+    private ZkUtils(String configDir) throws JDBCEngineException {
         setConfigDir(configDir);
         JDBCEngineConfig jdbcEngineConfig = JDBCEngineConfig.getInstance(configDir);
         setConnectionStr(jdbcEngineConfig.getHaZookeeperQuorum());
@@ -41,7 +42,7 @@ public class ZkUtils {
         isRunning = false;
     }
 
-    public static ZkUtils getInstance(String configDir) {
+    public static ZkUtils getInstance(String configDir) throws JDBCEngineException {
         if (singleton == null) {
             synchronized (ZkUtils.class) {
                 if (singleton == null) {

@@ -2,6 +2,7 @@ package com.ane56.engine.jdbc.executor.impl;
 
 import com.ane56.engine.jdbc.client.JDBCEngineDriverServiceClientManager;
 import com.ane56.engine.jdbc.enumeration.JDBCQueryStatus;
+import com.ane56.engine.jdbc.exception.JDBCEngineException;
 import com.ane56.engine.jdbc.executor.pool.connection.PooledDataSourceManager;
 import com.ane56.engine.jdbc.model.JDBCOperationRef;
 import com.ane56.engine.jdbc.model.JDBCResultRef;
@@ -36,7 +37,7 @@ public class JDBCEngineExecutorServiceImpl implements JDBCEngineExecutorService.
     private PooledDataSourceManager pooledDataSourceManager;
     private String jdbcConfDir;
 
-    public JDBCEngineExecutorServiceImpl(String jdbcConfDir) {
+    public JDBCEngineExecutorServiceImpl(String jdbcConfDir) throws JDBCEngineException {
         setJdbcConfDir(jdbcConfDir);
         checkInitialStatus();
     }
@@ -44,7 +45,11 @@ public class JDBCEngineExecutorServiceImpl implements JDBCEngineExecutorService.
     @Override
     public TJDBCResultRef query(TJDBCOperationRef jdbcOperationRef) {
         long startTime = System.currentTimeMillis();
-        checkInitialStatus();
+        try {
+            checkInitialStatus();
+        } catch (JDBCEngineException e) {
+            e.printStackTrace();
+        }
         JDBCOperationRef operationRef = JDBCOperationRef.builder()
                 .startTime(jdbcOperationRef.getStartTime())
                 .endTime(jdbcOperationRef.getEndTime())
@@ -73,7 +78,7 @@ public class JDBCEngineExecutorServiceImpl implements JDBCEngineExecutorService.
         return jdbcResultRef.asTJDBCResultRef();
     }
 
-    private void checkInitialStatus() {
+    private void checkInitialStatus() throws JDBCEngineException {
         if (jdbcEngineDriverServiceClientManager == null) {
             jdbcEngineDriverServiceClientManager = JDBCEngineDriverServiceClientManager.getInstance(getJdbcConfDir());
         }

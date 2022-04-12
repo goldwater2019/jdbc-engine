@@ -33,7 +33,7 @@ public class JDBCEngineDriverServiceClientManager {
 
     private String configDir;
 
-    public JDBCEngineDriverServiceClientManager(String configDir) {
+    public JDBCEngineDriverServiceClientManager(String configDir) throws JDBCEngineException {
         setConfigDir(configDir);
         setTimeout(JDBCEngineConfig.getInstance(
                 getConfigDir()
@@ -41,7 +41,7 @@ public class JDBCEngineDriverServiceClientManager {
         );
     }
 
-    public static JDBCEngineDriverServiceClientManager getInstance(String configDir) {
+    public static JDBCEngineDriverServiceClientManager getInstance(String configDir) throws JDBCEngineException {
         if (singleton == null) {
             synchronized (JDBCEngineDriverServiceClientManager.class) {
                 if (singleton == null) {

@@ -2,6 +2,7 @@ package com.ane56.engine.jdbc.driver;
 
 
 import com.ane56.engine.jdbc.client.JDBCEngineDriverServiceClientManager;
+import com.ane56.engine.jdbc.exception.JDBCEngineException;
 import com.ane56.engine.jdbc.model.JDBCResultRef;
 import com.ane56.engine.jdbc.model.thrift.JDBCEngineDriverServiceClientSuite;
 import com.ane56.engine.jdbc.thrit.service.JDBCEngineDriverService;
@@ -20,7 +21,7 @@ public class DriverClientTest {
     private String jdbcEngineConfDir = "C:/workspace/jdbc-engine/conf";
 
     @Before
-    public void beforeTest() {
+    public void beforeTest() throws JDBCEngineException {
         if (jdbcEngineDriverServiceClientManager == null) {
             jdbcEngineDriverServiceClientManager = JDBCEngineDriverServiceClientManager.getInstance(jdbcEngineConfDir);
         }

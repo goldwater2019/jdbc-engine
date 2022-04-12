@@ -2,6 +2,7 @@ package com.ane56.engine.jdbc.executor;
 
 import com.ane56.engine.jdbc.client.JDBCEngineDriverServiceClientManager;
 import com.ane56.engine.jdbc.config.JDBCEngineConfig;
+import com.ane56.engine.jdbc.exception.JDBCEngineException;
 import com.ane56.engine.jdbc.executor.impl.JDBCEngineExecutorServiceImpl;
 import com.ane56.engine.jdbc.executor.pool.connection.PooledDataSourceManager;
 import com.ane56.engine.jdbc.model.JDBCCatalog;
@@ -52,7 +53,7 @@ public class JDBCEngineExecutorServiceServer {
     /**
      * 构造方法
      */
-    private JDBCEngineExecutorServiceServer(int servicePort) {
+    private JDBCEngineExecutorServiceServer(int servicePort) throws JDBCEngineException {
         setServicePort(servicePort);
         checkInitialStatus();
     }
@@ -61,7 +62,7 @@ public class JDBCEngineExecutorServiceServer {
      * 单例方法
      * TODO 自增端口
      */
-    public static JDBCEngineExecutorServiceServer getInstance() {
+    public static JDBCEngineExecutorServiceServer getInstance() throws JDBCEngineException {
         if (singleton == null) {
             synchronized (JDBCEngineExecutorServiceServer.class) {
                 if (singleton == null) {
@@ -92,7 +93,7 @@ public class JDBCEngineExecutorServiceServer {
     /**
      * 检查初始化状态
      */
-    private void checkInitialStatus() {
+    private void checkInitialStatus() throws JDBCEngineException {
         if (jdbcEngineDriverServiceClientManager == null) {
             String configDir = configMap.getOrDefault("jdbc.engine.driver.config.path", "C:/workspace/jdbc-engine/conf");
             jdbcEngineDriverServiceClientManager = JDBCEngineDriverServiceClientManager.getInstance(configDir);
@@ -106,7 +107,7 @@ public class JDBCEngineExecutorServiceServer {
         }
     }
 
-    public void invoke() throws TTransportException {
+    public void invoke() throws TTransportException, JDBCEngineException {
         String configDir = configMap.getOrDefault("jdbc.engine.driver.config.path", "C:/workspace/jdbc-engine/conf");
         // 非阻塞式的，配合TFramedTransport使用
         TNonblockingServerTransport serverTransport = new TNonblockingServerSocket(servicePort);

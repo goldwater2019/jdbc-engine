@@ -1,5 +1,6 @@
 package com.ane56.engine.jdbc.config;
 
+import com.ane56.engine.jdbc.exception.JDBCEngineException;
 import com.ane56.engine.jdbc.utils.PropertiesUtils;
 import lombok.Data;
 
@@ -21,13 +22,13 @@ public class JDBCEngineConfig {
 
     private static volatile JDBCEngineConfig singleton;
 
-    public JDBCEngineConfig(String configPath) {
+    public JDBCEngineConfig(String configPath) throws JDBCEngineException {
         setConfigPath(configPath);
         setConfigMap(new LinkedHashMap<>());
         loadGetOrDefaultAsMap();
     }
 
-    public static JDBCEngineConfig getInstance(String configPath) {
+    public static JDBCEngineConfig getInstance(String configPath) throws JDBCEngineException {
         if (singleton == null) {
             synchronized (JDBCEngineConfig.class) {
                 if (singleton == null) {
@@ -38,14 +39,13 @@ public class JDBCEngineConfig {
         return singleton;
     }
 
-    private void loadGetOrDefaultAsMap() {
-        // TODO 根据configPath读取相应的jdbc-engine-default.conf中的内容
+    private void loadGetOrDefaultAsMap() throws JDBCEngineException {
         File configDir = new File(configPath);
         if (!configDir.exists()) {
-            // TODO 抛出异常
+            throw new JDBCEngineException(String.format("%s not exists, expect --conf-dir is a directory", configPath));
         }
         if (!configDir.isDirectory()) {
-            // TODO 抛出异常
+            throw new JDBCEngineException(String.format("%s not a directory, expect --conf-dir is a directory", configPath));
         }
 
         File[] files = configDir.listFiles();
