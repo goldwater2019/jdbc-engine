@@ -32,7 +32,7 @@
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss z</maven.build.timestamp.format>
         <lombok.version>1.18.20</lombok.version>
         <scala.version>2.12.5</scala.version>
-        <scla.binary.version>2.12</scla.binary.version>
+        <scala.binary.version>2.12</scala.binary.version>
         <libthrift.version>0.16.0</libthrift.version>
         <curator.version>5.2.0</curator.version>
         <slf4j.version>1.7.32</slf4j.version>
