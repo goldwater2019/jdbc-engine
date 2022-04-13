@@ -14,6 +14,7 @@ fi
 cp jdbc-engine-common/target/*-jar-with-dependencies.jar jar/jdbc-engine-common.jar
 cp jdbc-engine-driver/target/*-jar-with-dependencies.jar jar/jdbc-engine-driver.jar
 cp jdbc-engine-executor/target/*-jar-with-dependencies.jar jar/jdbc-engine-executor.jar
+cp jdbc-engine-gateway/target/*.jar jar/jdbc-engine-gateway.jar
 
 if [ ! -d "target/" ];then
   mkdir target
