@@ -10,6 +10,7 @@ import com.ane56.engine.jdbc.model.JDBCResultRef;
 import com.ane56.engine.jdbc.model.thrift.JDBCEngineDriverServiceClientSuite;
 import com.ane56.engine.jdbc.thrit.struct.TJDBCCatalog;
 import com.ane56.engine.jdbc.thrit.struct.TJDBCResultRef;
+import com.ane56.engine.jdbc.utils.PathUtils;
 import com.ane56.engine.service.JDBCEngineDriverService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -89,12 +90,22 @@ public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService {
 
 
     private void checkInitialStatus() throws JDBCEngineException {
+        checkConfigDir();
         if (jdbcEngineConfig == null) {
             jdbcEngineConfig = JDBCEngineConfig.getInstance(configDir);
         }
 
         if (jdbcEngineDriverServiceClientManager == null) {
             jdbcEngineDriverServiceClientManager = JDBCEngineDriverServiceClientManager.getInstance(configDir);
+        }
+    }
+
+    private void checkConfigDir() {
+        if (configDir == null || configDir.length() == 0) {
+            String jdbcEngineHome = System.getenv("JDBC_ENGINE_HOME");
+            if (jdbcEngineHome != null) {
+                configDir = PathUtils.checkAndCombinePath(jdbcEngineHome, "/conf");
+            }
         }
     }
 }
