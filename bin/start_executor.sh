@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
-JDBC_ENGINE_HOME=$(cd `dirname $0`/..;pwd)
+if [ ! -n "$JDBC_ENGINE_HOME" ]; then
+  JDBC_ENGINE_HOME=$(cd `dirname $0`/..;pwd)
+fi
+
+echo "JDBC_ENGINE_HOME: $JDBC_ENGINE_HOME"
 
 cd $JDBC_ENGINE_HOME
 if [ ! -d "pid/" ];then
