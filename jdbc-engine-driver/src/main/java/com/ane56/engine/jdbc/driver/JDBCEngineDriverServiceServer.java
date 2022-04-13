@@ -3,6 +3,7 @@ package com.ane56.engine.jdbc.driver;
 
 import com.ane56.engine.jdbc.config.JDBCEngineConfig;
 import com.ane56.engine.jdbc.driver.impl.JDBCEngineDriverServiceImpl;
+import com.ane56.engine.jdbc.exception.JDBCEngineException;
 import com.ane56.engine.jdbc.thrit.service.JDBCEngineDriverService;
 import com.ane56.engine.jdbc.utils.NetUtils;
 import com.ane56.engine.jdbc.utils.PathUtils;
@@ -49,7 +50,20 @@ public class JDBCEngineDriverServiceServer {
             }
         }
 
-        // TODO get default config path via env
+        String givenConfigDir = configMap.get("jdbc.engine.driver.config.path");
+        if (givenConfigDir == null) {
+            String jdbcEngineHome = System.getenv("JDBC_ENGINE_HOME");
+            if (jdbcEngineHome != null) {
+                configMap.put(
+                        "jdbc.engine.driver.config.path",
+                        PathUtils.checkAndCombinePath(jdbcEngineHome, "/conf"));
+            }
+        }
+        givenConfigDir = configMap.get("jdbc.engine.driver.config.path");
+        if (givenConfigDir == null) {
+            throw new JDBCEngineException("at least, env variable JDBC_ENGINE_HOME or args --conf-dir should be specified");
+        }
+
         String configDir = configMap.get("jdbc.engine.driver.config.path");// , "C:/workspace/jdbc-engine/conf");
 
         String driverHost = NetUtils.getInetHostAddress();
