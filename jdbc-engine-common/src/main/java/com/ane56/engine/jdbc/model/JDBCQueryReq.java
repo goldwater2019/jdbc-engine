@@ -1,4 +1,4 @@
-package com.ane56.engine.dto;
+package com.ane56.engine.jdbc.model;
 
 import lombok.*;
 

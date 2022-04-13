@@ -1,7 +1,7 @@
 package com.ane56.engine.service;
 
 
-import com.ane56.engine.dto.JsonResult;
+import com.ane56.engine.jdbc.model.JsonResult;
 import com.ane56.engine.jdbc.model.JDBCCatalog;
 import com.ane56.engine.jdbc.model.JDBCResultRef;
 

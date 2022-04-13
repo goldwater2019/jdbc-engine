@@ -1,4 +1,4 @@
-package com.ane56.engine.dto;
+package com.ane56.engine.jdbc.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,5 +34,11 @@ public class JsonResult<T> {
         setMsg(msg);
         setCode(0);
         setData(data);
+    }
+
+    public JsonResult(T data, String msg, int code) {
+        setData(data);
+        setMsg(msg);
+        setCode(code);
     }
 }

@@ -1,7 +1,7 @@
 package com.ane56.engine.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ane56.engine.dto.JsonResult;
+import com.ane56.engine.jdbc.model.JsonResult;
 import com.ane56.engine.jdbc.client.JDBCEngineDriverServiceClientManager;
 import com.ane56.engine.jdbc.config.JDBCEngineConfig;
 import com.ane56.engine.jdbc.exception.JDBCEngineException;
