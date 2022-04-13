@@ -42,20 +42,4 @@
         <okhttp.version>3.14.9</okhttp.version>
     </properties>
 
-
-    <!--仓库信息-->
-    <repositories>
-        <repository>
-            <id>aliyun</id>
-            <name>阿里maven仓库</name>
-            <url>https://maven.aliyun.com/repository/public</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
 </project>

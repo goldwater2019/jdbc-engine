@@ -70,50 +70,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
-            <plugin>
-                <groupId>com.spotify</groupId>
-                <artifactId>docker-maven-plugin</artifactId>
-                <version>1.2.1</version>
-                <configuration>
-                    <serverId>docker-registry</serverId>
-                    <imageName>registry-harbor.ane.com/application/${project.artifactId}:${project.version}</imageName>
-                    <imageTags>
-                        <imageTag>${project.version}</imageTag>
-                        <imageTag>latest</imageTag>
-                    </imageTags>
-                    <dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>
-                    <skipDockerBuild>false</skipDockerBuild>
-                    <resources>
-                        <resource>
-                            <targetPath>/</targetPath>
-                            <directory>${project.build.directory}</directory>
-                            <include>${project.build.finalName}.jar</include>
-                        </resource>
-                    </resources>
-                    <buildArgs>
-                        <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
-                        <ARTIFACT_ID>${project.artifactId}</ARTIFACT_ID>
-                    </buildArgs>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
-
-
-
-    <!--仓库信息-->
-    <repositories>
-        <repository>
-            <id>aliyun</id>
-            <name>阿里maven仓库</name>
-            <url>https://maven.aliyun.com/repository/public</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
 
 </project>
