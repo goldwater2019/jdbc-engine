@@ -10,6 +10,7 @@ import com.ane56.engine.jdbc.model.thrift.JDBCEngineDriverServiceClientSuite;
 import com.ane56.engine.jdbc.thrit.service.JDBCEngineDriverService;
 import com.ane56.engine.jdbc.thrit.service.JDBCEngineExecutorService;
 import com.ane56.engine.jdbc.thrit.struct.TJDBCCatalog;
+import com.ane56.engine.jdbc.utils.LogUtils;
 import com.ane56.engine.jdbc.utils.NetUtils;
 import com.ane56.engine.jdbc.utils.PathUtils;
 import com.ane56.engine.jdbc.utils.ZkUtils;
@@ -27,6 +28,8 @@ import org.apache.thrift.transport.TNonblockingServerTransport;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
 import org.apache.thrift.transport.layered.TFramedTransport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -37,7 +40,6 @@ import java.util.concurrent.TimeUnit;
 @Data
 @AllArgsConstructor
 @Builder
-@Slf4j
 @NoArgsConstructor
 public class JDBCEngineExecutorServiceServer {
     private static final int retryTimes = 3;
@@ -49,6 +51,7 @@ public class JDBCEngineExecutorServiceServer {
     private PooledDataSourceManager pooledDataSourceManager;
     private ScheduledExecutorService heartBeatExecutorService;
     private ScheduledExecutorService refreshCatalogExecutorService;
+    private static final Logger logger = LoggerFactory.getLogger(JDBCEngineExecutorServiceServer.class);
 
     /**
      * 构造方法
@@ -97,6 +100,9 @@ public class JDBCEngineExecutorServiceServer {
         }
 
         String configDir = configMap.get("jdbc.engine.driver.config.path");
+
+        LogUtils.getInstance().loadLog4jProperties(configDir);
+
         JDBCEngineExecutorServiceServer jdbcEngineExecutorServiceServer = JDBCEngineExecutorServiceServer.getInstance();
         jdbcEngineExecutorServiceServer.heartBeat();
         jdbcEngineExecutorServiceServer.invoke();
@@ -122,11 +128,11 @@ public class JDBCEngineExecutorServiceServer {
     }
 
     public void invoke() throws TTransportException, JDBCEngineException {
-        String configDir = configMap.getOrDefault("jdbc.engine.driver.config.path", "C:/workspace/jdbc-engine/conf");
+        String configPath = configMap.get("jdbc.engine.driver.config.path"); // , "C:/workspace/jdbc-engine/conf");
         // 非阻塞式的，配合TFramedTransport使用
         TNonblockingServerTransport serverTransport = new TNonblockingServerSocket(servicePort);
         // 关联处理器与Service服务的实现
-        TProcessor processor = new JDBCEngineExecutorService.Processor<JDBCEngineExecutorService.Iface>(new JDBCEngineExecutorServiceImpl(configDir));
+        TProcessor processor = new JDBCEngineExecutorService.Processor<JDBCEngineExecutorService.Iface>(new JDBCEngineExecutorServiceImpl(configPath));
         // 目前Thrift提供的最高级的模式，可并发处理客户端请求
         TThreadedSelectorServer.Args args = new TThreadedSelectorServer.Args(serverTransport);
         args.processor(processor);
@@ -142,7 +148,7 @@ public class JDBCEngineExecutorServiceServer {
         ExecutorService pool = Executors.newFixedThreadPool(3);
         args.executorService(pool);
         TThreadedSelectorServer server = new TThreadedSelectorServer(args);
-        log.info("Starting executor service server on port " + servicePort + "......");
+        logger.info("Starting executor service server on port " + servicePort + "......");
         server.serve();
     }
 

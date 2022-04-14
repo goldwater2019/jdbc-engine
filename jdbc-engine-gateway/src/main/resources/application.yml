@@ -1,6 +1,0 @@
-engine:
-  jdbc:
-    config-dir:
-
-server:
-  port: 8080
