@@ -39,5 +39,5 @@ java -cp jar/jdbc-engine-executor.jar com.ane56.engine.jdbc.executor.JDBCEngineE
 2. 指定启动参数`-Dengine.jdbc.config-dir`
 
 ```shell
-java -jar -Dlog4j,debug -Dlog4j,configuration=file:$JDBC_ENGINE_HOME/conf/log4j.properties jar/jdbc-engine-gateway.jar
+java -Xbootclasspath/a:/path/to/conf/dir -jar jdbc-engine-gateway/target/jdbc-engine-gateway-1.0-SNAPSHOT.jar
 ```

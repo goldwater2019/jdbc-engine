@@ -16,5 +16,6 @@ if [ ! -d "logs/" ];then
   mkdir logs
 fi
 
-nohup java -jar -Dlog4j,debug -Dlog4j,configuration=file:$JDBC_ENGINE_HOME/conf/log4j.properties $JDBC_ENGINE_HOME/jar/jdbc-engine-gateway.jar  $@ 2>&1 | tee logs/jdbc-engine-gateway-$USER.log & \
+nohup java -Xbootclasspath/a:$JDBC_ENGINE_HOME/conf -jar jar/jdbc-engine-gateway.jar \
+  $@ 2>&1 | tee logs/jdbc-engine-gateway-$USER.log & \
     echo $! > pid/gateway.pid
