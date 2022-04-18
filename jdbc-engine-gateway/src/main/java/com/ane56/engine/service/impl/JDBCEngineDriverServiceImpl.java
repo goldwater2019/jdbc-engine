@@ -39,6 +39,7 @@ public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService {
             return new JsonResult<String>(-1, e.getMessage());
         }
         String haZookeeperQuorum = jdbcEngineConfig.getHaZookeeperQuorum();
+        log.info("ha zookeeper quorum: " + haZookeeperQuorum);
         return new JsonResult<String>(haZookeeperQuorum);
     }
 
