@@ -6,6 +6,8 @@ fi
 
 echo "JDBC_ENGINE_HOME: $JDBC_ENGINE_HOME"
 
+export JDBC_ENGINE_HOME=${JDBC_ENGINE_HOME}
+
 cd $JDBC_ENGINE_HOME
 if [ ! -d "pid/" ];then
   mkdir pid
