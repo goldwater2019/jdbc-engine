@@ -26,7 +26,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @Builder
-public class JDBCEngineDriverServiceClientManager {
+public class    JDBCEngineDriverServiceClientManager {
     private static volatile JDBCEngineDriverServiceClientManager singleton;
 
     private int timeout;
