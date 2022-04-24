@@ -22,6 +22,7 @@
         <module>jdbc-engine-executor</module>
         <module>jdbc-engine-mock</module>
         <module>jdbc-engine-gateway</module>
+        <module>jdbc-engine-sql</module>
     </modules>
 
     <properties>

@@ -154,13 +154,21 @@ public class JDBCEngineDriverServiceImpl implements JDBCEngineDriverService.Ifac
      */
     private Map<String, String> convertSQL(String originalSQL) {
         Map<String, String> result = new HashMap<>();
+//        if (!originalSQL.contains("from")) {
+//            result.put(null, originalSQL);
+//            return result;
+//        }
         boolean isKicked = false;
         Map<String, JDBCCatalog> name2jdbcCatalogs = jdbcCatalogManager.getName2jdbcCatalogs();
         for (String catalogName : name2jdbcCatalogs.keySet()) {
             int index = originalSQL.indexOf(catalogName);
             if (index > -1) {
                 isKicked = true;
-                result.put(catalogName, originalSQL.replace(catalogName + ".", ""));
+                String newSQL = originalSQL.replace(catalogName + ".", "");
+                if (newSQL.contains("from " + catalogName)) {
+                    newSQL = newSQL.replace("from " + catalogName, "");
+                }
+                result.put(catalogName, newSQL);
                 break;
             }
         }
