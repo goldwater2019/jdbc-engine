@@ -36,7 +36,7 @@ public class UltraDriverUri {
     private final Properties properties;
 
     private String catalog;
-    // private String schema;
+     private String schema;
 
     public UltraDriverUri(String url, Properties driverProperties)
             throws SQLException {
@@ -58,9 +58,9 @@ public class UltraDriverUri {
         return uri;
     }
 
-//    public String getSchema() {
-//        return schema;
-//    }
+    public String getSchema() {
+        return schema;
+    }
 
     public String getCatalog() {
         return catalog;
@@ -179,7 +179,7 @@ public class UltraDriverUri {
             parts = parts.subList(0, parts.size() - 1);
         }
 
-        if (parts.size() > 1) {
+        if (parts.size() > 2) {
             throw new SQLException("Invalid path segments in URL: " + uri);
         }
 
@@ -188,12 +188,12 @@ public class UltraDriverUri {
         }
         catalog = parts.get(0);
 
-//        if (parts.size() > 1) {
-//            if (parts.get(1).isEmpty()) {
-//                throw new SQLException("Schema name is empty: " + uri);
-//            }
-//            schema = parts.get(1);
-//        }
+        if (parts.size() > 1) {
+            if (parts.get(1).isEmpty()) {
+                throw new SQLException("Schema name is empty: " + uri);
+            }
+            schema = parts.get(1);
+        }
     }
 
     /**

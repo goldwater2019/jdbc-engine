@@ -1,6 +1,7 @@
 package com.ane56.engine.jdbc;
 
 import com.ane56.engine.jdbc.connection.UltraConnection;
+import com.ane56.engine.jdbc.connection.UltraConnectionProperties;
 import com.ane56.engine.jdbc.socket.SocketChannelSocketFactory;
 import okhttp3.OkHttpClient;
 
@@ -55,8 +56,8 @@ public class UltraDriver implements Driver, Closeable {
     @Override
     public Connection connect(String url, Properties info) throws SQLException {
         // first check url is validate
-        if (acceptsURL(url)) {
-            return new UltraConnection(url, info);
+        if (!acceptsURL(url)) {
+            return null;
         }
 
         UltraDriverUri uri = new UltraDriverUri(url, info);
@@ -65,8 +66,7 @@ public class UltraDriver implements Driver, Closeable {
         uri.setupClient(builder);
         QueryExecutor executor = new QueryExecutor(builder.build());
 
-        return new PrestoConnection(uri, executor);
-        return null;
+        return new UltraConnection(uri, executor);
     }
 
     @Override
@@ -76,7 +76,10 @@ public class UltraDriver implements Driver, Closeable {
 
     @Override
     public DriverPropertyInfo[] getPropertyInfo(String url, Properties info) throws SQLException {
-        return new DriverPropertyInfo[0];
+        UltraDriverUri ultraDriverUri = new UltraDriverUri(url, info);
+        return UltraConnectionProperties.allProperties().stream()
+                .map(property -> property.getDriverPropertyInfo(ultraDriverUri.getProperties()))
+                .toArray(DriverPropertyInfo[]::new);
     }
 
     @Override

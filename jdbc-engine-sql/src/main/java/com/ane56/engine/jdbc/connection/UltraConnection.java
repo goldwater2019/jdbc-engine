@@ -1,11 +1,33 @@
 package com.ane56.engine.jdbc.connection;
 
+import com.ane56.engine.jdbc.GatewayInfo;
+import com.ane56.engine.jdbc.NotImplementedException;
+import com.ane56.engine.jdbc.QueryExecutor;
+import com.ane56.engine.jdbc.UltraDriverUri;
 import com.ane56.engine.jdbc.metadata.UltraDatabaseMetaData;
+import com.ane56.engine.jdbc.preparedstatement.UltraPreparedStatement;
+import com.ane56.engine.jdbc.statement.UltraStatement;
+import com.google.common.primitives.Ints;
 
+import java.net.URI;
+import java.nio.charset.CharsetEncoder;
 import java.sql.*;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.Maps.fromProperties;
+import static java.nio.charset.StandardCharsets.US_ASCII;
+import static java.util.Objects.requireNonNull;
+import static java.util.concurrent.TimeUnit.MINUTES;
 
 /**
  * @Author: zhangxinsen
@@ -15,23 +37,59 @@ import java.util.concurrent.Executor;
  */
 
 public class UltraConnection implements Connection {
-    public UltraConnection(String url, Properties info) {
 
+    private final AtomicBoolean closed = new AtomicBoolean();
+    private final AtomicBoolean autoCommit = new AtomicBoolean(true);
+    private final AtomicInteger isolationLevel = new AtomicInteger(TRANSACTION_READ_UNCOMMITTED);
+    private final AtomicBoolean readOnly = new AtomicBoolean();
+    private final AtomicReference<String> catalog = new AtomicReference<>();
+    private final AtomicReference<String> schema = new AtomicReference<>();
+    private final AtomicReference<Locale> locale = new AtomicReference<>();
+    private final AtomicReference<Integer> networkTimeoutMillis = new AtomicReference<>(Ints.saturatedCast(MINUTES.toMillis(2)));
+    private final AtomicReference<GatewayInfo> gatewayInfo = new AtomicReference<>();
+    private final AtomicLong nextStatementId = new AtomicLong(1);
+
+    private final URI jdbcUri;
+    private final URI httpUri;
+    private final String user;
+    private final Map<String, String> sessionProperties;
+    private final Properties connectionProperties;
+    private final Optional<String> applicationNamePrefix;
+    private final Map<String, String> clientInfo = new ConcurrentHashMap<>();
+    private final Map<String, String> preparedStatements = new ConcurrentHashMap<>();
+    private final AtomicReference<String> transactionId = new AtomicReference<>();
+    private final QueryExecutor queryExecutor;
+
+
+    public UltraConnection(UltraDriverUri uri, QueryExecutor queryExecutor) throws SQLException {
+        requireNonNull(uri, "uri is null");
+        jdbcUri = uri.getJdbcUri();
+        httpUri = uri.getHttpUri();
+        this.catalog.set(uri.getCatalog());  // TODO 测试catalog为空时的数据
+        this.schema.set(uri.getSchema());
+        this.user = uri.getUser();
+        this.applicationNamePrefix = uri.getApplicationNamePrefix();
+        this.sessionProperties = new ConcurrentHashMap<>(uri.getSessionProperties());
+        this.connectionProperties = uri.getProperties();
+        this.queryExecutor = requireNonNull(queryExecutor, "queryExecutor is null");
     }
 
     @Override
     public Statement createStatement() throws SQLException {
-        return null;
+        checkOpen();
+        return new UltraStatement(this);
     }
 
     @Override
     public PreparedStatement prepareStatement(String sql) throws SQLException {
-        return null;
+        checkOpen();
+        String name = "statement" + nextStatementId.getAndIncrement();
+        return new UltraPreparedStatement(this, name, sql);
     }
 
     @Override
     public CallableStatement prepareCall(String sql) throws SQLException {
-        return null;
+        throw new NotImplementedException("Connection", "prepareCall");
     }
 
     /**
@@ -46,34 +104,70 @@ public class UltraConnection implements Connection {
         return sql;
     }
 
+
+    /**
+     * 修改auto commit属性
+     * 如果原本auto commit 为 false, 现在为true, 则需要手动提交一次
+     *
+     * @param autoCommit <code>true</code> to enable auto-commit mode;
+     *                   <code>false</code> to disable it
+     * @throws SQLException
+     */
     @Override
     public void setAutoCommit(boolean autoCommit) throws SQLException {
-
+        checkOpen();
+        boolean wasAutoCommit = this.autoCommit.getAndSet(autoCommit);
+        if (autoCommit && !wasAutoCommit) {
+            commit();
+        }
     }
 
     @Override
     public boolean getAutoCommit() throws SQLException {
-        return false;
+        checkOpen();
+        return autoCommit.get();
     }
 
     @Override
     public void commit() throws SQLException {
-
+        checkOpen();
+        if (getAutoCommit()) {
+            throw new SQLException("Connection is in auto-commit mode");
+        }
+        try (UltraStatement statement = new UltraStatement(this)) {
+             statement.internalExecute("COMMIT");
+            // 回滚的支持
+        }
     }
 
     @Override
     public void rollback() throws SQLException {
-
+        checkOpen();
+        if (getAutoCommit()) {
+            throw new SQLException("Connection is in auto-commit mode");
+        }
+        try (UltraStatement statement = new UltraStatement(this)) {
+             statement.internalExecute("ROLLBACK");
+        }
     }
 
     @Override
     public void close() throws SQLException {
-
+        try {
+            if (!closed.get() && (transactionId.get() != null)) {  // 连接未关闭并且存在事务ID时
+                try (UltraStatement statement = new UltraStatement(this)) {
+                     statement.internalExecute("ROLLBACK");
+                }
+            }
+        } finally {
+            closed.set(true);
+            Throwable innerException = null;
+        }
     }
 
     @Override
     public boolean isClosed() throws SQLException {
-        return false;
+        return closed.get();
     }
 
     /**
@@ -89,216 +183,336 @@ public class UltraConnection implements Connection {
 
     @Override
     public void setReadOnly(boolean readOnly) throws SQLException {
-
+        checkOpen();
+        this.readOnly.set(readOnly);
     }
 
     @Override
     public boolean isReadOnly() throws SQLException {
-        return false;
+        return readOnly.get();
     }
 
     @Override
     public void setCatalog(String catalog) throws SQLException {
-
+        checkOpen();
+        this.catalog.set(catalog);
     }
 
     @Override
     public String getCatalog() throws SQLException {
-        return null;
+        checkOpen();
+        return this.catalog.get();
     }
 
+    /**
+     * 事务隔离级别设置
+     *
+     * @param level one of the following <code>Connection</code> constants:
+     *              <code>Connection.TRANSACTION_READ_UNCOMMITTED</code>,
+     *              <code>Connection.TRANSACTION_READ_COMMITTED</code>,
+     *              <code>Connection.TRANSACTION_REPEATABLE_READ</code>, or
+     *              <code>Connection.TRANSACTION_SERIALIZABLE</code>.
+     *              (Note that <code>Connection.TRANSACTION_NONE</code> cannot be used
+     *              because it specifies that transactions are not supported.)
+     * @throws SQLException
+     */
     @Override
     public void setTransactionIsolation(int level) throws SQLException {
-
+        checkOpen();
     }
 
     @Override
     public int getTransactionIsolation() throws SQLException {
-        return 0;
+        return isolationLevel.get();
     }
 
     @Override
     public SQLWarning getWarnings() throws SQLException {
+        checkOpen();
         return null;
     }
 
     @Override
     public void clearWarnings() throws SQLException {
-
+        checkOpen();
     }
 
     @Override
     public Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException {
-        return null;
+        checkResultSet(resultSetType, resultSetConcurrency);
+        return createStatement();
     }
 
     @Override
     public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
-        return null;
+        checkResultSet(resultSetType, resultSetConcurrency);
+        return prepareStatement(sql);
     }
 
     @Override
     public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
-        return null;
+        checkResultSet(resultSetType, resultSetConcurrency);
+        throw new SQLFeatureNotSupportedException("prepareCall");
     }
 
     @Override
     public Map<String, Class<?>> getTypeMap() throws SQLException {
-        return null;
+        throw new SQLFeatureNotSupportedException("getTypeMap");
     }
 
     @Override
     public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
-
+        throw new SQLFeatureNotSupportedException("setTypeMap");
     }
 
     @Override
     public void setHoldability(int holdability) throws SQLException {
-
+        checkOpen();
+        if (holdability != ResultSet.HOLD_CURSORS_OVER_COMMIT) {
+            throw new SQLFeatureNotSupportedException("Changing holdability not supported");
+        }
     }
 
     @Override
     public int getHoldability() throws SQLException {
-        return 0;
+        checkOpen();
+        return ResultSet.HOLD_CURSORS_OVER_COMMIT;
     }
 
     @Override
     public Savepoint setSavepoint() throws SQLException {
-        return null;
+        throw new SQLFeatureNotSupportedException("setSavepoint");
     }
 
     @Override
     public Savepoint setSavepoint(String name) throws SQLException {
-        return null;
+        throw new SQLFeatureNotSupportedException("setSavepoint");
     }
 
     @Override
     public void rollback(Savepoint savepoint) throws SQLException {
-
+        throw new SQLFeatureNotSupportedException("rollback");
     }
 
     @Override
     public void releaseSavepoint(Savepoint savepoint) throws SQLException {
-
+        throw new SQLFeatureNotSupportedException("releaseSavepoint");
     }
 
     @Override
     public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
-        return null;
+        checkHoldability(resultSetHoldability);
+        return createStatement(resultSetType, resultSetConcurrency);
     }
 
     @Override
     public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
-        return null;
+        checkHoldability(resultSetHoldability);
+        return prepareStatement(sql, resultSetType, resultSetConcurrency);
     }
 
     @Override
     public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
-        return null;
+        checkHoldability(resultSetHoldability);
+        return prepareCall(sql, resultSetType, resultSetConcurrency);
     }
 
     @Override
     public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) throws SQLException {
-        return null;
+        if (autoGeneratedKeys != Statement.RETURN_GENERATED_KEYS) {
+            throw new SQLFeatureNotSupportedException("Auto generated keys must be NO_GENERATED_KEYS");
+        }
+        return prepareStatement(sql);
     }
 
     @Override
     public PreparedStatement prepareStatement(String sql, int[] columnIndexes) throws SQLException {
-        return null;
+        throw new SQLFeatureNotSupportedException("prepareStatement");
     }
 
     @Override
     public PreparedStatement prepareStatement(String sql, String[] columnNames) throws SQLException {
-        return null;
+        throw new SQLFeatureNotSupportedException("prepareStatement");
     }
 
     @Override
     public Clob createClob() throws SQLException {
-        return null;
+        throw new SQLFeatureNotSupportedException("createClob");
     }
 
     @Override
     public Blob createBlob() throws SQLException {
-        return null;
+        throw new SQLFeatureNotSupportedException("createBlob");
     }
 
     @Override
     public NClob createNClob() throws SQLException {
-        return null;
+        throw new SQLFeatureNotSupportedException("createNClob");
     }
 
     @Override
     public SQLXML createSQLXML() throws SQLException {
-        return null;
+        throw new SQLFeatureNotSupportedException("createSQLXML");
     }
 
     @Override
     public boolean isValid(int timeout) throws SQLException {
-        return false;
+        if (timeout < 0) {
+            throw new SQLException("Timeout is negative");
+        }
+        return !isClosed();
     }
 
     @Override
     public void setClientInfo(String name, String value) throws SQLClientInfoException {
-
+        requireNonNull(name, "name is null");
+        if (value != null) {
+            clientInfo.put(name, value);
+        } else {
+            clientInfo.remove(name);
+        }
     }
 
     @Override
     public void setClientInfo(Properties properties) throws SQLClientInfoException {
-
+        clientInfo.putAll(fromProperties(properties));
     }
 
     @Override
     public String getClientInfo(String name) throws SQLException {
-        return null;
+        return clientInfo.get(name);
+
     }
 
     @Override
     public Properties getClientInfo() throws SQLException {
-        return null;
+        Properties properties = new Properties();
+        for (Map.Entry<String, String> entry : clientInfo.entrySet()) {
+            properties.setProperty(entry.getKey(), entry.getValue());
+        }
+        return properties;
     }
 
     @Override
     public Array createArrayOf(String typeName, Object[] elements) throws SQLException {
-        return null;
+        throw new SQLFeatureNotSupportedException("createArrayOf");
     }
 
     @Override
     public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
-        return null;
+        throw new SQLFeatureNotSupportedException("createStruct");
     }
 
     @Override
     public void setSchema(String schema) throws SQLException {
-
+        checkOpen();
+        this.schema.set(schema);
     }
 
     @Override
     public String getSchema() throws SQLException {
-        return null;
+        return schema.get();
     }
 
     @Override
     public void abort(Executor executor) throws SQLException {
-
+        close();
     }
 
     @Override
     public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
-
+        checkOpen();
+        if (milliseconds < 0) {
+            throw new SQLException("Timeout is negative");
+        }
+        networkTimeoutMillis.set(milliseconds);
     }
 
     @Override
     public int getNetworkTimeout() throws SQLException {
-        return 0;
+        checkOpen();
+        return networkTimeoutMillis.get();
     }
 
     @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
-        return null;
+        if (isWrapperFor(iface)) {
+            return (T) this;
+        }
+        throw new SQLException("No wrapper for " + iface);
     }
 
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        return false;
+        return iface.isInstance(this);
     }
+
+    private void checkOpen()
+            throws SQLException {
+        if (isClosed()) {
+            throw new SQLException("Connection is closed");
+        }
+    }
+
+    public Properties getConnectionProperties() {
+        Properties properties = new Properties();
+        for (Map.Entry<Object, Object> entry : connectionProperties.entrySet()) {
+            properties.setProperty((String) entry.getKey(), (String) entry.getValue());
+        }
+        return properties;
+    }
+
+    public void setSessionProperty(String name, String value) {
+        requireNonNull(name, "name is null");
+        requireNonNull(value, "value is null");
+        checkArgument(!name.isEmpty(), "name is empty");
+
+        CharsetEncoder charsetEncoder = US_ASCII.newEncoder();
+        checkArgument(name.indexOf('=') < 0, "Session property name must not contain '=': %s", name);
+        checkArgument(charsetEncoder.canEncode(name), "Session property name is not US_ASCII: %s", name);
+        checkArgument(charsetEncoder.canEncode(value), "Session property value is not US_ASCII: %s", value);
+
+        sessionProperties.put(name, value);
+    }
+
+    URI getURI() {
+        return jdbcUri;
+    }
+
+    String getUser() {
+        return user;
+    }
+
+    private static void checkResultSet(int resultSetType, int resultSetConcurrency)
+            throws SQLFeatureNotSupportedException {
+        if (resultSetType != ResultSet.TYPE_FORWARD_ONLY) {
+            throw new SQLFeatureNotSupportedException("Result set type must be TYPE_FORWARD_ONLY");
+        }
+        if (resultSetConcurrency != ResultSet.CONCUR_READ_ONLY) {
+            throw new SQLFeatureNotSupportedException("Result set concurrency must be CONCUR_READ_ONLY");
+        }
+    }
+
+    private static void checkHoldability(int resultSetHoldability)
+            throws SQLFeatureNotSupportedException {
+        if (resultSetHoldability != ResultSet.HOLD_CURSORS_OVER_COMMIT) {
+            throw new SQLFeatureNotSupportedException("Result set holdability must be HOLD_CURSORS_OVER_COMMIT");
+        }
+    }
+
+    private static String getIsolationLevel(int level)
+            throws SQLException {
+        switch (level) {
+            case TRANSACTION_READ_UNCOMMITTED:
+                return "READ UNCOMMITTED";
+            case TRANSACTION_READ_COMMITTED:
+                return "READ COMMITTED";
+            case TRANSACTION_REPEATABLE_READ:
+                return "REPEATABLE READ";
+            case TRANSACTION_SERIALIZABLE:
+                return "SERIALIZABLE";
+        }
+        throw new SQLException("Invalid transaction isolation level: " + level);
+    }
+
 }
