@@ -1,7 +1,10 @@
 package com.ane56.engine.jdbc;
 
+import com.ane56.engine.jdbc.common.client.ClientSession;
+import com.ane56.engine.jdbc.common.client.StatementClient;
 import okhttp3.OkHttpClient;
 
+import static com.ane56.engine.jdbc.common.client.StatementClientFactory.newStatementClient;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -14,8 +17,11 @@ import static java.util.Objects.requireNonNull;
 public class QueryExecutor {
     private final OkHttpClient httpClient;
 
-    public QueryExecutor(OkHttpClient httpClient)
-    {
+    public QueryExecutor(OkHttpClient httpClient) {
         this.httpClient = requireNonNull(httpClient, "httpClient is null");
+    }
+
+    public StatementClient startQuery(ClientSession session, String query) {
+        return newStatementClient(httpClient, session, query);
     }
 }

@@ -37,6 +37,12 @@
             <version>${curator.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>${joda-time.version}</version>
+        </dependency>
+
 <!--        &lt;!&ndash; slf4j &ndash;&gt;-->
 <!--        <dependency>-->
 <!--            <groupId>org.slf4j</groupId>-->

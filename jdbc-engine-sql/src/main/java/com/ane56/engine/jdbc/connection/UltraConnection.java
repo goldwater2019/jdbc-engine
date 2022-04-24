@@ -4,18 +4,18 @@ import com.ane56.engine.jdbc.GatewayInfo;
 import com.ane56.engine.jdbc.NotImplementedException;
 import com.ane56.engine.jdbc.QueryExecutor;
 import com.ane56.engine.jdbc.UltraDriverUri;
+import com.ane56.engine.jdbc.common.client.ClientSession;
+import com.ane56.engine.jdbc.common.client.StatementClient;
 import com.ane56.engine.jdbc.metadata.UltraDatabaseMetaData;
 import com.ane56.engine.jdbc.preparedstatement.UltraPreparedStatement;
 import com.ane56.engine.jdbc.statement.UltraStatement;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Ints;
 
 import java.net.URI;
 import java.nio.charset.CharsetEncoder;
 import java.sql.*;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -515,4 +515,64 @@ public class UltraConnection implements Connection {
         throw new SQLException("Invalid transaction isolation level: " + level);
     }
 
+    /**
+     * 启动query查询
+     *
+     * @param sql
+     * @param sessionPropertiesOverride
+     * @return
+     */
+    public StatementClient startQuery(String sql, Map<String, String> sessionPropertiesOverride) {
+        String source = "jdbc-ultra";
+        if (applicationNamePrefix.isPresent()) {
+            source = applicationNamePrefix.get();
+        }
+        String applicationName = clientInfo.get("applicationName");
+        if (applicationName != null && applicationName.length() > 0) {
+            source = source + applicationName;
+        }
+        Map<String, String> allProperties = new HashMap<>(sessionProperties);
+        allProperties.putAll(sessionPropertiesOverride);
+        Integer millis = networkTimeoutMillis.get() > 0 ? networkTimeoutMillis.get() : 0;
+//        Duration timeout = (millis > 0) ? new Duration(millis, MILLISECONDS) : new Duration(999, DAYS);
+        ClientSession session = ClientSession.builder()
+                .server(httpUri)
+                .user(user)
+                .source(source)
+                .clientInfo(clientInfo.get("ClientInfo"))
+                .catalog(catalog.get())
+                .schema(schema.get())
+                .resourceEstimates(ImmutableMap.of())
+                .properties(ImmutableMap.copyOf(allProperties))
+                .preparedStatements(ImmutableMap.copyOf(preparedStatements))
+                .transactionId(transactionId.get())
+                .clientRequestTimeout(millis)
+                .sessionFunctions(ImmutableMap.of())
+                .build();
+
+        return queryExecutor.startQuery(session, sql);
+    }
+
+    /**
+     * 根据statementClient更新connection的session信息
+     *
+     * @param client
+     */
+    public void updateSession(StatementClient client) {
+        sessionProperties.putAll(client.getSetSessionProperties());
+        client.getResetSessionProperties().forEach(sessionProperties::remove);
+
+        preparedStatements.putAll(client.getAddedPreparedStatements());
+        client.getDeallocatedPreparedStatements().forEach(preparedStatements::remove);
+
+        client.getSetCatalog().ifPresent(catalog::set);
+        client.getSetSchema().ifPresent(schema::set);
+
+        if (client.getStartedTransactionId() != null) {
+            transactionId.set(client.getStartedTransactionId());
+        }
+        if (client.isClearTransactionId()) {
+            transactionId.set(null);
+        }
+    }
 }
