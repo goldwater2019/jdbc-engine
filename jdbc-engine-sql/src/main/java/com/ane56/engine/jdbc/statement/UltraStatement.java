@@ -228,6 +228,18 @@ public class UltraStatement implements Statement {
         return internalExecute(sql);
     }
 
+    /**
+     * statement 真正执行SQL的地方
+     * 1. 获得connection
+     * 2. 通过connection执行query, 获得statementClient对象
+     * 3. 将正在执行的client置为获得的client
+     * 4. 获得相应的resetSet
+     * 5. 如果是query,将currentResultSet更新
+     *
+     * @param sql
+     * @return
+     * @throws SQLException
+     */
     public final boolean internalExecute(String sql) throws SQLException {
         clearCurrentResults();
         checkOpen();

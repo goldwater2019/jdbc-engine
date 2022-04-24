@@ -139,11 +139,32 @@ public class PooledDataSourceManager {
             ResultSetMetaData metaData = resultSet.getMetaData();
             int columnCount = metaData.getColumnCount();
             for (int i = 1; i <= columnCount; i++) {
+                // TODO 新增字段
+                int nullable = metaData.isNullable(i);
                 JDBCResultColumn resultColumn = JDBCResultColumn.builder()
-                        .columnValue(resultSet.getString(i))
+                        .columnCount(metaData.getColumnCount())
+                        .autoIncrement(metaData.isAutoIncrement(i))
+                        .caseSensitive(metaData.isCaseSensitive(i))
+                        .searchable(metaData.isSearchable(i))
+                        .currency(metaData.isCurrency(i))
+                        .nullable(nullable)
+                        .signed(metaData.isSigned(i))
+                        .columnDisplaySize(metaData.getColumnDisplaySize(i))
+                        .columnLabel(metaData.getColumnLabel(i))
+                        .columnName(metaData.getColumnName(i))
+                        .schemaName(metaData.getSchemaName(i))
+                        .precision(metaData.getPrecision(i))
+                        .scale(metaData.getScale(i))
+                        .tableName(metaData.getTableName(i))
+                        .catalogName(metaData.getCatalogName(i))
+                        .columnType(metaData.getColumnType(i))
+                        .columnTypeName(metaData.getColumnTypeName(i))
+                        .readOnly(metaData.isReadOnly(i))
+                        .writable(metaData.isWritable(i))
+                        .definitelyWritable(metaData.isDefinitelyWritable(i))
                         .columnClassName(metaData.getColumnClassName(i))
-                        .columnName(metaData.getColumnLabel(i))
-                        .columnType(JDBCColumnType.findByValue(metaData.getColumnType(i)))
+                        .columnValue(resultSet.getString(i))
+                        .jdbcColumnType(JDBCColumnType.findByValue(metaData.getColumnType(i)))
                         .build();
                 jdbcResultColumnList.add(resultColumn);
             }

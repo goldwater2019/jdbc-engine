@@ -1,9 +1,12 @@
 package com.ane56.engine.jdbc.resultset;
 
+import com.ane56.engine.jdbc.NotImplementedException;
+import com.ane56.engine.jdbc.common.Column;
+import com.ane56.engine.jdbc.common.QueryError;
+import com.ane56.engine.jdbc.common.QueryStats;
 import com.ane56.engine.jdbc.common.QueryStatusInfo;
 import com.ane56.engine.jdbc.common.client.StatementClient;
 import com.google.common.collect.AbstractIterator;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import lombok.*;
 import org.joda.time.DateTimeZone;
@@ -18,7 +21,6 @@ import java.sql.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 
 import static com.google.common.base.Verify.verify;
 import static com.google.common.collect.Iterables.getOnlyElement;
@@ -69,13 +71,21 @@ public class UltraResultSet implements ResultSet {
     // private DateTimeZone sessionTimeZone;
     private String queryId;
     private Iterator<List<Object>> results;
-    private Map<String, Integer> fieldMap;
-    private List<ColumnInfo> columnInfoList;
+    private Map<String, Integer> fieldMap;  // (fieldName, index)
     private ResultSetMetaData resultSetMetaData;
     private AtomicReference<List<Object>> row = new AtomicReference<>();
     private AtomicBoolean wasNull = new AtomicBoolean();
     private AtomicBoolean closed = new AtomicBoolean();
 
+
+    /**
+     * 查询结束之后通过当前构造方法生成相应的ultraResultSet
+     *
+     * @param statement
+     * @param client
+     * @param maxRows
+     * @throws SQLException
+     */
     public UltraResultSet(Statement statement, StatementClient client, long maxRows)
             throws SQLException {
         this.statement = requireNonNull(statement, "statement is null");
@@ -84,12 +94,11 @@ public class UltraResultSet implements ResultSet {
         // this.sessionTimeZone = DateTimeZone.forID(client.getTimeZone().getId());
         this.queryId = client.currentStatusInfo().getId();
 
-        List<Column> columns = getColumns(client, progressCallback);
+        List<Column> columns = getColumns(client);
         this.fieldMap = getFieldMap(columns);
-        this.columnInfoList = getColumnInfo(columns);
-        this.resultSetMetaData = new PrestoResultSetMetaData(columnInfoList);
+        this.resultSetMetaData = new UltraResultSetMetaData(columns);
 
-        this.results = flatten(new ResultsPageIterator(client, progressCallback, warningsManager), maxRows);
+        this.results = flatten(new ResultsPageIterator(client), maxRows);
     }
 
     public String getQueryId() {
@@ -201,7 +210,7 @@ public class UltraResultSet implements ResultSet {
     @Override
     public Date getDate(int columnIndex)
             throws SQLException {
-        return getDate(columnIndex, sessionTimeZone);
+        return getDate(columnIndex, DateTimeZone.UTC);
     }
 
     private Date getDate(int columnIndex, DateTimeZone localTimeZone)
@@ -221,7 +230,7 @@ public class UltraResultSet implements ResultSet {
     @Override
     public Time getTime(int columnIndex)
             throws SQLException {
-        return getTime(columnIndex, sessionTimeZone);
+        return getTime(columnIndex, DateTimeZone.UTC);
     }
 
     private Time getTime(int columnIndex, DateTimeZone localTimeZone)
@@ -231,8 +240,10 @@ public class UltraResultSet implements ResultSet {
             return null;
         }
 
-        ColumnInfo columnInfo = columnInfo(columnIndex);
-        if (columnInfo.getColumnTypeName().equalsIgnoreCase("time")) {
+        // ColumnInfo columnInfo = columnInfo(columnIndex);
+        List<Column> columns = getColumns(this.client);
+        Column column = columns.get(columnIndex);
+        if (column.getColumnTypeName().equalsIgnoreCase("time")) {
             try {
                 return new Time(TIME_FORMATTER.withZone(localTimeZone).parseMillis(String.valueOf(value)));
             } catch (IllegalArgumentException e) {
@@ -240,7 +251,7 @@ public class UltraResultSet implements ResultSet {
             }
         }
 
-        if (columnInfo.getColumnTypeName().equalsIgnoreCase("time with time zone")) {
+        if (column.getColumnTypeName().equalsIgnoreCase("time with time zone")) {
             try {
                 return new Time(TIME_WITH_TIME_ZONE_FORMATTER.parseMillis(String.valueOf(value)));
             } catch (IllegalArgumentException e) {
@@ -248,13 +259,13 @@ public class UltraResultSet implements ResultSet {
             }
         }
 
-        throw new IllegalArgumentException("Expected column to be a time type but is " + columnInfo.getColumnTypeName());
+        throw new IllegalArgumentException("Expected column to be a time type but is " + column.getColumnTypeName());
     }
 
     @Override
     public Timestamp getTimestamp(int columnIndex)
             throws SQLException {
-        return getTimestamp(columnIndex, sessionTimeZone);
+        return getTimestamp(columnIndex, DateTimeZone.UTC);
     }
 
     private Timestamp getTimestamp(int columnIndex, DateTimeZone localTimeZone)
@@ -264,8 +275,9 @@ public class UltraResultSet implements ResultSet {
             return null;
         }
 
-        ColumnInfo columnInfo = columnInfo(columnIndex);
-        if (columnInfo.getColumnTypeName().equalsIgnoreCase("timestamp")) {
+        // ColumnInfo columnInfo = columnInfo(columnIndex);
+        Column column = getColumns(this.client).get(columnIndex);
+        if (column.getColumnTypeName().equalsIgnoreCase("timestamp")) {
             try {
                 return new Timestamp(TIMESTAMP_FORMATTER.withZone(localTimeZone).parseMillis(String.valueOf(value)));
             } catch (IllegalArgumentException e) {
@@ -273,7 +285,7 @@ public class UltraResultSet implements ResultSet {
             }
         }
 
-        if (columnInfo.getColumnTypeName().equalsIgnoreCase("timestamp with time zone")) {
+        if (column.getColumnTypeName().equalsIgnoreCase("timestamp with time zone")) {
             try {
                 return new Timestamp(TIMESTAMP_WITH_TIME_ZONE_FORMATTER.parseMillis(String.valueOf(value)));
             } catch (IllegalArgumentException e) {
@@ -281,7 +293,7 @@ public class UltraResultSet implements ResultSet {
             }
         }
 
-        throw new IllegalArgumentException("Expected column to be a timestamp type but is " + columnInfo.getColumnTypeName());
+        throw new IllegalArgumentException("Expected column to be a timestamp type but is " + column.getColumnTypeName());
     }
 
     @Override
@@ -404,14 +416,13 @@ public class UltraResultSet implements ResultSet {
     public SQLWarning getWarnings()
             throws SQLException {
         checkOpen();
-        return warningsManager.getWarnings();
+        return null;
     }
 
     @Override
     public void clearWarnings()
             throws SQLException {
         checkOpen();
-        warningsManager.clearWarnings();
     }
 
     @Override
@@ -429,8 +440,9 @@ public class UltraResultSet implements ResultSet {
     @Override
     public Object getObject(int columnIndex)
             throws SQLException {
-        ColumnInfo columnInfo = columnInfo(columnIndex);
-        switch (columnInfo.getColumnType()) {
+        List<Column> columns = getColumns(this.client);
+        Column column = columns.get(columnIndex);
+        switch (column.getColumnType()) {
             case Types.DATE:
                 return getDate(columnIndex);
             case Types.TIME:
@@ -442,34 +454,15 @@ public class UltraResultSet implements ResultSet {
             case Types.DECIMAL:
                 return getBigDecimal(columnIndex);
             case Types.JAVA_OBJECT:
-                if (columnInfo.getColumnTypeName().equalsIgnoreCase("interval year to month")) {
-                    return getIntervalYearMonth(columnIndex);
-                }
-                if (columnInfo.getColumnTypeName().equalsIgnoreCase("interval day to second")) {
-                    return getIntervalDayTime(columnIndex);
-                }
+//                if (column.getColumnTypeName().equalsIgnoreCase("interval year to month")) {
+//                    return getIntervalYearMonth(columnIndex);
+//                }
+//                if (columnInfo.getColumnTypeName().equalsIgnoreCase("interval day to second")) {
+//                    return getIntervalDayTime(columnIndex);
+//                }
+                throw new SQLException("un support data type, java object");
         }
         return column(columnIndex);
-    }
-
-    private PrestoIntervalYearMonth getIntervalYearMonth(int columnIndex)
-            throws SQLException {
-        Object value = column(columnIndex);
-        if (value == null) {
-            return null;
-        }
-
-        return new PrestoIntervalYearMonth(IntervalYearMonth.parseMonths(String.valueOf(value)));
-    }
-
-    private PrestoIntervalDayTime getIntervalDayTime(int columnIndex)
-            throws SQLException {
-        Object value = column(columnIndex);
-        if (value == null) {
-            return null;
-        }
-
-        return new PrestoIntervalDayTime(IntervalDayTime.parseMillis(String.valueOf(value)));
     }
 
     @Override
@@ -960,6 +953,7 @@ public class UltraResultSet implements ResultSet {
         }
 
         ColumnInfo columnInfo = columnInfo(columnIndex);
+
         String elementTypeName = getOnlyElement(columnInfo.getColumnTypeSignature().getParameters()).toString();
         int elementType = getOnlyElement(columnInfo.getColumnParameterTypes());
         return new PrestoArray(elementTypeName, elementType, (List<?>) value);
@@ -1438,16 +1432,6 @@ public class UltraResultSet implements ResultSet {
         return value;
     }
 
-    private ColumnInfo columnInfo(int index)
-            throws SQLException {
-        checkOpen();
-        checkValidRow();
-        if ((index <= 0) || (index > columnInfoList.size())) {
-            throw new SQLException("Invalid column index: " + index);
-        }
-        return columnInfoList.get(index - 1);
-    }
-
     private Object column(String label)
             throws SQLException {
         checkOpen();
@@ -1510,14 +1494,10 @@ public class UltraResultSet implements ResultSet {
     private static class ResultsPageIterator
             extends AbstractIterator<Iterable<List<Object>>> {
         private StatementClient client;
-        private Consumer<QueryStats> progressCallback;
-        private WarningsManager warningsManager;
         private boolean isQuery;
 
-        private ResultsPageIterator(StatementClient client, Consumer<QueryStats> progressCallback, WarningsManager warningsManager) {
+        private ResultsPageIterator(StatementClient client) {
             this.client = requireNonNull(client, "client is null");
-            this.progressCallback = requireNonNull(progressCallback, "progressCallback is null");
-            this.warningsManager = requireNonNull(warningsManager, "warningsManager is null");
             this.isQuery = isQuery(client);
         }
 
@@ -1534,15 +1514,11 @@ public class UltraResultSet implements ResultSet {
         @Override
         protected Iterable<List<Object>> computeNext() {
             if (isQuery) {
-                // Clear the warnings if this is a query, per ResultSet javadoc
-                warningsManager.clearWarnings();
             }
             while (client.isRunning()) {
                 checkInterruption(null);
 
                 QueryStatusInfo results = client.currentStatusInfo();
-                progressCallback.accept(QueryStats.create(results.getId(), results.getStats()));
-                warningsManager.addWarnings(results.getWarnings());
                 Iterable<List<Object>> data = client.currentData().getData();
 
                 try {
@@ -1559,8 +1535,6 @@ public class UltraResultSet implements ResultSet {
 
             verify(client.isFinished());
             QueryStatusInfo results = client.finalStatusInfo();
-            progressCallback.accept(QueryStats.create(results.getId(), results.getStats()));
-            warningsManager.addWarnings(results.getWarnings());
             if (results.getError() != null) {
                 throw new RuntimeException(resultsException(results));
             }
@@ -1579,36 +1553,17 @@ public class UltraResultSet implements ResultSet {
     public static SQLException resultsException(QueryStatusInfo results) {
         QueryError error = requireNonNull(results.getError());
         String message = format("Query failed (#%s): %s", results.getId(), error.getMessage());
-        Throwable cause = (error.getFailureInfo() == null) ? null : error.getFailureInfo().toException();
-        return new SQLException(message, error.getSqlState(), error.getErrorCode(), cause);
+        return new SQLException(message);
     }
 
     private static Map<String, Integer> getFieldMap(List<Column> columns) {
         Map<String, Integer> map = new HashMap<>();
         for (int i = 0; i < columns.size(); i++) {
-            String name = columns.get(i).getName().toLowerCase(ENGLISH);
+            String name = columns.get(i).getColumnName().toLowerCase(ENGLISH);
             if (!map.containsKey(name)) {
                 map.put(name, i + 1);
             }
         }
         return ImmutableMap.copyOf(map);
-    }
-
-    private static List<ColumnInfo> getColumnInfo(List<Column> columns) {
-        ImmutableList.Builder<ColumnInfo> list = ImmutableList.builder();
-        for (Column column : columns) {
-            ColumnInfo.Builder builder = new ColumnInfo.Builder()
-                    .setCatalogName("") // TODO
-                    .setSchemaName("") // TODO
-                    .setTableName("") // TODO
-                    .setColumnLabel(column.getName())
-                    .setColumnName(column.getName()) // TODO
-                    .setColumnTypeSignature(parseTypeSignature(column.getType().toUpperCase(ENGLISH)))
-                    .setNullable(Nullable.UNKNOWN)
-                    .setCurrency(false);
-            setTypeInfo(builder, parseTypeSignature(column.getType()));
-            list.add(builder.build());
-        }
-        return list.build();
     }
 }

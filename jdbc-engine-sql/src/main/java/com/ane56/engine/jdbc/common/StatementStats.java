@@ -16,9 +16,8 @@ import lombok.*;
 @EqualsAndHashCode
 @ToString
 public class StatementStats {
-    private String state;
-    private boolean waitingForPrerequisites;
-    private boolean queued;
-    private boolean scheduled;
-    private int nodes;
+    private String queryId;
+    private String query;
+    private long queryStartTime;
+    private long queryEndTime;
 }

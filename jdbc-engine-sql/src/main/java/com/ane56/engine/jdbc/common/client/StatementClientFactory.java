@@ -16,6 +16,10 @@ public final class StatementClientFactory
 
     public static StatementClient newStatementClient(OkHttpClient httpClient, ClientSession session, String query)
     {
-        return new StatementClientImpl(httpClient, session, query);
+        return StatementClientImpl.builder()
+                .httpClient(httpClient)
+                .session(session)
+                .query(query)
+                .build();
     }
 }

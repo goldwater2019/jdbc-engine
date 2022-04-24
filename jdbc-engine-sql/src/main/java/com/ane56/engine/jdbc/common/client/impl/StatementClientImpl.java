@@ -1,6 +1,12 @@
 package com.ane56.engine.jdbc.common.client.impl;
 
+import com.ane56.engine.jdbc.common.QueryData;
+import com.ane56.engine.jdbc.common.QueryStatusInfo;
+import com.ane56.engine.jdbc.common.StatementStats;
+import com.ane56.engine.jdbc.common.client.ClientSession;
 import com.ane56.engine.jdbc.common.client.StatementClient;
+import lombok.*;
+import okhttp3.OkHttpClient;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -8,16 +14,29 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
+ * StatementClient实现类
+ * 真正执行query的地方
+ *
  * @Author: zhangxinsen
  * @Date: 2022/4/24 4:03 PM
  * @Desc:
  * @Version: v1.0
  */
 
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode
+@ToString
 public class StatementClientImpl implements StatementClient {
+    private OkHttpClient httpClient;
+    private ClientSession session;
+    private String query;
+
     @Override
     public String getQuery() {
-        return null;
+        return query;
     }
 
     @Override

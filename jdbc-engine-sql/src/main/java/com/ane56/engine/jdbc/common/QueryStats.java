@@ -2,13 +2,10 @@ package com.ane56.engine.jdbc.common;
 
 import lombok.*;
 
-import java.util.Optional;
-import java.util.OptionalDouble;
-
-import static java.lang.Math.min;
-import static java.util.Objects.requireNonNull;
-
 /**
+ * query运行时
+ * 数据记录的地方
+ *
  * @Author: zhangxinsen
  * @Date: 2022/4/24 5:34 PM
  * @Desc:
@@ -21,24 +18,18 @@ import static java.util.Objects.requireNonNull;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class QueryStats
-{
+public class QueryStats {
     private String queryId;
-    private String state;
-    private boolean waitingForPrerequisites;
-    private boolean queued;
-    private boolean scheduled;
-    private int nodes;
+    private String query;
+    private long queryStartTime;
+    private long queryEndTime;
 
-    static QueryStats create(String queryId, StatementStats stats)
-    {
+    public static QueryStats create(String queryId, StatementStats stats) {
         return QueryStats.builder()
                 .queryId(queryId)
-                .state(stats.getState())
-                .waitingForPrerequisites(stats.isWaitingForPrerequisites())
-                .queued(stats.isQueued())
-                .scheduled(stats.isScheduled())
-                .nodes(stats.getNodes())
+                .query(stats.getQuery())
+                .queryStartTime(stats.getQueryStartTime())
+                .queryEndTime(stats.getQueryEndTime())
                 .build();
     }
 }

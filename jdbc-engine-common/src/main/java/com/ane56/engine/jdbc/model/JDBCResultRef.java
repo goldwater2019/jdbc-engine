@@ -67,7 +67,7 @@ public class JDBCResultRef {
                     for (JDBCResultColumn jdbcResultColumn : columnList) {
                         jdbcColumns.add(
                                 JDBCColumn.builder()
-                                        .jdbcColumnType(jdbcResultColumn.getColumnType())
+                                        .jdbcColumnType(jdbcResultColumn.getJdbcColumnType())
                                         .jdbcColumnName(jdbcResultColumn.getColumnName())
                                         .build()
                         );
