@@ -5,23 +5,77 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.ane56.engine</groupId>
-    <artifactId>xsql-driver</artifactId>
+    <artifactId>xsql-dependency</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <name>${artifactId}</name>
 
     <properties>
-        <maven-compiler-plugin.version>3.7.0</maven-compiler-plugin.version>
         <source.level>1.8</source.level>
         <target.level>1.8</target.level>
+        <dubbo.version>3.0.7</dubbo.version>
+        <spring.version>4.3.16.RELEASE</spring.version>
+        <junit.version>4.12</junit.version>
+        <spring-boot.version>2.6.7</spring-boot.version>
+        <lombok.version>1.18.22</lombok.version>
+        <maven-compiler-plugin.version>3.7.0</maven-compiler-plugin.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.ane56.engine</groupId>
-                <artifactId>xsql-dependency</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-parent</artifactId>
+                <version>${spring-boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dubbo</groupId>
+                <artifactId>dubbo-bom</artifactId>
+                <version>${dubbo.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dubbo</groupId>
+                <artifactId>dubbo-dependencies-zookeeper</artifactId>
+                <version>${dubbo.version}</version>
+                <type>pom</type>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-reload4j</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.ane56.engine</groupId>
+                <artifactId>xsql-common</artifactId>
+                <version>1.0-SNAPSHOT</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.ane56.engine</groupId>
+                <artifactId>xsql-driver</artifactId>
+                <version>1.0-SNAPSHOT</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.ane56.engine</groupId>
+                <artifactId>xsql-executor</artifactId>
+                <version>1.0-SNAPSHOT</version>
+                <scope>compile</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -56,10 +110,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.ane56.engine</groupId>
-            <artifactId>xsql-common</artifactId>
         </dependency>
     </dependencies>
 

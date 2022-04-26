@@ -24,6 +24,7 @@
 <!--        <module>jdbc-engine-mock</module>-->
 <!--        <module>jdbc-engine-gateway</module>-->
 <!--        <module>jdbc-engine-sql</module>-->
+        <module>xsql-dependency</module>
         <module>xsql-common</module>
         <module>xsql-driver</module>
         <module>xsql-executor</module>
