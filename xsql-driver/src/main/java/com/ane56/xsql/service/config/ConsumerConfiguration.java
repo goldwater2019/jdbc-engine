@@ -17,7 +17,7 @@ import org.springframework.context.annotation.PropertySource;
 
 @Configuration
 @EnableDubbo(scanBasePackages = "com.ane56.xsql.service.consumer")
-@PropertySource("classpath:/dubbo-consumer.properties")
+//@PropertySource("classpath:/dubbo-consumer.properties")
 @ComponentScan("com.ane56.xsql.service.consumer")
 public class ConsumerConfiguration {
     @DubboReference

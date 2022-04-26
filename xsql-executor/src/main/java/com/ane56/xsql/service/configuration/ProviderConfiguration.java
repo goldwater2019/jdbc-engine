@@ -15,7 +15,8 @@ import org.springframework.context.annotation.PropertySource;
 
 @Configuration
 @EnableDubbo(scanBasePackages = "com.ane56.xsql.service.provider")
-@PropertySource("classpath:/dubbo-provider.properties")
+//@PropertySource("classpath:/dubbo-provider.properties")
+//@PropertySource("classpath:/application.yml")
 public class ProviderConfiguration {
     @Bean
     public ProviderConfig providerConfig() {

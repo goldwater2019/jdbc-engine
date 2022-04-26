@@ -1,12 +1,14 @@
 package com.ane56.xsql.service.controller;
 
+import com.ane56.xsql.common.model.JsonResult;
+import com.ane56.xsql.common.model.UltraBaseStatement;
+import com.ane56.xsql.common.model.UltraCatalog;
+import com.ane56.xsql.common.model.UltraResultRow;
 import com.ane56.xsql.service.consumer.XSqlDriverConsumer;
 import com.ane56.xsql.service.consumer.XSqlExecutorConsumer;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -19,9 +21,9 @@ import java.util.List;
 @RestController()
 @RequestMapping("catalog")
 public class CatalogController {
-    @Resource
+    @Autowired
     private XSqlDriverConsumer xSqlDriverConsumer;
-    @Resource
+    @Autowired
     private XSqlExecutorConsumer xSqlExecutorConsumer;
 
     @GetMapping("echo")
@@ -30,8 +32,18 @@ public class CatalogController {
     }
 
     @GetMapping("show")
-    public List<String> showCatalogs() {
+    public JsonResult<List<UltraCatalog>> showCatalogs() {
+        xSqlExecutorConsumer.init();
         return xSqlExecutorConsumer.getCatalogs();
     }
 
+    @PostMapping("query")
+    public JsonResult<List<UltraResultRow>> query(@RequestBody UltraBaseStatement ultraBaseStatement) {
+        return xSqlExecutorConsumer.query(ultraBaseStatement);
+    }
+
+    @PostMapping("execute")
+    public JsonResult<Boolean> execute(@RequestBody UltraBaseStatement ultraBaseStatement) {
+        return xSqlExecutorConsumer.execute(ultraBaseStatement);
+    }
 }

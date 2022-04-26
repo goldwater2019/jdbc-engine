@@ -2,6 +2,7 @@ package com.ane56.xsql.gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 /**
  * @Author: zhangxinsen
@@ -11,6 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 
 @SpringBootApplication
+@EnableDiscoveryClient
 public class XSqlGatewayApplication {
     public static void main(String[] args) {
         SpringApplication.run(XSqlGatewayApplication.class, args);

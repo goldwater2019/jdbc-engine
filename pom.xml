@@ -18,9 +18,9 @@
     <packaging>pom</packaging>
 
     <modules>
-<!--        <module>jdbc-engine-common</module>-->
+        <module>jdbc-engine-common</module>
 <!--        <module>jdbc-engine-driver</module>-->
-<!--        <module>jdbc-engine-executor</module>-->
+        <module>jdbc-engine-executor</module>
 <!--        <module>jdbc-engine-mock</module>-->
 <!--        <module>jdbc-engine-gateway</module>-->
 <!--        <module>jdbc-engine-sql</module>-->
