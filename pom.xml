@@ -26,6 +26,7 @@
 <!--        <module>jdbc-engine-sql</module>-->
         <module>xsql-dependency</module>
         <module>xsql-common</module>
+        <module>xsql-gateway</module>
         <module>xsql-driver</module>
         <module>xsql-executor</module>
 <!--        <module>xsql-ultra-jdbc</module>-->
