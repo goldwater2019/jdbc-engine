@@ -6,11 +6,14 @@ import com.ane56.xsql.common.model.UltraCatalog;
 import com.ane56.xsql.common.model.UltraResultRow;
 import com.ane56.xsql.service.manager.PooledDataSourceManager;
 import com.google.common.collect.ImmutableList;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: zhangxinsen
@@ -20,20 +23,25 @@ import java.util.List;
  */
 
 @DubboService
+@Slf4j
+@RefreshScope
 public class XSqlExecutorServiceImpl implements XSqlExecutorService {
 
-    // TODO 单例, 获得连接池管理对象
     private PooledDataSourceManager pooledDataSourceManager;
 
     @Override
     public List<UltraCatalog> showCatalogs() {
         checkInitialStatus();
-        return ImmutableList.copyOf(pooledDataSourceManager.getName2catalog().values());
+        if (pooledDataSourceManager.getName2catalog().size() > 0) {
+            return ImmutableList.copyOf(pooledDataSourceManager.getName2catalog().values());
+        }
+        return new LinkedList<>();
     }
 
     @Override
     public List<UltraCatalog> showAvailableCatalogs() {
-        return null;
+        // TODO 添加心跳
+        return new LinkedList<>();
     }
 
     @Override
@@ -71,6 +79,14 @@ public class XSqlExecutorServiceImpl implements XSqlExecutorService {
     public void execute(String catalogName, String query) throws SQLException, XSQLException {
         checkInitialStatus();
         pooledDataSourceManager.execute(catalogName, query);
+    }
+
+    @Override
+    public void updateOrInitCatalogs() {
+        checkInitialStatus();
+        Map<String, UltraCatalog> name2catalog = pooledDataSourceManager.getName2catalog();
+        // TODO 获得配置的catalog, 然后对比是否相同
+        // 如果不同, 则关闭当前连接, 并且创建新的连接
     }
 
     /**

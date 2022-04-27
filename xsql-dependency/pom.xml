@@ -4,10 +4,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.ane56.engine</groupId>
+    <parent>
+        <artifactId>kyuubi-jdbc-engine</artifactId>
+        <groupId>com.ane56.engine</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
     <artifactId>xsql-dependency</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <name>${artifactId}</name>
+    <name>${project.artifactId}</name>
+    <version>${project.parent.version}</version>
+    <packaging>pom</packaging>
+
 
     <properties>
         <source.level>1.8</source.level>
@@ -25,10 +32,22 @@
         <druid.version>1.2.6</druid.version>
         <dubbo-serialization.version>2.7.14</dubbo-serialization.version>
         <mysql-connector.version>8.0.25</mysql-connector.version>
+        <okhttp.version>3.14.9</okhttp.version>
+        <fastjson.version>1.2.76</fastjson.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${okhttp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.apache.dubbo</groupId>
                 <artifactId>dubbo-serialization-fst</artifactId>
@@ -113,25 +132,35 @@
             <dependency>
                 <groupId>com.ane56.engine</groupId>
                 <artifactId>xsql-common</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <version>${project.parent.version}</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>com.ane56.engine</groupId>
                 <artifactId>xsql-driver</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <version>${project.parent.version}</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>com.ane56.engine</groupId>
                 <artifactId>xsql-executor</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <version>${project.parent.version}</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>com.ane56.engine</groupId>
                 <artifactId>xsql-gateway</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <version>${project.parent.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ane56.engine</groupId>
+                <artifactId>xsql-client</artifactId>
+                <version>${project.parent.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ane56.engine</groupId>
+                <artifactId>xsql-ultra-jdbc</artifactId>
+                <version>${project.parent.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

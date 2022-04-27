@@ -9,19 +9,30 @@
         <groupId>com.ane56.engine</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>jdbc-engine-sql</artifactId>
+    <artifactId>xsql-ultra-jdbc</artifactId>
     <name>${project.artifactId}</name>
     <packaging>jar</packaging>
+    <version>${project.parent.version}</version>
 
     <properties>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.ane56.engine</groupId>
+                <artifactId>xsql-dependency</artifactId>
+                <version>${project.parent.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
             <groupId>com.ane56.engine</groupId>
-            <artifactId>jdbc-engine-common</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <artifactId>xsql-common</artifactId>
         </dependency>
     </dependencies>
 

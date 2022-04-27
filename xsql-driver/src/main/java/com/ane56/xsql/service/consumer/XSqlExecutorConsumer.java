@@ -26,14 +26,14 @@ public class XSqlExecutorConsumer {
     @Resource
     private XSqlExecutorService xSqlExecutorService;
 
+
     public JsonResult<List<UltraCatalog>> getCatalogs() {
         return (JsonResult<List<UltraCatalog>>) new JsonResult(xSqlExecutorService.showCatalogs());
     }
 
     public void init() {
-        long startTime = System.currentTimeMillis();
         List<UltraCatalog> catalogs = xSqlExecutorService.showCatalogs();
-        if (catalogs.size() == 0) {
+        if (catalogs == null || catalogs.size() == 0) {
             xSqlExecutorService.addCatalog(
                     UltraCatalog.builder()
                             .name("starrocks")
@@ -63,7 +63,6 @@ public class XSqlExecutorConsumer {
         for (UltraCatalog ultraCatalog : ultraCatalogs) {
             xSqlExecutorService.checkDataSource(ultraCatalog);
         }
-        log.info("initial finished, elapsed: " + (System.currentTimeMillis() - startTime) + " ms");
     }
 
     public JsonResult<List<UltraResultRow>> query(UltraBaseStatement ultraBaseStatement) {
@@ -92,5 +91,12 @@ public class XSqlExecutorConsumer {
             jsonResult = new JsonResult<>(-1, e.getMessage());
         }
         return jsonResult;
+    }
+
+    public void ping() throws SQLException, XSQLException {
+        List<UltraCatalog> ultraCatalogs = xSqlExecutorService.showUnForbiddenCatalogs();
+        for (UltraCatalog ultraCatalog : ultraCatalogs) {
+            xSqlExecutorService.query(ultraCatalog.getName(), "select 1");
+        }
     }
 }

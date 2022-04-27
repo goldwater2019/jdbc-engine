@@ -4,9 +4,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.ane56.engine</groupId>
+    <parent>
+        <artifactId>kyuubi-jdbc-engine</artifactId>
+        <groupId>com.ane56.engine</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
     <artifactId>xsql-executor</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>${project.parent.version}</version>
+
 
     <properties>
         <maven-compiler-plugin.version>3.7.0</maven-compiler-plugin.version>
@@ -19,6 +25,13 @@
             <dependency>
                 <groupId>com.ane56.engine</groupId>
                 <artifactId>xsql-dependency</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.ane56.engine</groupId>
+                <artifactId>xsql-common</artifactId>
                 <version>1.0-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
@@ -95,6 +108,12 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-bootstrap</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <dependency>

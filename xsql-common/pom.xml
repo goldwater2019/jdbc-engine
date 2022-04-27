@@ -4,9 +4,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.ane56.engine</groupId>
+    <parent>
+        <artifactId>kyuubi-jdbc-engine</artifactId>
+        <groupId>com.ane56.engine</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
     <artifactId>xsql-common</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <name>${project.artifactId}</name>
+    <version>${project.parent.version}</version>
 
     <properties>
         <maven-compiler-plugin.version>3.7.0</maven-compiler-plugin.version>
@@ -19,7 +25,7 @@
             <dependency>
                 <groupId>com.ane56.engine</groupId>
                 <artifactId>xsql-dependency</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <version>${project.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

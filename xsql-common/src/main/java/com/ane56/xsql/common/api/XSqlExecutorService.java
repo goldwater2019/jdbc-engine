@@ -41,4 +41,11 @@ public interface XSqlExecutorService {
      * @param query
      */
     public void execute(String catalogName, String query) throws SQLException, XSQLException;
+
+
+    /**
+     * 从配置中心获得最新的catalog信息
+     * 初始化/更新 catalogs
+     */
+    public void updateOrInitCatalogs();
 }

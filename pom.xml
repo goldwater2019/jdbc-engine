@@ -18,38 +18,25 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>jdbc-engine-common</module>
-<!--        <module>jdbc-engine-driver</module>-->
-        <module>jdbc-engine-executor</module>
-<!--        <module>jdbc-engine-mock</module>-->
-<!--        <module>jdbc-engine-gateway</module>-->
-<!--        <module>jdbc-engine-sql</module>-->
+<!--        <module>jdbc-engine-common</module>-->
+        <!--        <module>jdbc-engine-driver</module>-->
+        <!--        <module>jdbc-engine-executor</module>-->
+        <!--        <module>jdbc-engine-mock</module>-->
+        <!--        <module>jdbc-engine-gateway</module>-->
+        <!--        <module>jdbc-engine-sql</module>-->
         <module>xsql-dependency</module>
         <module>xsql-common</module>
         <module>xsql-gateway</module>
         <module>xsql-driver</module>
         <module>xsql-executor</module>
-<!--        <module>xsql-ultra-jdbc</module>-->
+        <module>xsql-client</module>
+        <module>xsql-ultra-jdbc</module>
+        <!--        <module>xsql-ultra-jdbc</module>-->
     </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
-        <dubbo.version>2.7.1</dubbo.version>
-        <junit.version>4.13.2</junit.version>
-        <maven.plugin.build.helper.version>3.2.0</maven.plugin.build.helper.version>
-        <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss z</maven.build.timestamp.format>
-        <lombok.version>1.18.20</lombok.version>
-        <scala.version>2.12.5</scala.version>
-        <scala.binary.version>2.12</scala.binary.version>
-        <libthrift.version>0.16.0</libthrift.version>
-        <curator.version>5.2.0</curator.version>
-        <slf4j.version>1.7.32</slf4j.version>
-        <alibaba.druid.version>1.2.8</alibaba.druid.version>
-        <mysql.version>8.0.19</mysql.version>
-        <fastjson.version>1.2.71</fastjson.version>
-        <okhttp.version>3.14.9</okhttp.version>
-        <joda-time.version>2.10.13</joda-time.version>
     </properties>
 
 </project>
