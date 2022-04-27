@@ -1,0 +1,32 @@
+server:
+  port: 6666
+
+spring:
+  cloud:
+    nacos:
+      username: nacos
+      password: nacos
+      server-addr: bdtnode10:8848
+      discovery:
+        server-addr: bdtnode10:8848
+        enabled: true
+    gateway:
+      discovery:
+        locator:
+          lowerCaseServiceId: true
+          enabled: true
+      routes:
+        - id: driver_route
+          uri: lb://driver-service
+          order: 1
+          predicates:
+            - Path=/api/v1/driver/**
+          filters:
+            - StripPrefix=3
+    loadbalancer:
+      nacos:
+        enabled: true
+      retry:
+        enabled: true
+  application:
+    name: xsql-gateway

@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: executor-service
+  cloud:
+    nacos:
+      username: nacos
+      password: nacos
+      server-addr: 10.10.106.102:8848
+      discovery:
+        server-addr: 10.10.106.102:8848
+        enabled: true
+      config:
+        server-addr: 10.10.106.102:8848
+        file-extension: yaml
+  profiles:
+    active: dev
