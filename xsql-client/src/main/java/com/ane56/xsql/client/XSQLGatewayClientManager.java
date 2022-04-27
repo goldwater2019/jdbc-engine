@@ -21,7 +21,6 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 @EqualsAndHashCode
 @ToString
 @Builder
@@ -48,6 +47,8 @@ public class XSQLGatewayClientManager {
         }
         return singleton;
     }
+
+    public XSQLGatewayClientManager() {};
 
     /**
      * 查询语句调用

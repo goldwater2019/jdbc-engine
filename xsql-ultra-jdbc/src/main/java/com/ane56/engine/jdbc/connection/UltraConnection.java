@@ -13,7 +13,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Ints;
 
 import java.net.URI;
-import java.nio.charset.CharsetEncoder;
 import java.sql.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,16 +22,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Maps.fromProperties;
-import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MINUTES;
 
 /**
  * @Author: zhangxinsen
  * @Date: 2022/4/24 12:06 AM
- * @Desc:
+ * @Desc: 网关连接对象
  * @Version: v1.0
  */
 
@@ -52,9 +49,7 @@ public class UltraConnection implements Connection {
     private final URI jdbcUri;
     private final URI httpUri;
     private final String user;
-    private final Map<String, String> sessionProperties;
-    private final Properties connectionProperties;
-    private final Optional<String> applicationNamePrefix;
+    private final Optional<String> applicationName;
     private final Map<String, String> clientInfo = new ConcurrentHashMap<>();
     private final Map<String, String> preparedStatements = new ConcurrentHashMap<>();
     private final AtomicReference<String> transactionId = new AtomicReference<>();
@@ -68,12 +63,15 @@ public class UltraConnection implements Connection {
         this.catalog.set(uri.getCatalog());  // TODO 测试catalog为空时的数据
         this.schema.set(uri.getSchema());
         this.user = uri.getUser();
-        this.applicationNamePrefix = uri.getApplicationNamePrefix();
-        this.sessionProperties = new ConcurrentHashMap<>(uri.getSessionProperties());
-        this.connectionProperties = uri.getProperties();
+        this.applicationName = uri.getApplicationName();
         this.queryExecutor = requireNonNull(queryExecutor, "queryExecutor is null");
     }
 
+    /**
+     * TODO 解析Statement对象
+     * @return
+     * @throws SQLException
+     */
     @Override
     public Statement createStatement() throws SQLException {
         checkOpen();
@@ -116,10 +114,7 @@ public class UltraConnection implements Connection {
     @Override
     public void setAutoCommit(boolean autoCommit) throws SQLException {
         checkOpen();
-        boolean wasAutoCommit = this.autoCommit.getAndSet(autoCommit);
-        if (autoCommit && !wasAutoCommit) {
-            commit();
-        }
+        throw new NotImplementedException("Connection", "setAutoCommit");
     }
 
     @Override
@@ -131,24 +126,13 @@ public class UltraConnection implements Connection {
     @Override
     public void commit() throws SQLException {
         checkOpen();
-        if (getAutoCommit()) {
-            throw new SQLException("Connection is in auto-commit mode");
-        }
-        try (UltraStatement statement = new UltraStatement(this)) {
-             statement.internalExecute("COMMIT");
-            // 回滚的支持
-        }
+        throw new NotImplementedException("Connection", "commit");
     }
 
     @Override
     public void rollback() throws SQLException {
         checkOpen();
-        if (getAutoCommit()) {
-            throw new SQLException("Connection is in auto-commit mode");
-        }
-        try (UltraStatement statement = new UltraStatement(this)) {
-             statement.internalExecute("ROLLBACK");
-        }
+        throw new NotImplementedException("Connection", "rollback");
     }
 
     @Override
@@ -172,6 +156,7 @@ public class UltraConnection implements Connection {
 
     /**
      * 返回元数据信息
+     * TODO 解析数据库元数据
      * 通过自己实现的MyDatabaseMetaData 完成部分
      * @return
      * @throws SQLException
@@ -219,11 +204,13 @@ public class UltraConnection implements Connection {
     @Override
     public void setTransactionIsolation(int level) throws SQLException {
         checkOpen();
+        throw new NotImplementedException("Connection", "setTransactionIsolation");
     }
 
     @Override
     public int getTransactionIsolation() throws SQLException {
-        return isolationLevel.get();
+        throw new NotImplementedException("Connection", "getTransactionIsolation");
+//        return isolationLevel.get();
     }
 
     @Override
@@ -363,6 +350,16 @@ public class UltraConnection implements Connection {
         return !isClosed();
     }
 
+
+    /**
+     * 如果传入的value为null, 则置空
+     * @param name          The name of the client info property to set
+     * @param value         The value to set the client info property to.  If the
+     *                                      value is null, the current value of the specified
+     *                                      property is cleared.
+     * <p>
+     * @throws SQLClientInfoException
+     */
     @Override
     public void setClientInfo(String name, String value) throws SQLClientInfoException {
         requireNonNull(name, "name is null");
@@ -414,6 +411,12 @@ public class UltraConnection implements Connection {
         return schema.get();
     }
 
+    /**
+     * 取消执行
+     * @param executor  The <code>Executor</code>  implementation which will
+     * be used by <code>abort</code>.
+     * @throws SQLException
+     */
     @Override
     public void abort(Executor executor) throws SQLException {
         close();
@@ -454,27 +457,6 @@ public class UltraConnection implements Connection {
         }
     }
 
-    public Properties getConnectionProperties() {
-        Properties properties = new Properties();
-        for (Map.Entry<Object, Object> entry : connectionProperties.entrySet()) {
-            properties.setProperty((String) entry.getKey(), (String) entry.getValue());
-        }
-        return properties;
-    }
-
-    public void setSessionProperty(String name, String value) {
-        requireNonNull(name, "name is null");
-        requireNonNull(value, "value is null");
-        checkArgument(!name.isEmpty(), "name is empty");
-
-        CharsetEncoder charsetEncoder = US_ASCII.newEncoder();
-        checkArgument(name.indexOf('=') < 0, "Session property name must not contain '=': %s", name);
-        checkArgument(charsetEncoder.canEncode(name), "Session property name is not US_ASCII: %s", name);
-        checkArgument(charsetEncoder.canEncode(value), "Session property value is not US_ASCII: %s", value);
-
-        sessionProperties.put(name, value);
-    }
-
     URI getURI() {
         return jdbcUri;
     }
@@ -500,21 +482,6 @@ public class UltraConnection implements Connection {
         }
     }
 
-    private static String getIsolationLevel(int level)
-            throws SQLException {
-        switch (level) {
-            case TRANSACTION_READ_UNCOMMITTED:
-                return "READ UNCOMMITTED";
-            case TRANSACTION_READ_COMMITTED:
-                return "READ COMMITTED";
-            case TRANSACTION_REPEATABLE_READ:
-                return "REPEATABLE READ";
-            case TRANSACTION_SERIALIZABLE:
-                return "SERIALIZABLE";
-        }
-        throw new SQLException("Invalid transaction isolation level: " + level);
-    }
-
     /**
      * 启动query查询
      *
@@ -524,17 +491,9 @@ public class UltraConnection implements Connection {
      */
     public StatementClient startQuery(String sql, Map<String, String> sessionPropertiesOverride) {
         String source = "jdbc-ultra";
-        if (applicationNamePrefix.isPresent()) {
-            source = applicationNamePrefix.get();
+        if (applicationName.isPresent()) {
+            source = applicationName.get();
         }
-        String applicationName = clientInfo.get("applicationName");
-        if (applicationName != null && applicationName.length() > 0) {
-            source = source + applicationName;
-        }
-        Map<String, String> allProperties = new HashMap<>(sessionProperties);
-        allProperties.putAll(sessionPropertiesOverride);
-        Integer millis = networkTimeoutMillis.get() > 0 ? networkTimeoutMillis.get() : 0;
-//        Duration timeout = (millis > 0) ? new Duration(millis, MILLISECONDS) : new Duration(999, DAYS);
         ClientSession session = ClientSession.builder()
                 .server(httpUri)
                 .user(user)

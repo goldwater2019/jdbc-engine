@@ -21,14 +21,15 @@ import static java.util.stream.Collectors.toMap;
 public class UltraConnectionProperties {
     public static final ConnectionProperty<String> USER = new User();
     public static final ConnectionProperty<String> PASSWORD = new Password();
-    public static final ConnectionProperty<String> APPLICATION_NAME_PREFIX = new ApplicationNamePrefix();
-    public static final ConnectionProperty<Map<String, String>> SESSION_PROPERTIES = new SessionProperties();
+    public static final ConnectionProperty<String> APPLICATION_NAME = new ApplicationName();
+
+    public static final ConnectionProperty<Integer> TIMEOUT = new Timeout();
 
     private static final Set<ConnectionProperty<?>> ALL_PROPERTIES = ImmutableSet.<ConnectionProperty<?>>builder()
             .add(USER)
             .add(PASSWORD)
-            .add(APPLICATION_NAME_PREFIX)
-            .add(SESSION_PROPERTIES)
+            .add(APPLICATION_NAME)
+            .add(TIMEOUT)
             .build();
 
     private static final Map<String, ConnectionProperty<?>> KEY_LOOKUP = unmodifiableMap(ALL_PROPERTIES.stream()
@@ -72,10 +73,17 @@ public class UltraConnectionProperties {
         }
     }
 
-    private static class ApplicationNamePrefix
+    private static class ApplicationName
             extends AbstractUltraConnectionProperty<String> {
-        public ApplicationNamePrefix() {
-            super("applicationNamePrefix", NOT_REQUIRED, ALLOWED, STRING_CONVERTER);
+        public ApplicationName() {
+            super("applicationName", NOT_REQUIRED, ALLOWED, STRING_CONVERTER);
+        }
+    }
+
+    private static class Timeout
+            extends AbstractUltraConnectionProperty<Integer> {
+        public Timeout() {
+            super("timeout", NOT_REQUIRED, ALLOWED, INTEGER_CONVERTER);
         }
     }
 

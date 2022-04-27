@@ -2,8 +2,8 @@ package com.ane56.engine.jdbc;
 
 import com.ane56.engine.jdbc.connection.ConnectionProperty;
 import com.ane56.engine.jdbc.connection.UltraConnectionProperties;
+import com.ane56.xsql.common.utils.OkHttpUtil;
 import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.net.HostAndPort;
 import okhttp3.OkHttpClient;
@@ -11,7 +11,11 @@ import okhttp3.OkHttpClient;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import static com.ane56.engine.jdbc.connection.UltraConnectionProperties.*;
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -20,7 +24,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * @Author: zhangxinsen
  * @Date: 2022/4/24 12:48 AM
- * @Desc:
+ * @Desc: 通过连接串, 解析相应的信息
  * @Version: v1.0
  */
 
@@ -36,8 +40,17 @@ public class UltraDriverUri {
     private final Properties properties;
 
     private String catalog;
-     private String schema;
+    private String schema;
 
+
+    /**
+     * 解析传入的url
+     * 同时保留连接属性
+     *
+     * @param url
+     * @param driverProperties
+     * @throws SQLException
+     */
     public UltraDriverUri(String url, Properties driverProperties)
             throws SQLException {
         this(parseDriverUrl(url), driverProperties);
@@ -75,9 +88,18 @@ public class UltraDriverUri {
         return USER.getRequiredValue(properties);
     }
 
-    public Optional<String> getApplicationNamePrefix()
+    public Optional<String> getApplicationName()
             throws SQLException {
-        return APPLICATION_NAME_PREFIX.getValue(properties);
+        return APPLICATION_NAME.getValue(properties);
+    }
+
+    public Optional<Integer> getTimeout()
+            throws SQLException {
+        Optional<Integer> timeoutValue = TIMEOUT.getValue(properties);
+        if (timeoutValue.isPresent()) {
+            return timeoutValue;
+        }
+        return Optional.of(Integer.MAX_VALUE);
     }
 
     public Properties getProperties() {
@@ -85,43 +107,23 @@ public class UltraDriverUri {
     }
 
 
-    public Map<String, String> getSessionProperties()
-            throws SQLException {
-        return SESSION_PROPERTIES.getValue(properties).orElse(ImmutableMap.of());
-    }
-
+    /**
+     * 1. 修改OkHttpClient.Builder对象的属性
+     * 2. 鉴权
+     *
+     * @param builder
+     * @throws SQLException
+     */
     public void setupClient(OkHttpClient.Builder builder)
             throws SQLException {
-        // setupSocksProxy(builder, SOCKS_PROXY.getValue(properties));
-        // setupHttpProxy(builder, HTTP_PROXY.getValue(properties));
+        OkHttpUtil.setupTimeouts(builder, getTimeout().get(), TimeUnit.MILLISECONDS);
 
-        // add user specified protocols to okhttp3 client if specified
-        // getProtocols().ifPresent(builder::protocols);
-
-        // TODO: fix Tempto to allow empty passwords
         String password = PASSWORD.getValue(properties).orElse("");
         if (!password.isEmpty() && !password.equals("***empty***")) {
             throw new SQLException("Authentication using username/password requires SSL to be enabled");
         }
 
         // TODO 鉴权
-    }
-
-    private static Map<String, String> parseParameters(String query)
-            throws SQLException {
-        Map<String, String> result = new HashMap<>();
-
-        if (query != null) {
-            Iterable<String> queryArgs = QUERY_SPLITTER.split(query);
-            for (String queryArg : queryArgs) {
-                List<String> parts = ARG_SPLITTER.splitToList(queryArg);
-                if (result.put(parts.get(0), parts.get(1)) != null) {
-                    throw new SQLException(String.format("Connection property '%s' is in URL multiple times", parts.get(0)));
-                }
-            }
-        }
-
-        return result;
     }
 
     /**
@@ -160,6 +162,12 @@ public class UltraDriverUri {
         }
     }
 
+
+    /**
+     * 初始化catalog和schema
+     *
+     * @throws SQLException
+     */
     private void initCatalogAndSchema()
             throws SQLException {
         String path = uri.getPath();
@@ -206,19 +214,15 @@ public class UltraDriverUri {
     private static Properties mergeConnectionProperties(URI uri, Properties driverProperties)
             throws SQLException {
         Map<String, String> defaults = UltraConnectionProperties.getDefaults();
-        Map<String, String> urlProperties = parseParameters(uri.getQuery());
+        // 关闭query的内容, 暂时不开启
+        // Map<String, String> urlProperties = parseParameters(uri.getQuery());
+        // username, password, applicationName, timeout
         Map<String, String> suppliedProperties = Maps.fromProperties(driverProperties);
-
-        for (String key : urlProperties.keySet()) {
-            if (suppliedProperties.containsKey(key)) {
-                throw new SQLException(String.format("Connection property '%s' is both in the URL and an argument", key));
-            }
-        }
 
         Properties result = new Properties();
         setProperties(result, defaults);
-        setProperties(result, urlProperties);
-        setProperties(result, suppliedProperties);
+        // setProperties(result, urlProperties);
+        setProperties(result, suppliedProperties);  // 覆盖默认参数
         return result;
     }
 

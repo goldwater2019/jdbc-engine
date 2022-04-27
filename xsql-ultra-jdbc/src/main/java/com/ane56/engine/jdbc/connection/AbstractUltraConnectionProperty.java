@@ -138,6 +138,10 @@ public class AbstractUltraConnectionProperty<T>
 
     protected static final Converter<String> STRING_CONVERTER = value -> value;
 
+    protected static final Converter<Long> LONG_CONVERTER = Long::valueOf;
+
+    protected static final Converter<Integer> INTEGER_CONVERTER = Integer::valueOf;
+
     protected static final Converter<String> NON_EMPTY_STRING_CONVERTER = value -> {
         checkArgument(!value.isEmpty(), "value is empty");
         return value;
