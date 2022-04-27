@@ -23,10 +23,22 @@
         <zookeeper.version>3.7.0</zookeeper.version>
         <curator.version>5.2.0</curator.version>
         <druid.version>1.2.6</druid.version>
+        <dubbo-serialization.version>2.7.14</dubbo-serialization.version>
+        <mysql-connector.version>8.0.25</mysql-connector.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.apache.dubbo</groupId>
+                <artifactId>dubbo-serialization-fst</artifactId>
+                <version>${dubbo-serialization.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql-connector.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid</artifactId>
