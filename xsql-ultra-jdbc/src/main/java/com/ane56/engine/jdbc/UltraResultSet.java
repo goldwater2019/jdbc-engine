@@ -1,9 +1,6 @@
 package com.ane56.engine.jdbc;
 
-import com.ane56.engine.jdbc.NotImplementedException;
-import com.ane56.engine.jdbc.UltraResultSetMetaDataV2;
-import com.ane56.engine.jdbc.StatementClient;
-import lombok.*;
+import lombok.Builder;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.*;
 
@@ -83,7 +80,7 @@ public class UltraResultSet implements ResultSet {
         Map<String, Integer> temp = new LinkedHashMap<>();
         int columnCount = this.resultSetMetaData.getColumnCount();
         for (int i = 0; i < columnCount; i++) {
-            temp.put(this.resultSetMetaData.getColumnLabel(i), i + 1);
+            temp.put(this.resultSetMetaData.getColumnLabel(i + 1).toLowerCase(ENGLISH), i + 1);
         }
         fieldMap.set(temp);
     }
@@ -290,7 +287,7 @@ public class UltraResultSet implements ResultSet {
         }
 
         // TODO 检查此处是否存在下标越界的问题
-        String columnTypeName = resultSetMetaData.getColumnTypeName(columnIndex + 1);
+        String columnTypeName = resultSetMetaData.getColumnTypeName(columnIndex);
         if (columnTypeName.equalsIgnoreCase("time")) {
             try {
                 return new Time(TIME_FORMATTER.withZone(localTimeZone).parseMillis(String.valueOf(value)));
@@ -326,7 +323,7 @@ public class UltraResultSet implements ResultSet {
         // ColumnInfo columnInfo = columnInfo(columnIndex);
         // Column column = getColumns(this.client).get(columnIndex);
         // TODO 检查此处的数组下标越界问题
-        String columnTypeName = resultSetMetaData.getColumnTypeName(columnIndex + 1);
+        String columnTypeName = resultSetMetaData.getColumnTypeName(columnIndex);
         if (columnTypeName.equalsIgnoreCase("timestamp")) {
             try {
                 return new Timestamp(TIMESTAMP_FORMATTER.withZone(localTimeZone).parseMillis(String.valueOf(value)));
@@ -492,23 +489,27 @@ public class UltraResultSet implements ResultSet {
             throws SQLException {
 //        List<Column> columns = getColumns(this.client);
 //        Column column = columns.get(columnIndex);
-        // TODO 数组下标越界
-        Integer columnType = resultSetMetaData.getColumnType(columnIndex + 1);
-        switch (columnType) {
-            case Types.DATE:
-                return getDate(columnIndex);
-            case Types.TIME:
-                return getTime(columnIndex);
-            case Types.TIMESTAMP:
-                return getTimestamp(columnIndex);
-            case Types.ARRAY:
-                return getArray(columnIndex);
-            case Types.DECIMAL:
-                return getBigDecimal(columnIndex);
-            case Types.JAVA_OBJECT:
-                throw new SQLException("un support data type, java object");
+        String columnClassName = resultSetMetaData.getColumnClassName(columnIndex);
+        if (columnClassName.toLowerCase(Locale.ROOT).endsWith("localdatetime")) {
+            return column(columnIndex);
         }
         return column(columnIndex);
+//        Integer columnType = resultSetMetaData.getColumnType(columnIndex);
+//        switch (columnType) {
+//            case Types.DATE:
+//                return getDate(columnIndex);
+//            case Types.TIME:
+//                return getTime(columnIndex);
+//            case Types.TIMESTAMP:
+//                return getTimestamp(columnIndex);
+//            case Types.ARRAY:
+//                return getArray(columnIndex);
+//            case Types.DECIMAL:
+//                return getBigDecimal(columnIndex);
+//            case Types.JAVA_OBJECT:
+//                throw new SQLException("un support data type, java object");
+//        }
+//        return column(columnIndex);
     }
 
     @Override

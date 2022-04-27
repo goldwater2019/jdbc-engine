@@ -157,7 +157,7 @@ public class UltraConnection implements Connection {
      */
     @Override
     public DatabaseMetaData getMetaData() throws SQLException {
-        return new UltraDatabaseMetaData();
+        return new UltraDatabaseMetaDataV2();
     }
 
     @Override

@@ -61,24 +61,33 @@ public class UltraDriverTest {
         Statement statement = conn.createStatement();
         String sql = "select 1";
         ResultSet resultSet = statement.executeQuery(sql);
-        printSchemaAndData(sql, resultSet);
+//        printSchemaAndData(sql, resultSet);
 
         sql = "select max(update_time) as max_update_time " +
                 "from tx_dev.bd_manager_area_station";
         resultSet = statement.executeQuery(sql);
-        printSchemaAndData(sql, resultSet);
+//        printSchemaAndData(sql, resultSet);
 
 
         sql = "select * " +
-                "from tx_dev.bd_manager_area_station order by update_Time " +
+                "from tx_dev.bd_manager_area_station order by update_time " +
                 "limit 100 offset 2";
         resultSet = statement.executeQuery(sql);
-        printSchemaAndData(sql, resultSet);
+//        printSchemaAndData(sql, resultSet);
 
 
         sql = "show create table tx_dev.bd_manager_area_station";
         resultSet = statement.executeQuery(sql);
-        printSchemaAndData(sql, resultSet);
+//        printSchemaAndData(sql, resultSet);
+
+        sql = "show tables";
+        resultSet = statement.executeQuery(sql);
+//        printSchemaAndData(sql, resultSet);
+
+        sql = "select update_time from tx_dev.bd_manager_area_station limit 10";
+        resultSet = statement.executeQuery(sql);
+        resultSet.next();
+        System.out.println(resultSet.getObject(1));
         conn.close();
     }
 
@@ -97,7 +106,7 @@ public class UltraDriverTest {
 
                 System.out.print("|");
                 for (int i = 0; i < columnCount; i++) {
-                    System.out.print(center(metaData.getColumnLabel(i), 20));
+                    System.out.print(center(metaData.getColumnLabel(i + 1), 20));
                     System.out.print("|");
                 }
                 System.out.println("");
@@ -111,7 +120,7 @@ public class UltraDriverTest {
             }
             System.out.print("|");
             for (int i = 0; i < columnCount; i++) {
-                System.out.print(center(resultSet.getString(i + 1), 20));
+                System.out.print(center(resultSet.getString(metaData.getColumnLabel(i + 1)), 20));
                 System.out.print("|");
             }
             System.out.println("");
@@ -138,5 +147,31 @@ public class UltraDriverTest {
             sb.append(" ");
         }
         return sb.toString();
+    }
+
+    //    @Test
+    public void testMySQL() throws SQLException, ClassNotFoundException {
+//        .name("aliyun")
+//                            .driverClassName("com.mysql.cj.jdbc.Driver")
+//                            .isAvailable(true)
+//                            .isForbidden(false)
+//                            .jdbcUrl("jdbc:mysql://rm-uf67xpwhzp9xvuciv2o.mysql.rds.aliyuncs.com:3306")
+//                            .username("root")
+//                            .password("Luxin@19980516")
+//                            .build()
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        Connection connection = DriverManager.getConnection("jdbc:mysql://rm-uf67xpwhzp9xvuciv2o.mysql.rds.aliyuncs.com:3306", "root", "Luxin@19980516");
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("select * from engine.t_click_logs limit 100 offset 10");
+        while (resultSet.next()) {
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            int columnCount = metaData.getColumnCount();
+            for (int i = 0; i < columnCount; i++) {
+                System.out.println(metaData.getColumnLabel(i + 1));
+            }
+            for (int i = 0; i < columnCount; i++) {
+                System.out.printf(" %10s |", resultSet.getString(i + 1));
+            }
+        }
     }
 }

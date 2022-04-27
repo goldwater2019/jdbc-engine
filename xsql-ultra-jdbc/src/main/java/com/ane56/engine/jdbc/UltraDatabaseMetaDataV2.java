@@ -9,7 +9,7 @@ import java.sql.*;
  * @Version: v1.0
  */
 
-public class UltraDatabaseMetaData implements DatabaseMetaData {
+public class UltraDatabaseMetaDataV2 implements DatabaseMetaData {
     @Override
     public boolean allProceduresAreCallable() throws SQLException {
         return false;

@@ -41,27 +41,27 @@ public class UltraResultSetMetaDataV2
 
     @Override
     public boolean isAutoIncrement(int column) throws SQLException {
-        return columnMetaDataList.get(column).getAutoIncrement();
+        return columnMetaDataList.get(column - 1).getAutoIncrement();
     }
 
     @Override
     public boolean isCaseSensitive(int column) throws SQLException {
-        return columnMetaDataList.get(column).getCaseSensitive();
+        return columnMetaDataList.get(column - 1).getCaseSensitive();
     }
 
     @Override
     public boolean isSearchable(int column) throws SQLException {
-        return columnMetaDataList.get(column).getSearchable();
+        return columnMetaDataList.get(column - 1).getSearchable();
     }
 
     @Override
     public boolean isCurrency(int column) throws SQLException {
-        return columnMetaDataList.get(column).getCurrency();
+        return columnMetaDataList.get(column - 1).getCurrency();
     }
 
     @Override
     public int isNullable(int column) throws SQLException {
-        Integer nullable = columnMetaDataList.get(column).getNullable();
+        Integer nullable = columnMetaDataList.get(column - 1).getNullable();
         if (nullable == 0) {
             return ResultSetMetaData.columnNoNulls;
         } else if (nullable == 1) {
@@ -72,77 +72,77 @@ public class UltraResultSetMetaDataV2
 
     @Override
     public boolean isSigned(int column) throws SQLException {
-        return columnMetaDataList.get(column).getSigned();
+        return columnMetaDataList.get(column - 1).getSigned();
     }
 
     @Override
     public int getColumnDisplaySize(int column) throws SQLException {
-        return columnMetaDataList.get(column).getColumnDisplaySize();
+        return columnMetaDataList.get(column - 1).getColumnDisplaySize();
     }
 
     @Override
     public String getColumnLabel(int column) throws SQLException {
-        return columnMetaDataList.get(column).getColumnLabel();
+        return columnMetaDataList.get(column - 1).getColumnLabel();
     }
 
     @Override
     public String getColumnName(int column) throws SQLException {
-        return columnMetaDataList.get(column).getColumnName();
+        return columnMetaDataList.get(column - 1).getColumnName();
     }
 
     @Override
     public String getSchemaName(int column) throws SQLException {
-        return columnMetaDataList.get(column).getSchemaName();
+        return columnMetaDataList.get(column - 1).getSchemaName();
     }
 
     @Override
     public int getPrecision(int column) throws SQLException {
-        return columnMetaDataList.get(column).getPrecision();
+        return columnMetaDataList.get(column - 1).getPrecision();
     }
 
     @Override
     public int getScale(int column) throws SQLException {
-        return columnMetaDataList.get(column).getScale();
+        return columnMetaDataList.get(column - 1).getScale();
     }
 
     @Override
     public String getTableName(int column) throws SQLException {
-        return columnMetaDataList.get(column).getTableName();
+        return columnMetaDataList.get(column - 1).getTableName();
     }
 
     @Override
     public String getCatalogName(int column) throws SQLException {
-        return columnMetaDataList.get(column).getCatalogName();
+        return columnMetaDataList.get(column - 1).getCatalogName();
     }
 
     @Override
     public int getColumnType(int column) throws SQLException {
-        return columnMetaDataList.get(column).getColumnType();
+        return columnMetaDataList.get(column - 1).getColumnType();
     }
 
     @Override
     public String getColumnTypeName(int column) throws SQLException {
-        return columnMetaDataList.get(column).getColumnTypeName();
+        return columnMetaDataList.get(column - 1).getColumnTypeName();
     }
 
     @Override
     public boolean isReadOnly(int column) throws SQLException {
-        return columnMetaDataList.get(column).getReadOnly();
+        return columnMetaDataList.get(column - 1).getReadOnly();
     }
 
     @Override
     public boolean isWritable(int column) throws SQLException {
-        return columnMetaDataList.get(column).getWritable();
+        return columnMetaDataList.get(column - 1).getWritable();
     }
 
     @Override
     public boolean isDefinitelyWritable(int column) throws SQLException {
-        return columnMetaDataList.get(column).getDefinitelyWritable();
+        return columnMetaDataList.get(column - 1).getDefinitelyWritable();
     }
 
     @Override
     public String getColumnClassName(int column) throws SQLException {
-        return columnMetaDataList.get(column).getColumnClassName();
+        return columnMetaDataList.get(column - 1).getColumnClassName();
     }
 
     @Override
