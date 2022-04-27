@@ -1,7 +1,7 @@
 package com.ane56.engine.jdbc.preparedstatement;
 
 import com.ane56.engine.jdbc.connection.UltraConnection;
-import com.ane56.engine.jdbc.statement.UltraStatement;
+import com.ane56.engine.jdbc.UltraStatement;
 
 import java.io.InputStream;
 import java.io.Reader;

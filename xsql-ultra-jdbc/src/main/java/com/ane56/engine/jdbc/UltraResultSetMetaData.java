@@ -1,6 +1,6 @@
-package com.ane56.engine.jdbc.resultset;
+package com.ane56.engine.jdbc;
 
-import com.ane56.engine.jdbc.common.Column;
+import com.ane56.xsql.common.model.UltraResultColumnMetaData;
 import com.google.common.collect.ImmutableList;
 
 import java.sql.ResultSetMetaData;
@@ -21,40 +21,47 @@ import static java.util.Objects.requireNonNull;
 public class UltraResultSetMetaData
         implements ResultSetMetaData {
 
-    private List<Column> columnLists;
+    private int countCount;
+    private List<UltraResultColumnMetaData> columnMetaDataList;
 
-    public UltraResultSetMetaData(List<Column> columnList) {
-        this.columnLists = ImmutableList.copyOf(requireNonNull(columnList, "column list is null"));
+    /**
+     * 构造方法
+     *
+     * @param columnMetaDataList
+     */
+    public UltraResultSetMetaData(List<UltraResultColumnMetaData> columnMetaDataList) {
+        this.countCount = columnMetaDataList.size();
+        this.columnMetaDataList = ImmutableList.copyOf(requireNonNull(columnMetaDataList, "column list is null"));
     }
 
     @Override
     public int getColumnCount() throws SQLException {
-        return columnLists.size();
+        return columnMetaDataList.size();
     }
 
     @Override
     public boolean isAutoIncrement(int column) throws SQLException {
-        return columnLists.get(column).getAutoIncrement();
+        return columnMetaDataList.get(column).getAutoIncrement();
     }
 
     @Override
     public boolean isCaseSensitive(int column) throws SQLException {
-        return columnLists.get(column).getCaseSensitive();
+        return columnMetaDataList.get(column).getCaseSensitive();
     }
 
     @Override
     public boolean isSearchable(int column) throws SQLException {
-        return columnLists.get(column).getSearchable();
+        return columnMetaDataList.get(column).getSearchable();
     }
 
     @Override
     public boolean isCurrency(int column) throws SQLException {
-        return columnLists.get(column).getCurrency();
+        return columnMetaDataList.get(column).getCurrency();
     }
 
     @Override
     public int isNullable(int column) throws SQLException {
-        Integer nullable = columnLists.get(column).getNullable();
+        Integer nullable = columnMetaDataList.get(column).getNullable();
         if (nullable == 0) {
             return ResultSetMetaData.columnNoNulls;
         } else if (nullable == 1) {
@@ -65,77 +72,77 @@ public class UltraResultSetMetaData
 
     @Override
     public boolean isSigned(int column) throws SQLException {
-        return columnLists.get(column).getSigned();
+        return columnMetaDataList.get(column).getSigned();
     }
 
     @Override
     public int getColumnDisplaySize(int column) throws SQLException {
-        return columnLists.get(column).getColumnDisplaySize();
+        return columnMetaDataList.get(column).getColumnDisplaySize();
     }
 
     @Override
     public String getColumnLabel(int column) throws SQLException {
-        return columnLists.get(column).getColumnLabel();
+        return columnMetaDataList.get(column).getColumnLabel();
     }
 
     @Override
     public String getColumnName(int column) throws SQLException {
-        return columnLists.get(column).getColumnName();
+        return columnMetaDataList.get(column).getColumnName();
     }
 
     @Override
     public String getSchemaName(int column) throws SQLException {
-        return columnLists.get(column).getSchemaName();
+        return columnMetaDataList.get(column).getSchemaName();
     }
 
     @Override
     public int getPrecision(int column) throws SQLException {
-        return columnLists.get(column).getPrecision();
+        return columnMetaDataList.get(column).getPrecision();
     }
 
     @Override
     public int getScale(int column) throws SQLException {
-        return columnLists.get(column).getScale();
+        return columnMetaDataList.get(column).getScale();
     }
 
     @Override
     public String getTableName(int column) throws SQLException {
-        return columnLists.get(column).getTableName();
+        return columnMetaDataList.get(column).getTableName();
     }
 
     @Override
     public String getCatalogName(int column) throws SQLException {
-        return columnLists.get(column).getCatalogName();
+        return columnMetaDataList.get(column).getCatalogName();
     }
 
     @Override
     public int getColumnType(int column) throws SQLException {
-        return columnLists.get(column).getColumnType();
+        return columnMetaDataList.get(column).getColumnType();
     }
 
     @Override
     public String getColumnTypeName(int column) throws SQLException {
-        return columnLists.get(column).getColumnTypeName();
+        return columnMetaDataList.get(column).getColumnTypeName();
     }
 
     @Override
     public boolean isReadOnly(int column) throws SQLException {
-        return columnLists.get(column).getReadOnly();
+        return columnMetaDataList.get(column).getReadOnly();
     }
 
     @Override
     public boolean isWritable(int column) throws SQLException {
-        return columnLists.get(column).getWritable();
+        return columnMetaDataList.get(column).getWritable();
     }
 
     @Override
     public boolean isDefinitelyWritable(int column) throws SQLException {
-        return columnLists.get(column).getDefinitelyWritable();
+        return columnMetaDataList.get(column).getDefinitelyWritable();
     }
 
     @Override
     public String getColumnClassName(int column) throws SQLException {
-        return columnLists.get(column).getColumnClassName();
+        return columnMetaDataList.get(column).getColumnClassName();
     }
 
     @Override

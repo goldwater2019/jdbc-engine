@@ -1,14 +1,9 @@
 package com.ane56.engine.jdbc.common.client;
 
 import com.ane56.engine.jdbc.common.QueryData;
-import com.ane56.engine.jdbc.common.QueryStatusInfo;
-import com.ane56.engine.jdbc.common.StatementStats;
-
-import javax.annotation.Nullable;
-import java.io.Closeable;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import com.ane56.engine.jdbc.resultset.UltraResultSet;
+import lombok.*;
+import okhttp3.OkHttpClient;
 
 /**
  * @Author: zhangxinsen
@@ -17,52 +12,27 @@ import java.util.Set;
  * @Version: v1.0
  */
 
-public interface StatementClient
-        extends Closeable
-{
-    String getQuery();
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@EqualsAndHashCode
+@ToString
+public class StatementClient {
 
-    boolean isRunning();
+    private OkHttpClient httpClient;
+    private ClientSession clientSession;
+    private String query;
+    private QueryData currentData;
+    private UltraResultSet resultSet;
 
-    boolean isClientAborted();
 
-    boolean isClientError();
+    /**
+     * TODO 新增此处的数据处理
+     *
+     * @return
+     */
+    boolean advance() {
+        return true;
+    }
 
-    boolean isFinished();
-
-    StatementStats getStats();
-
-    QueryStatusInfo currentStatusInfo();
-
-    QueryData currentData();
-
-    QueryStatusInfo finalStatusInfo();
-
-    Optional<String> getSetCatalog();
-
-    Optional<String> getSetSchema();
-
-    Map<String, String> getSetSessionProperties();
-
-    Set<String> getResetSessionProperties();
-
-    Map<String, String> getAddedPreparedStatements();
-
-    Set<String> getDeallocatedPreparedStatements();
-
-    @Nullable
-    String getStartedTransactionId();
-
-    boolean isClearTransactionId();
-
-    Map<String, String> getAddedSessionFunctions();
-
-    Set<String> getRemovedSessionFunctions();
-
-    boolean advance();
-
-    void cancelLeafStage();
-
-    @Override
-    void close();
 }

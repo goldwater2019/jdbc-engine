@@ -1,6 +1,7 @@
 package com.ane56.engine.jdbc.resultset;
 
 import com.ane56.engine.jdbc.NotImplementedException;
+import com.ane56.engine.jdbc.UltraResultSetMetaData;
 import com.ane56.engine.jdbc.common.Column;
 import com.ane56.engine.jdbc.common.QueryError;
 import com.ane56.engine.jdbc.common.QueryStats;

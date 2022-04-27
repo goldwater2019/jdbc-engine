@@ -8,7 +8,7 @@ import com.ane56.engine.jdbc.common.client.ClientSession;
 import com.ane56.engine.jdbc.common.client.StatementClient;
 import com.ane56.engine.jdbc.metadata.UltraDatabaseMetaData;
 import com.ane56.engine.jdbc.preparedstatement.UltraPreparedStatement;
-import com.ane56.engine.jdbc.statement.UltraStatement;
+import com.ane56.engine.jdbc.UltraStatement;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Ints;
 
