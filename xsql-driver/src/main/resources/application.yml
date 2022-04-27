@@ -2,16 +2,13 @@ spring:
   application:
     name: driver-service
   cloud:
-    zookeeper:
-      connect-string: bdtnode08:2181,bdtnode09:2181,bdtnode10:2181
-
-#  dubbo.application.name=xsql-executor-provider
-#  dubbo.registry.address=zookeeper://bdtnode10:2181
-#  dubbo.registry.simplifed=true
-#  dubbo.protocol.name=dubbo
-#  dubbo.protocol.port=20880
-#  dubbo.provider.token=true
-
+    nacos:
+      username: nacos
+      password: nacos
+      server-addr: bdtnode10:8848
+      discovery:
+        server-addr: bdtnode10:8848
+        enabled: true
 
 dubbo:
   consumer:
@@ -19,7 +16,7 @@ dubbo:
   application:
     name: driver-dubbo-provider
   registry:
-    address: zookeeper://bdtnode10:2181
+    address: nacos://bdtnode10:8848?username=nacos&password=nacos
     simplifed: true
   protocol:
     name: dubbo
