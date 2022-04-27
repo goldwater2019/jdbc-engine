@@ -12,13 +12,13 @@
     </parent>
 
     <groupId>com.ane56.engine</groupId>
-    <artifactId>kyuubi-jdbc-engine</artifactId>
+    <artifactId>xsql-jdbc-engine</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>${project.artifactId}</name>
     <packaging>pom</packaging>
 
     <modules>
-<!--        <module>jdbc-engine-common</module>-->
+        <!--        <module>jdbc-engine-common</module>-->
         <!--        <module>jdbc-engine-driver</module>-->
         <!--        <module>jdbc-engine-executor</module>-->
         <!--        <module>jdbc-engine-mock</module>-->
@@ -31,7 +31,6 @@
         <module>xsql-executor</module>
         <module>xsql-client</module>
         <module>xsql-ultra-jdbc</module>
-        <!--        <module>xsql-ultra-jdbc</module>-->
     </modules>
 
     <properties>
