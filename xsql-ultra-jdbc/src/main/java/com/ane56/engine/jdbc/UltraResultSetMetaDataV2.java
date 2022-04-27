@@ -18,7 +18,7 @@ import static java.util.Objects.requireNonNull;
  * @Version: v1.0
  */
 
-public class UltraResultSetMetaData
+public class UltraResultSetMetaDataV2
         implements ResultSetMetaData {
 
     private int countCount;
@@ -29,7 +29,7 @@ public class UltraResultSetMetaData
      *
      * @param columnMetaDataList
      */
-    public UltraResultSetMetaData(List<UltraResultColumnMetaData> columnMetaDataList) {
+    public UltraResultSetMetaDataV2(List<UltraResultColumnMetaData> columnMetaDataList) {
         this.countCount = columnMetaDataList.size();
         this.columnMetaDataList = ImmutableList.copyOf(requireNonNull(columnMetaDataList, "column list is null"));
     }

@@ -1,7 +1,5 @@
 package com.ane56.engine.jdbc;
 
-import com.ane56.engine.jdbc.connection.UltraConnection;
-import com.ane56.engine.jdbc.connection.UltraConnectionProperties;
 import com.ane56.engine.jdbc.socket.SocketChannelSocketFactory;
 import okhttp3.OkHttpClient;
 

@@ -1,13 +1,11 @@
-package com.ane56.engine.jdbc.common.client;
+package com.ane56.engine.jdbc;
 
-import com.google.common.collect.ImmutableMap;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.net.URI;
-import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
 
@@ -28,7 +26,6 @@ public class ClientSession {
     private String source;
     private String catalog;
     private String schema;
-    private Map<String, String> properties;
     private String transactionId;
 
     public static ClientSession stripTransactionId(ClientSession session) {
@@ -38,7 +35,6 @@ public class ClientSession {
                 .source(session.getSource())
                 .catalog(session.getCatalog())
                 .schema(session.getSchema())
-                .properties(ImmutableMap.copyOf(session.getProperties()))
                 .transactionId(null)
                 .build();
     }
@@ -49,7 +45,6 @@ public class ClientSession {
             String source,
             String catalog,
             String schema,
-            Map<String, String> properties,
             String transactionId) {
         this.server = requireNonNull(server, "server is null");
         this.user = user;
@@ -57,7 +52,6 @@ public class ClientSession {
         this.catalog = catalog;
         this.schema = schema;
         this.transactionId = transactionId;
-        this.properties = ImmutableMap.copyOf(requireNonNull(properties, "properties is null"));
 
     }
 

@@ -1,4 +1,4 @@
-package com.ane56.engine.jdbc.metadata;
+package com.ane56.engine.jdbc;
 
 import java.sql.*;
 

@@ -1,20 +1,15 @@
 package com.ane56.engine.jdbc;
 
-import com.ane56.engine.jdbc.common.QueryStatusInfo;
-import com.ane56.engine.jdbc.common.client.StatementClient;
-import com.ane56.engine.jdbc.connection.UltraConnection;
-import com.ane56.engine.jdbc.resultset.UltraResultSet;
-import com.google.common.collect.ImmutableMap;
+import com.ane56.xsql.common.exception.XSQLException;
 import com.google.common.primitives.Ints;
 
+import java.io.IOException;
 import java.sql.*;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.ane56.engine.jdbc.resultset.UltraResultSet.resultsException;
 import static java.lang.Math.toIntExact;
 import static java.util.Objects.requireNonNull;
 
@@ -232,26 +227,25 @@ public class UltraStatement implements Statement {
         try {
             // 开始查询
             client = connection().startQuery(sql);
+            boolean isQuery = client.advance();
             executingClient.set(client);
-            resultSet = new UltraResultSet(this, client, maxRows.get());
-            // TODO 检查是否是一个query
-            if (client.currentStatusInfo().getUpdateType() == null) {
+            if (isQuery) {
+                client.refreshResultSet(this);
+                resultSet = client.getResultSet();
                 currentResult.set(resultSet);
                 return true;
             }
-
             // this is an update
-            while (resultSet.next()) {
+            while (resultSet!= null && resultSet.next()) {
                 // no-ops
             }
 
-            connection().updateSession(client);
-
-            Long updateCount = client.finalStatusInfo().getUpdateCount();
-            currentUpdateCount.set((updateCount != null) ? updateCount : 0);
-            currentUpdateType.set(client.finalStatusInfo().getUpdateType());
-            return false;
+            return isQuery;
         } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (XSQLException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
             // TODO 别的catch补全
@@ -261,7 +255,7 @@ public class UltraStatement implements Statement {
                     resultSet.close();
                 }
                 if (client != null) {
-                    client.close();
+                    // TODO 关闭client
                 }
             }
         }
