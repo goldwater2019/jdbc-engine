@@ -3,7 +3,9 @@ package com.ane56.xsql.service.provider;
 import com.ane56.xsql.common.api.XSqlExecutorService;
 import com.ane56.xsql.common.exception.XSQLException;
 import com.ane56.xsql.common.model.UltraCatalog;
+import com.ane56.xsql.common.model.UltraDatabaseMetaData;
 import com.ane56.xsql.common.model.UltraResultRow;
+import com.ane56.xsql.common.model.UltraResultSetMetaData;
 import com.ane56.xsql.service.manager.PooledDataSourceManager;
 import com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
@@ -87,6 +89,12 @@ public class XSqlExecutorServiceImpl implements XSqlExecutorService {
         Map<String, UltraCatalog> name2catalog = pooledDataSourceManager.getName2catalog();
         // TODO 获得配置的catalog, 然后对比是否相同
         // 如果不同, 则关闭当前连接, 并且创建新的连接
+    }
+
+    @Override
+    public UltraDatabaseMetaData getDatabaseMetaData(String catalogName) throws SQLException, XSQLException {
+        checkInitialStatus();
+        return pooledDataSourceManager.getDatabaseMetaData(catalogName);
     }
 
     /**

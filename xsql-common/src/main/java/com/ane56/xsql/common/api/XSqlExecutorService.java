@@ -2,6 +2,7 @@ package com.ane56.xsql.common.api;
 
 import com.ane56.xsql.common.exception.XSQLException;
 import com.ane56.xsql.common.model.UltraCatalog;
+import com.ane56.xsql.common.model.UltraDatabaseMetaData;
 import com.ane56.xsql.common.model.UltraResultRow;
 
 import java.sql.SQLException;
@@ -48,4 +49,6 @@ public interface XSqlExecutorService {
      * 初始化/更新 catalogs
      */
     public void updateOrInitCatalogs();
+
+    public UltraDatabaseMetaData getDatabaseMetaData(String catalogName) throws SQLException, XSQLException;
 }

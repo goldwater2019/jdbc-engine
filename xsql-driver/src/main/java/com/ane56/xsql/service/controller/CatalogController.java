@@ -1,14 +1,13 @@
 package com.ane56.xsql.service.controller;
 
-import com.ane56.xsql.common.model.JsonResult;
-import com.ane56.xsql.common.model.UltraBaseStatement;
-import com.ane56.xsql.common.model.UltraCatalog;
-import com.ane56.xsql.common.model.UltraResultRow;
+import com.ane56.xsql.common.exception.XSQLException;
+import com.ane56.xsql.common.model.*;
 import com.ane56.xsql.service.consumer.XSqlDriverConsumer;
 import com.ane56.xsql.service.consumer.XSqlExecutorConsumer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -45,5 +44,10 @@ public class CatalogController {
     @PostMapping("execute")
     public JsonResult<Boolean> execute(@RequestBody UltraBaseStatement ultraBaseStatement) {
         return xSqlExecutorConsumer.execute(ultraBaseStatement);
+    }
+
+    @PostMapping("metadata")
+    public JsonResult<UltraDatabaseMetaData> getMetaData(@RequestBody UltraBaseStatement ultraBaseStatement) throws SQLException, XSQLException {
+        return xSqlExecutorConsumer.getMetaData(ultraBaseStatement);
     }
 }

@@ -51,7 +51,7 @@ public class UltraDriverTest {
     }
 
     @Test
-    public void testQuery() throws ClassNotFoundException, SQLException {
+    public void testQuery() throws ClassNotFoundException, SQLException, InterruptedException {
         Class.forName(DRIVER_NAME);
         Properties connectionProperties = new Properties();
         connectionProperties.setProperty("user", USERNAME);
@@ -88,7 +88,15 @@ public class UltraDriverTest {
         resultSet = statement.executeQuery(sql);
         resultSet.next();
         System.out.println(resultSet.getObject(1));
-        conn.close();
+
+        while (true) {
+            sql = "select * " +
+                    "from tx_dev.bd_manager_area_station";
+            resultSet = statement.executeQuery(sql);
+            Thread.sleep(500);
+        }
+
+//        conn.close();
     }
 
     private void printSchemaAndData(String sql, ResultSet resultSet) throws SQLException {
