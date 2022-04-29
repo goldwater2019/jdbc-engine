@@ -59,6 +59,17 @@ public class XSqlExecutorConsumer {
                             .password("Luxin@19980516")
                             .build()
             );
+            xSqlExecutorService.addCatalog(
+                    UltraCatalog.builder()
+                            .name("presto")
+                            .driverClassName("com.facebook.presto.jdbc.PrestoDriver")
+                            .isAvailable(true)
+                            .isForbidden(false)
+                            .jdbcUrl("jdbc:presto://bdtnode04:8881")
+                            .username("root")
+                            .password("")
+                            .build()
+            );
         }
 
         List<UltraCatalog> ultraCatalogs = xSqlExecutorService.showCatalogs();

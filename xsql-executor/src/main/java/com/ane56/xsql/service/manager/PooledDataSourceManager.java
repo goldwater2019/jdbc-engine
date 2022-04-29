@@ -127,8 +127,9 @@ public class PooledDataSourceManager {
         log.info("get data source costs: " + (System.currentTimeMillis() - startTime));
         startTime = System.currentTimeMillis();
         DruidPooledConnection connection = dataSource.getConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(sqlStatement);
-        ResultSet resultSet = preparedStatement.executeQuery();
+//        PreparedStatement preparedStatement = connection.prepareStatement(sqlStatement);
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(sqlStatement);
         List<UltraResultRow> result = new LinkedList<>();
         while (resultSet.next()) {
             List<Object> ultraResultSetData = new LinkedList<>();
@@ -175,6 +176,7 @@ public class PooledDataSourceManager {
                             .build()
             );
         }
+        statement.close();
         connection.close();
         log.info("query pool costs: " + (System.currentTimeMillis() - startTime));
         return result;
@@ -190,8 +192,10 @@ public class PooledDataSourceManager {
         log.info("get data source costs: " + (System.currentTimeMillis() - startTime));
         startTime = System.currentTimeMillis();
         DruidPooledConnection connection = dataSource.getConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(sqlStatement);
-        boolean executeResult = preparedStatement.execute();
+        Statement statement = connection.createStatement();
+//        PreparedStatement preparedStatement = connection.prepareStatement(sqlStatement);
+        boolean executeResult = statement.execute(sqlStatement);
+        statement.close();
         connection.close();
         log.info("query pool costs: " + (System.currentTimeMillis() - startTime));
         return;

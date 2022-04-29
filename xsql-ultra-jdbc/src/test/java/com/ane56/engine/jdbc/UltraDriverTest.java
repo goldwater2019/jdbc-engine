@@ -47,6 +47,21 @@ public class UltraDriverTest {
         Statement statement = conn.createStatement();
         statement.execute("drop table if exists xsql_test");
         statement.execute("use tx_dev");
+        statement.close();
+        conn.close();
+    }
+
+    @Test
+    public void testChangeCatalog() throws ClassNotFoundException, SQLException {
+        Class.forName(DRIVER_NAME);
+        Properties connectionProperties = new Properties();
+        connectionProperties.setProperty("user", USERNAME);
+        connectionProperties.setProperty("password", PASSWORD);
+        connectionProperties.setProperty("applicationName", "ultra-test");
+        Connection conn = DriverManager.getConnection(JDBC_URL, connectionProperties);
+        Statement statement = conn.createStatement();
+        statement.execute("set backend.catalog = presto");
+        statement.close();
         conn.close();
     }
 
@@ -218,5 +233,45 @@ public class UltraDriverTest {
                 System.out.printf(" %10s |", resultSet.getString(i + 1));
             }
         }
+        statement.close();
+        connection.close();
+    }
+
+    @Test
+    public void testPrestoJDBCConnection() throws SQLException, ClassNotFoundException {
+        Class.forName("com.facebook.presto.jdbc.PrestoDriver");
+        Connection connection = DriverManager.getConnection("jdbc:presto://bdtnode04:8881", "presto", "");
+        Statement statement = connection.createStatement();
+        statement.execute("use hive.edw_cdm");
+        String sql = "show tables";
+        ResultSet resultSet = statement.executeQuery(sql);
+        printSchemaAndData(sql, resultSet);
+        statement.close();
+        connection.close();
+    }
+
+    @Test
+    public void testPrestoConnection() throws SQLException, ClassNotFoundException {
+        Class.forName(DRIVER_NAME);
+        Properties connectionProperties = new Properties();
+        connectionProperties.setProperty("user", USERNAME);
+        connectionProperties.setProperty("password", PASSWORD);
+        connectionProperties.setProperty("applicationName", "ultra-test");
+        Connection connection = DriverManager.getConnection(JDBC_URL, connectionProperties);
+        Statement statement = connection.createStatement();
+        statement.execute("use hive.edw_cdm");
+        ResultSet resultSet = statement.executeQuery("show tables");
+        while (resultSet.next()) {
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            int columnCount = metaData.getColumnCount();
+            for (int i = 0; i < columnCount; i++) {
+                System.out.println(metaData.getColumnLabel(i + 1));
+            }
+            for (int i = 0; i < columnCount; i++) {
+                System.out.printf(" %10s |", resultSet.getString(i + 1));
+            }
+        }
+        statement.close();
+        connection.close();
     }
 }
