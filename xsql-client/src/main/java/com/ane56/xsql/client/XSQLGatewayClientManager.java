@@ -2,6 +2,8 @@ package com.ane56.xsql.client;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ane56.xsql.common.exception.XSQLException;
+import com.ane56.xsql.common.model.UltraCatalog;
+import com.ane56.xsql.common.model.UltraDatabaseMetaData;
 import com.ane56.xsql.common.model.UltraResultRow;
 import com.ane56.xsql.common.model.XSqlExecuteReq;
 import lombok.*;
@@ -9,7 +11,6 @@ import okhttp3.*;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -110,6 +111,47 @@ public class XSQLGatewayClientManager {
         Integer msgCode = jsonObject.getInteger("code");
         if (msgCode == 0) {
             return jsonObject.getBoolean("data");
+        }
+        throw new XSQLException(jsonObject.getString("msg"));
+    }
+
+    public List<UltraCatalog> getCatalogs(OkHttpClient httpClient, URI baseUri) throws IOException, XSQLException {
+        URI uri = URI.create(String.format("%s/%s", baseUri.toString(), "api/v1/driver/catalog/show"));
+        Request request = new Request.Builder().url(uri.toString()).get().build();
+        Response response = httpClient.newCall(request).execute();
+        // TODO 路由错误, 400, 504, 503 ,etc 的处理
+        if (response.body() == null) {
+            // TODO 抛出异常
+        }
+        String responseJsonStr = response.body().string();
+        JSONObject jsonObject = JSONObject.parseObject(responseJsonStr);
+        Integer msgCode = jsonObject.getInteger("code");
+        if (msgCode == 0) {
+            String catalogListString = jsonObject.getString("data");
+            return JSONObject.parseArray(catalogListString, UltraCatalog.class);
+        }
+        throw new XSQLException(jsonObject.getString("msg"));
+    }
+
+    public UltraDatabaseMetaData getDatabaseMetaData(String catalog, OkHttpClient httpClient, URI baseUri) throws IOException, XSQLException {
+        URI uri = URI.create(String.format("%s/%s", baseUri.toString(), "api/v1/driver/catalog/metadata"));
+        XSqlExecuteReq xSqlExecuteReq = XSqlExecuteReq.builder()
+                .catalogName(catalog)
+                .build();
+        String reqJsonString = JSONObject.toJSONString(xSqlExecuteReq);
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), reqJsonString);
+        Request request = new Request.Builder().url(uri.toString()).post(requestBody).build();
+        Response response = httpClient.newCall(request).execute();
+        // TODO 路由错误, 400, 504, 503 ,etc 的处理
+        if (response.body() == null) {
+            // TODO 抛出异常
+        }
+        String responseJsonStr = response.body().string();
+        JSONObject jsonObject = JSONObject.parseObject(responseJsonStr);
+        Integer msgCode = jsonObject.getInteger("code");
+        if (msgCode == 0) {
+            String jsonObjectString = jsonObject.getString("data");
+            return JSONObject.parseObject(jsonObjectString, UltraDatabaseMetaData.class);
         }
         throw new XSQLException(jsonObject.getString("msg"));
     }

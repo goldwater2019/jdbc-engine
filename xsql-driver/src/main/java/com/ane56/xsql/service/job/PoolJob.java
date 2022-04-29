@@ -24,7 +24,7 @@ public class PoolJob {
     @Autowired
     private XSqlExecutorConsumer xSqlExecutorConsumer;
 
-    @Scheduled(fixedRate = 5, timeUnit = TimeUnit.SECONDS)
+//    @Scheduled(fixedRate = 5, timeUnit = TimeUnit.SECONDS)
     public void ping() throws SQLException, XSQLException {
         long startTime = System.currentTimeMillis();
         xSqlExecutorConsumer.init();

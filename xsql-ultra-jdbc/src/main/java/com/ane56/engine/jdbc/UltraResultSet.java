@@ -1,5 +1,10 @@
 package com.ane56.engine.jdbc;
 
+import com.ane56.xsql.common.model.UltraDatabaseMetaData;
+import com.ane56.xsql.common.model.UltraResultColumnMetaData;
+import com.ane56.xsql.common.model.UltraResultRow;
+import com.ane56.xsql.common.model.UltraResultSetMetaData;
+import com.google.common.collect.ImmutableList;
 import lombok.Builder;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.*;
@@ -27,6 +32,25 @@ import static java.util.Objects.requireNonNull;
 
 @Builder
 public class UltraResultSet implements ResultSet {
+
+    public static UltraResultSet parseFromListOfUltraResultRow(List<UltraResultRow> ultraResultRowList) {
+        UltraResultSet ultraResultSet = new UltraResultSet();
+        List<List<Object>> data = new LinkedList<>();
+        for (UltraResultRow ultraResultRow : ultraResultRowList) {
+            if (ultraResultSet.getResultSetMetaData() == null) {
+                List<UltraResultColumnMetaData> columnMetaDataList = new LinkedList<>();
+                UltraResultSetMetaData ultraResultSetMetaData = ultraResultRow.getUltraResultSetMetaData();
+                List<UltraResultColumnMetaData> ultraColumnMetaDataList = ultraResultSetMetaData.getColumnMetaDataList();
+                columnMetaDataList = ImmutableList.copyOf(ultraColumnMetaDataList);
+                UltraResultSetMetaDataV2 ultraResultSetMetaDataV2 =new UltraResultSetMetaDataV2(columnMetaDataList);
+                ultraResultSet.setResultSetMetaData(ultraResultSetMetaDataV2);
+            }
+            data.add(ultraResultRow.getUltraResultSetData());
+        }
+        ultraResultSet.setResults(data.iterator());
+        return ultraResultSet;
+    }
+
     static final DateTimeFormatter DATE_FORMATTER = ISODateTimeFormat.date();
     static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern("HH:mm:ss.SSS");
     static final DateTimeFormatter TIME_WITH_TIME_ZONE_FORMATTER = new DateTimeFormatterBuilder()

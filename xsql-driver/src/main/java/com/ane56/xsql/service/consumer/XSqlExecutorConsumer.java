@@ -98,13 +98,14 @@ public class XSqlExecutorConsumer {
     public void ping() throws SQLException, XSQLException {
         List<UltraCatalog> ultraCatalogs = xSqlExecutorService.showUnForbiddenCatalogs();
         for (UltraCatalog ultraCatalog : ultraCatalogs) {
-            xSqlExecutorService.query(ultraCatalog.getName(), "select 1");
+            List<UltraResultRow> ultraResultRows = xSqlExecutorService.query(ultraCatalog.getName(), "select 1");
+            log.info(String.valueOf(ultraResultRows.get(0)));
         }
     }
 
     public JsonResult<UltraDatabaseMetaData> getMetaData(UltraBaseStatement ultraBaseStatement) throws SQLException, XSQLException {
         String catalogName = ultraBaseStatement.getCatalogName();
-        Long lastUpdateTime = name2time.get(catalogName);
+        Long lastUpdateTime = name2time.getOrDefault(catalogName, 0L);
         if (System.currentTimeMillis() - lastUpdateTime <= 5000L) {
             return new JsonResult<>(name2metaData.get(catalogName));
         } else {

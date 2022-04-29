@@ -2,9 +2,9 @@ package com.ane56.xsql.common.model;
 
 import lombok.*;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
+import java.io.Serializable;
 import java.sql.RowIdLifetime;
+import java.util.List;
 
 /**
  * @Author: zhangxinsen
@@ -21,8 +21,13 @@ import java.sql.RowIdLifetime;
 @EqualsAndHashCode
 @Builder
 @ToString
-public class UltraDatabaseMetaData {
+public class UltraDatabaseMetaData implements Serializable {
+    private static final long serialVersionUID = -3651916755546911965L;
+
+//    private boolean supportsTransactionIsolationLevel;
     private boolean allProceduresAreCallable;
+
+    private String catalogTerm;
 
     public boolean allTablesAreSelectable;
 
@@ -255,17 +260,15 @@ public class UltraDatabaseMetaData {
     public boolean dataDefinitionIgnoredInTransactions;
 
 
-    public ResultSet schemas;
+    public List<UltraResultRow> schemas;
 
-    public ResultSet catalogs;
+    public List<UltraResultRow> catalogs;
 
-    public ResultSet tableTypes;
+    public List<UltraResultRow> tableTypes;
 
-    public ResultSet typeInfo;
+    public List<UltraResultRow> typeInfo;
 
     public boolean supportsBatchUpdates;
-
-    public Connection connection;
 
     public boolean supportsSavepoints;
 
@@ -297,7 +300,7 @@ public class UltraDatabaseMetaData {
 
     public boolean autoCommitFailureClosesAllResultSets;
 
-    public ResultSet clientInfoProperties;
+    public List<UltraResultRow> clientInfoProperties;
 
     public boolean generatedKeyAlwaysReturned;
 }

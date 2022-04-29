@@ -1,10 +1,11 @@
 package com.ane56.xsql.client;
 
 import com.ane56.xsql.common.exception.XSQLException;
+import com.ane56.xsql.common.model.UltraCatalog;
+import com.ane56.xsql.common.model.UltraDatabaseMetaData;
 import com.ane56.xsql.common.model.UltraResultRow;
 import okhttp3.OkHttpClient;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -77,5 +78,21 @@ public class XSQLGatewayClientManagerTest {
     public void testExecute() throws IOException, XSQLException {
         URI uri = URI.create("http://127.0.0.1:6666");
         boolean execute = xsqlGatewayClientManager.execute("aliyun", "drop table if exists engine.xsql_test", httpClient, uri);
+    }
+
+    @Test()
+    public void testGetCatalogs() throws XSQLException, IOException {
+        URI uri = URI.create("http://127.0.0.1:6666");
+        List<UltraCatalog> catalogs = xsqlGatewayClientManager.getCatalogs(httpClient, uri);
+        for (UltraCatalog catalog : catalogs) {
+            System.out.println(catalog);
+        }
+    }
+
+    @Test()
+    public void testGetDatabaseMetadata() throws XSQLException, IOException {
+        URI uri = URI.create("http://127.0.0.1:6666");
+        UltraDatabaseMetaData databaseMetaData = xsqlGatewayClientManager.getDatabaseMetaData("starrocks", httpClient, uri);
+        System.out.println(databaseMetaData);
     }
 }

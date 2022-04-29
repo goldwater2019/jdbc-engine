@@ -210,6 +210,8 @@ public class PooledDataSourceManager {
         DatabaseMetaData metaData = connection.getMetaData();
         UltraDatabaseMetaData ultraDatabaseMetaData = new UltraDatabaseMetaData();
         connection.close();
+//        ultraDatabaseMetaData.setSupportsTransactionIsolationLevel(metaData.supportsTransactionIsolationLevel());
+        ultraDatabaseMetaData.setCatalogTerm(metaData.getCatalogTerm());
         ultraDatabaseMetaData.setAllProceduresAreCallable(metaData.allProceduresAreCallable());
         ultraDatabaseMetaData.setAllTablesAreSelectable(metaData.allTablesAreSelectable());
         ultraDatabaseMetaData.setURL(metaData.getURL());
@@ -326,12 +328,11 @@ public class PooledDataSourceManager {
         ultraDatabaseMetaData.setSupportsDataManipulationTransactionsOnly(metaData.supportsDataManipulationTransactionsOnly());
         ultraDatabaseMetaData.setDataDefinitionCausesTransactionCommit(metaData.dataDefinitionCausesTransactionCommit());
         ultraDatabaseMetaData.setDataDefinitionIgnoredInTransactions(metaData.dataDefinitionIgnoredInTransactions());
-        ultraDatabaseMetaData.setSchemas(metaData.getSchemas());
-        ultraDatabaseMetaData.setCatalogs(metaData.getCatalogs());
-        ultraDatabaseMetaData.setTableTypes(metaData.getTableTypes());
-        ultraDatabaseMetaData.setTypeInfo(metaData.getTypeInfo());
+        ultraDatabaseMetaData.setSchemas(UltraResultRow.parseResultSet(metaData.getSchemas()));
+        ultraDatabaseMetaData.setCatalogs(UltraResultRow.parseResultSet(metaData.getCatalogs()));
+        ultraDatabaseMetaData.setTableTypes(UltraResultRow.parseResultSet(metaData.getTableTypes()));
+        ultraDatabaseMetaData.setTypeInfo(UltraResultRow.parseResultSet(metaData.getTypeInfo()));
         ultraDatabaseMetaData.setSupportsBatchUpdates(metaData.supportsBatchUpdates());
-        ultraDatabaseMetaData.setConnection(metaData.getConnection());
         ultraDatabaseMetaData.setSupportsSavepoints(metaData.supportsSavepoints());
         ultraDatabaseMetaData.setSupportsNamedParameters(metaData.supportsNamedParameters());
         ultraDatabaseMetaData.setSupportsMultipleOpenResults(metaData.supportsMultipleOpenResults());
@@ -347,7 +348,7 @@ public class PooledDataSourceManager {
         ultraDatabaseMetaData.setRowIdLifetime(metaData.getRowIdLifetime());
         ultraDatabaseMetaData.setSupportsStoredFunctionsUsingCallSyntax(metaData.supportsStoredFunctionsUsingCallSyntax());
         ultraDatabaseMetaData.setAutoCommitFailureClosesAllResultSets(metaData.autoCommitFailureClosesAllResultSets());
-        ultraDatabaseMetaData.setClientInfoProperties(metaData.getClientInfoProperties());
+        ultraDatabaseMetaData.setClientInfoProperties(UltraResultRow.parseResultSet(metaData.getClientInfoProperties()));
         ultraDatabaseMetaData.setGeneratedKeyAlwaysReturned(metaData.generatedKeyAlwaysReturned());
         return ultraDatabaseMetaData;
     }

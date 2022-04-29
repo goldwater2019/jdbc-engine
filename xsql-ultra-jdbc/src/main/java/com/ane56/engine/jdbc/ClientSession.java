@@ -1,11 +1,13 @@
 package com.ane56.engine.jdbc;
 
+import com.ane56.xsql.common.model.UltraCatalog;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.net.URI;
+import java.util.List;
 
 import static java.util.Objects.requireNonNull;
 
@@ -28,6 +30,8 @@ public class ClientSession {
     private String schema;
     private String transactionId;
 
+    private List<UltraCatalog> availableCatalogs;
+
     public static ClientSession stripTransactionId(ClientSession session) {
         return ClientSession.builder()
                 .server(session.getServer())
@@ -45,14 +49,15 @@ public class ClientSession {
             String source,
             String catalog,
             String schema,
-            String transactionId) {
+            String transactionId,
+            List<UltraCatalog> availableCatalogs) {
         this.server = requireNonNull(server, "server is null");
         this.user = user;
         this.source = source;
         this.catalog = catalog;
         this.schema = schema;
         this.transactionId = transactionId;
-
+        this.availableCatalogs = availableCatalogs;
     }
 
 

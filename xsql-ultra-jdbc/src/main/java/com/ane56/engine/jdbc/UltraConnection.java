@@ -1,14 +1,15 @@
 package com.ane56.engine.jdbc;
 
 import com.ane56.engine.jdbc.preparedstatement.UltraPreparedStatement;
+import com.ane56.xsql.common.exception.XSQLException;
+import com.ane56.xsql.common.model.UltraCatalog;
+import com.ane56.xsql.common.model.UltraDatabaseMetaData;
 import com.google.common.primitives.Ints;
 
+import java.io.IOException;
 import java.net.URI;
 import java.sql.*;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -28,6 +29,8 @@ import static java.util.concurrent.TimeUnit.MINUTES;
  */
 
 public class UltraConnection implements Connection {
+
+    private final List<UltraCatalog> availableCatalogList = new LinkedList<>();
 
     private final AtomicBoolean closed = new AtomicBoolean();
     private final AtomicBoolean autoCommit = new AtomicBoolean(true);
@@ -152,12 +155,46 @@ public class UltraConnection implements Connection {
      * 返回元数据信息
      * TODO 解析数据库元数据
      * 通过自己实现的MyDatabaseMetaData 完成部分
+     *
      * @return
      * @throws SQLException
      */
+    public UltraDatabaseMetaData getDatabaseMetaData() throws XSQLException, IOException {
+        String source = "jdbc-ultra";
+        if (applicationName.isPresent()) {
+            source = applicationName.get();
+        }
+        String catalogName = catalog.get();
+        ClientSession session = ClientSession.builder()
+                .server(httpUri)
+                .user(user)
+                .source(source)
+                .catalog(catalogName)
+                .schema(schema.get())
+                .transactionId(transactionId.get())
+                .build();
+        if (catalogName == null || catalogName.length() == 0) {
+            // TODO 指定catalogName
+            List<UltraCatalog> catalogs = queryExecutor.getCatalogs(session);
+            if (catalogs.size() == 0) {
+                // TODO 抛出catalog获得server端错误的异常
+            }
+            catalog.set(catalogs.get(0).getName());
+        }
+        return queryExecutor.getDatabaseMetaData(session, catalog.get());
+    }
+
     @Override
     public DatabaseMetaData getMetaData() throws SQLException {
-        return new UltraDatabaseMetaDataV2();
+        UltraDatabaseMetaData databaseMetaData = null;
+        try {
+            databaseMetaData = getDatabaseMetaData();
+        } catch (XSQLException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return new UltraDatabaseMetaDataV2(databaseMetaData, this);
     }
 
     @Override
@@ -496,6 +533,24 @@ public class UltraConnection implements Connection {
                 .transactionId(transactionId.get())
                 .build();
 
-        return queryExecutor.startQuery(session, sql);
+        if (availableCatalogList.size() == 0) {
+            try {
+                List<UltraCatalog> catalogs = queryExecutor.getCatalogs(session);
+                for (UltraCatalog ultraCatalog : catalogs) {
+                    availableCatalogList.add(ultraCatalog);
+                }
+                session.setAvailableCatalogs(availableCatalogList);
+            } catch (XSQLException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            session.setAvailableCatalogs(availableCatalogList);
+        }
+
+        return queryExecutor.startQuery(this, session, sql);
     }
+
+
 }

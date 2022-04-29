@@ -51,6 +51,43 @@ public class UltraDriverTest {
     }
 
     @Test
+    public void testSelectFromCatalog() throws SQLException, ClassNotFoundException {
+        Class.forName(DRIVER_NAME);
+        Properties connectionProperties = new Properties();
+        connectionProperties.setProperty("user", USERNAME);
+        connectionProperties.setProperty("password", PASSWORD);
+        connectionProperties.setProperty("applicationName", "ultra-test");
+        Connection conn = DriverManager.getConnection(JDBC_URL, connectionProperties);
+        Statement statement = conn.createStatement();
+        String sql = "select 1";
+        ResultSet resultSet = statement.executeQuery(sql);
+        printSchemaAndData(sql, resultSet);
+
+        sql = "select 1 from aliyun";
+        resultSet = statement.executeQuery(sql);
+        printSchemaAndData(sql, resultSet);
+
+        statement.close();
+        conn.close();
+    }
+
+    @Test
+    public void showCatalogs() throws SQLException, ClassNotFoundException {
+        Class.forName(DRIVER_NAME);
+        Properties connectionProperties = new Properties();
+        connectionProperties.setProperty("user", USERNAME);
+        connectionProperties.setProperty("password", PASSWORD);
+        connectionProperties.setProperty("applicationName", "ultra-test");
+        Connection conn = DriverManager.getConnection(JDBC_URL, connectionProperties);
+        Statement statement = conn.createStatement();
+        String sql = "show catalogs";
+        ResultSet resultSet = statement.executeQuery(sql);
+        printSchemaAndData(sql, resultSet);
+        statement.close();
+        conn.close();
+    }
+
+    @Test
     public void testQuery() throws ClassNotFoundException, SQLException, InterruptedException {
         Class.forName(DRIVER_NAME);
         Properties connectionProperties = new Properties();

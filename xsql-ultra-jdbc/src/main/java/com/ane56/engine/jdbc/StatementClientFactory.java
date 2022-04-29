@@ -14,12 +14,15 @@ public final class StatementClientFactory {
     private StatementClientFactory() {
     }
 
-    public static StatementClient newStatementClient(OkHttpClient httpClient,
-                                                     ClientSession session,
-                                                     String query,
-                                                     XSQLGatewayClientManager xSqlGatewayClientManager) {
+    public static StatementClient newStatementClient(
+            UltraConnection connection,
+            OkHttpClient httpClient,
+            ClientSession session,
+            String query,
+            XSQLGatewayClientManager xSqlGatewayClientManager) {
         return StatementClient
                 .builder()
+                .connection(connection)
                 .httpClient(httpClient)
                 .clientSession(session)
                 .query(query)
