@@ -1004,6 +1004,23 @@ public class UltraDatabaseMetaDataV2 implements DatabaseMetaData {
         return null;
     }
 
+    /**
+     *
+     * @param catalog a catalog name; must match the catalog name as it
+     *        is stored in the database; "" retrieves those without a catalog;
+     *        <code>null</code> means that the catalog name should not be used to narrow
+     *        the search
+     * @param schemaPattern a schema name pattern; must match the schema name
+     *        as it is stored in the database; "" retrieves those without a schema;
+     *        <code>null</code> means that the schema name should not be used to narrow
+     *        the search
+     * @param tableNamePattern a table name pattern; must match the
+     *        table name as it is stored in the database
+     * @param columnNamePattern a column name pattern; must match the column
+     *        name as it is stored in the database
+     * @return
+     * @throws SQLException
+     */
     @Override
     public ResultSet getColumns(String catalog, String schemaPattern, String tableNamePattern, String columnNamePattern) throws SQLException {
         return null;
