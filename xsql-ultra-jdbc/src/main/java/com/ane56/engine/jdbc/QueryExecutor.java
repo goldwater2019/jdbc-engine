@@ -1,11 +1,15 @@
 package com.ane56.engine.jdbc;
 
-import com.ane56.engine.jdbc.common.client.ClientSession;
-import com.ane56.engine.jdbc.common.client.StatementClient;
 import com.ane56.xsql.client.XSQLGatewayClientManager;
+import com.ane56.xsql.common.exception.XSQLException;
+import com.ane56.xsql.common.model.UltraCatalog;
+import com.ane56.xsql.common.model.UltraDatabaseMetaData;
 import okhttp3.OkHttpClient;
 
-import static com.ane56.engine.jdbc.common.client.StatementClientFactory.newStatementClient;
+import java.io.IOException;
+import java.util.List;
+
+import static com.ane56.engine.jdbc.StatementClientFactory.newStatementClient;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -25,7 +29,15 @@ public class QueryExecutor {
         xSqlGatewayClientManager = XSQLGatewayClientManager.getInstance();
     }
 
-    public StatementClient startQuery(ClientSession session, String query) {
-        return newStatementClient(httpClient, session, query);
+    public StatementClient startQuery(UltraConnection connection, ClientSession session, String query) {
+        return newStatementClient(connection, httpClient, session, query, xSqlGatewayClientManager);
+    }
+
+    public List<UltraCatalog> getCatalogs(ClientSession session) throws XSQLException, IOException {
+        return xSqlGatewayClientManager.getCatalogs(httpClient, session.getServer());
+    }
+
+    public UltraDatabaseMetaData getDatabaseMetaData(ClientSession session, String catalogName) throws XSQLException, IOException {
+        return xSqlGatewayClientManager.getDatabaseMetaData(catalogName, httpClient, session.getServer());
     }
 }

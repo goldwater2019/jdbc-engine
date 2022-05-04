@@ -1,17 +1,12 @@
-package com.ane56.engine.jdbc.connection;
+package com.ane56.engine.jdbc;
 
-import com.ane56.engine.jdbc.GatewayInfo;
-import com.ane56.engine.jdbc.NotImplementedException;
-import com.ane56.engine.jdbc.QueryExecutor;
-import com.ane56.engine.jdbc.UltraDriverUri;
-import com.ane56.engine.jdbc.common.client.ClientSession;
-import com.ane56.engine.jdbc.common.client.StatementClient;
-import com.ane56.engine.jdbc.metadata.UltraDatabaseMetaData;
 import com.ane56.engine.jdbc.preparedstatement.UltraPreparedStatement;
-import com.ane56.engine.jdbc.statement.UltraStatement;
-import com.google.common.collect.ImmutableMap;
+import com.ane56.xsql.common.exception.XSQLException;
+import com.ane56.xsql.common.model.UltraCatalog;
+import com.ane56.xsql.common.model.UltraDatabaseMetaData;
 import com.google.common.primitives.Ints;
 
+import java.io.IOException;
 import java.net.URI;
 import java.sql.*;
 import java.util.*;
@@ -34,6 +29,8 @@ import static java.util.concurrent.TimeUnit.MINUTES;
  */
 
 public class UltraConnection implements Connection {
+
+    private final List<UltraCatalog> availableCatalogList = new LinkedList<>();
 
     private final AtomicBoolean closed = new AtomicBoolean();
     private final AtomicBoolean autoCommit = new AtomicBoolean(true);
@@ -158,12 +155,46 @@ public class UltraConnection implements Connection {
      * 返回元数据信息
      * TODO 解析数据库元数据
      * 通过自己实现的MyDatabaseMetaData 完成部分
+     *
      * @return
      * @throws SQLException
      */
+    public UltraDatabaseMetaData getDatabaseMetaData() throws XSQLException, IOException {
+        String source = "jdbc-ultra";
+        if (applicationName.isPresent()) {
+            source = applicationName.get();
+        }
+        String catalogName = catalog.get();
+        ClientSession session = ClientSession.builder()
+                .server(httpUri)
+                .user(user)
+                .source(source)
+                .catalog(catalogName)
+                .schema(schema.get())
+                .transactionId(transactionId.get())
+                .build();
+        if (catalogName == null || catalogName.length() == 0) {
+            // TODO 指定catalogName
+            List<UltraCatalog> catalogs = queryExecutor.getCatalogs(session);
+            if (catalogs.size() == 0) {
+                // TODO 抛出catalog获得server端错误的异常
+            }
+            catalog.set(catalogs.get(0).getCatalogName());
+        }
+        return queryExecutor.getDatabaseMetaData(session, catalog.get());
+    }
+
     @Override
     public DatabaseMetaData getMetaData() throws SQLException {
-        return new UltraDatabaseMetaData();
+        UltraDatabaseMetaData databaseMetaData = null;
+        try {
+            databaseMetaData = getDatabaseMetaData();
+        } catch (XSQLException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return new UltraDatabaseMetaDataV2(databaseMetaData, this);
     }
 
     @Override
@@ -486,10 +517,9 @@ public class UltraConnection implements Connection {
      * 启动query查询
      *
      * @param sql
-     * @param sessionPropertiesOverride
      * @return
      */
-    public StatementClient startQuery(String sql, Map<String, String> sessionPropertiesOverride) {
+    public StatementClient startQuery(String sql) {
         String source = "jdbc-ultra";
         if (applicationName.isPresent()) {
             source = applicationName.get();
@@ -498,40 +528,29 @@ public class UltraConnection implements Connection {
                 .server(httpUri)
                 .user(user)
                 .source(source)
-                .clientInfo(clientInfo.get("ClientInfo"))
                 .catalog(catalog.get())
                 .schema(schema.get())
-                .resourceEstimates(ImmutableMap.of())
-                .properties(ImmutableMap.copyOf(allProperties))
-                .preparedStatements(ImmutableMap.copyOf(preparedStatements))
                 .transactionId(transactionId.get())
-                .clientRequestTimeout(millis)
-                .sessionFunctions(ImmutableMap.of())
                 .build();
 
-        return queryExecutor.startQuery(session, sql);
+        if (availableCatalogList.size() == 0) {
+            try {
+                List<UltraCatalog> catalogs = queryExecutor.getCatalogs(session);
+                for (UltraCatalog ultraCatalog : catalogs) {
+                    availableCatalogList.add(ultraCatalog);
+                }
+                session.setAvailableCatalogs(availableCatalogList);
+            } catch (XSQLException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            session.setAvailableCatalogs(availableCatalogList);
+        }
+
+        return queryExecutor.startQuery(this, session, sql);
     }
 
-    /**
-     * 根据statementClient更新connection的session信息
-     *
-     * @param client
-     */
-    public void updateSession(StatementClient client) {
-        sessionProperties.putAll(client.getSetSessionProperties());
-        client.getResetSessionProperties().forEach(sessionProperties::remove);
 
-        preparedStatements.putAll(client.getAddedPreparedStatements());
-        client.getDeallocatedPreparedStatements().forEach(preparedStatements::remove);
-
-        client.getSetCatalog().ifPresent(catalog::set);
-        client.getSetSchema().ifPresent(schema::set);
-
-        if (client.getStartedTransactionId() != null) {
-            transactionId.set(client.getStartedTransactionId());
-        }
-        if (client.isClearTransactionId()) {
-            transactionId.set(null);
-        }
-    }
 }

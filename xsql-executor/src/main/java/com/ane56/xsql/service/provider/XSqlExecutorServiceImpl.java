@@ -3,11 +3,13 @@ package com.ane56.xsql.service.provider;
 import com.ane56.xsql.common.api.XSqlExecutorService;
 import com.ane56.xsql.common.exception.XSQLException;
 import com.ane56.xsql.common.model.UltraCatalog;
+import com.ane56.xsql.common.model.UltraDatabaseMetaData;
 import com.ane56.xsql.common.model.UltraResultRow;
+import com.ane56.xsql.service.consumer.XSqlDriverConsumer;
 import com.ane56.xsql.service.manager.PooledDataSourceManager;
-import com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 
 import java.sql.SQLException;
@@ -29,31 +31,30 @@ public class XSqlExecutorServiceImpl implements XSqlExecutorService {
 
     private PooledDataSourceManager pooledDataSourceManager;
 
+    @Autowired
+    private XSqlDriverConsumer xSqlDriverConsumer;
+
     @Override
     public List<UltraCatalog> showCatalogs() {
-        checkInitialStatus();
-        if (pooledDataSourceManager.getName2catalog().size() > 0) {
-            return ImmutableList.copyOf(pooledDataSourceManager.getName2catalog().values());
-        }
-        return new LinkedList<>();
+        return showAvailableCatalogs();
     }
 
     @Override
     public List<UltraCatalog> showAvailableCatalogs() {
-        // TODO 添加心跳
-        return new LinkedList<>();
+        List<UltraCatalog> catalogs = xSqlDriverConsumer.getAvailableAndUnForbiddenCatalogs();
+        if (catalogs == null) {
+            catalogs = new LinkedList<>();
+        }
+        for (UltraCatalog catalog : catalogs) {
+            addCatalog(catalog);
+            checkDataSource(catalog);
+        }
+        return catalogs;
     }
 
     @Override
     public List<UltraCatalog> showUnForbiddenCatalogs() {
-        checkInitialStatus();
-        List<UltraCatalog> result = new LinkedList<>();
-        for (UltraCatalog ultraCatalog : showCatalogs()) {
-            if (!ultraCatalog.getIsForbidden()) {
-                result.add(ultraCatalog);
-            }
-        }
-        return result;
+        return showAvailableCatalogs();
     }
 
     @Override
@@ -87,6 +88,12 @@ public class XSqlExecutorServiceImpl implements XSqlExecutorService {
         Map<String, UltraCatalog> name2catalog = pooledDataSourceManager.getName2catalog();
         // TODO 获得配置的catalog, 然后对比是否相同
         // 如果不同, 则关闭当前连接, 并且创建新的连接
+    }
+
+    @Override
+    public UltraDatabaseMetaData getDatabaseMetaData(String catalogName) throws SQLException, XSQLException {
+        checkInitialStatus();
+        return pooledDataSourceManager.getDatabaseMetaData(catalogName);
     }
 
     /**

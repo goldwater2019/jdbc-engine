@@ -3,6 +3,7 @@ package com.ane56.xsql.common.model;
 import lombok.*;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @Author: zhangxinsen
@@ -19,12 +20,45 @@ import java.io.Serializable;
 @ToString
 public class UltraCatalog implements Serializable {
     private static final long serialVersionUID = -8398701659259091582L;
-    private String name;
+    private Integer catalogId;
+
+    /**
+     * catalog名称
+     */
+    private String catalogName;
+
+    /**
+     * 连接串
+     */
     private String jdbcUrl;
+
+    /**
+     * 账号
+     */
     private String username;
+
+    /**
+     * 密码
+     */
     private String password;
+
+    /**
+     * 驱动类名
+     */
     private String driverClassName;
-    private Boolean isAvailable;  // 是否可用
-    private Boolean isForbidden;  // 是否禁用
+
+    /**
+     * 是否可用
+     */
+    private Boolean isAvailable;
+
+    /**
+     * 是否禁用
+     */
+    private Boolean isForbidden;
+
+    private Date createTime;
+
+    private Date updateTime;
 
 }

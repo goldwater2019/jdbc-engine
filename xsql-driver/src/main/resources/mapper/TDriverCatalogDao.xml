@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ane56.xsql.service.dao.TDriverCatalogDao">
+
+    <resultMap type="com.ane56.xsql.common.model.UltraCatalog" id="TDriverCatalogMap">
+        <result property="catalogId" column="catalog_id" jdbcType="INTEGER"/>
+        <result property="catalogName" column="catalog_name" jdbcType="VARCHAR"/>
+        <result property="driverClassName" column="driver_class_name" jdbcType="VARCHAR"/>
+        <result property="jdbcUrl" column="jdbc_url" jdbcType="VARCHAR"/>
+        <result property="username" column="username" jdbcType="VARCHAR"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="isForbidden" column="is_forbidden" jdbcType="INTEGER"/>
+        <result property="isAvailable" column="is_available" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="TDriverCatalogMap">
+        select catalog_id,
+               catalog_name,
+               driver_class_name,
+               jdbc_url,
+               username,
+               password,
+               is_forbidden,
+               is_available,
+               create_time,
+               update_time
+        from t_driver_catalog
+        where catalog_id = #{catalogId}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="TDriverCatalogMap">
+        select
+        catalog_id, catalog_name, driver_class_name, jdbc_url, username, password, is_forbidden, is_available,
+        create_time, update_time
+        from t_driver_catalog
+        <where>
+            <if test="catalogId != null">
+                and catalog_id = #{catalogId}
+            </if>
+            <if test="catalogName != null and catalogName != ''">
+                and catalog_name = #{catalogName}
+            </if>
+            <if test="driverClassName != null and driverClassName != ''">
+                and driver_class_name = #{driverClassName}
+            </if>
+            <if test="jdbcUrl != null and jdbcUrl != ''">
+                and jdbc_url = #{jdbcUrl}
+            </if>
+            <if test="username != null and username != ''">
+                and username = #{username}
+            </if>
+            <if test="password != null and password != ''">
+                and password = #{password}
+            </if>
+            <if test="isForbidden != null">
+                and is_forbidden = #{isForbidden}
+            </if>
+            <if test="isAvailable != null">
+                and is_available = #{isAvailable}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="updateTime != null">
+                and update_time = #{updateTime}
+            </if>
+        </where>
+        limit #{pageable.offset}, #{pageable.pageSize}
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from t_driver_catalog
+        <where>
+            <if test="catalogId != null">
+                and catalog_id = #{catalogId}
+            </if>
+            <if test="catalogName != null and catalogName != ''">
+                and catalog_name = #{catalogName}
+            </if>
+            <if test="driverClassName != null and driverClassName != ''">
+                and driver_class_name = #{driverClassName}
+            </if>
+            <if test="jdbcUrl != null and jdbcUrl != ''">
+                and jdbc_url = #{jdbcUrl}
+            </if>
+            <if test="username != null and username != ''">
+                and username = #{username}
+            </if>
+            <if test="password != null and password != ''">
+                and password = #{password}
+            </if>
+            <if test="isForbidden != null">
+                and is_forbidden = #{isForbidden}
+            </if>
+            <if test="isAvailable != null">
+                and is_available = #{isAvailable}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="updateTime != null">
+                and update_time = #{updateTime}
+            </if>
+        </where>
+    </select>
+    <select id="getAllCatalogs" resultMap="TDriverCatalogMap">
+        select catalog_id,
+               catalog_name,
+               driver_class_name,
+               jdbc_url,
+               username,
+               password,
+               is_forbidden,
+               is_available,
+               create_time,
+               update_time
+        from t_driver_catalog
+        order by create_time asc
+    </select>
+    <select id="queryByCatalogName" resultMap="TDriverCatalogMap">
+        select catalog_id,
+               catalog_name,
+               driver_class_name,
+               jdbc_url,
+               username,
+               password,
+               is_forbidden,
+               is_available,
+               create_time,
+               update_time
+        from t_driver_catalog
+        where catalog_name = #{catalogName}
+    </select>
+    <select id="getAllCatalogsWithFilter" resultMap="TDriverCatalogMap">
+        select catalog_id,
+               catalog_name,
+               driver_class_name,
+               jdbc_url,
+               username,
+               password,
+               is_forbidden,
+               is_available,
+               create_time,
+               update_time
+        from t_driver_catalog
+        where is_forbidden = ${isForbidden}
+        and is_available = ${isAvailable}
+        order by create_time asc
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="catalogId" useGeneratedKeys="true">
+        insert into t_driver_catalog(catalog_name, driver_class_name, jdbc_url, username, password, is_forbidden,
+                                     is_available)
+        values (#{catalogName}, #{driverClassName}, #{jdbcUrl}, #{username}, #{password}, #{isForbidden},
+                #{isAvailable})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="catalogId" useGeneratedKeys="true">
+        insert into t_driver_catalog(catalog_name, driver_class_name, jdbc_url, username, password, is_forbidden,
+        is_available)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.catalogName}, #{entity.driverClassName}, #{entity.jdbcUrl}, #{entity.username},
+            #{entity.password}, #{entity.isForbidden}, #{entity.isAvailable})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="catalogId" useGeneratedKeys="true">
+        insert into t_driver_catalog(catalog_name, driver_class_name, jdbc_url, username, password, is_forbidden,
+        is_available)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.catalogName}, #{entity.driverClassName}, #{entity.jdbcUrl}, #{entity.username},
+            #{entity.password}, #{entity.isForbidden}, #{entity.isAvailable})
+        </foreach>
+        on duplicate key update
+        catalog_name = values(catalog_name),
+        driver_class_name = values(driver_class_name),
+        jdbc_url = values(jdbc_url),
+        username = values(username),
+        password = values(password),
+        is_forbidden = values(is_forbidden),
+        is_available = values(is_available)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update t_driver_catalog
+        <set>
+            <if test="catalogName != null and catalogName != ''">
+                catalog_name = #{catalogName},
+            </if>
+            <if test="driverClassName != null and driverClassName != ''">
+                driver_class_name = #{driverClassName},
+            </if>
+            <if test="jdbcUrl != null and jdbcUrl != ''">
+                jdbc_url = #{jdbcUrl},
+            </if>
+            <if test="username != null and username != ''">
+                username = #{username},
+            </if>
+            <if test="password != null and password != ''">
+                password = #{password},
+            </if>
+            <if test="isForbidden != null">
+                is_forbidden = #{isForbidden},
+            </if>
+            <if test="isAvailable != null">
+                is_available = #{isAvailable},
+            </if>
+        </set>
+        where catalog_id = #{catalogId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from t_driver_catalog
+        where catalog_id = #{catalogId}
+    </delete>
+
+</mapper>
+

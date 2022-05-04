@@ -1,20 +1,15 @@
-package com.ane56.engine.jdbc.statement;
+package com.ane56.engine.jdbc;
 
-import com.ane56.engine.jdbc.common.QueryStatusInfo;
-import com.ane56.engine.jdbc.common.client.StatementClient;
-import com.ane56.engine.jdbc.connection.UltraConnection;
-import com.ane56.engine.jdbc.resultset.UltraResultSet;
-import com.google.common.collect.ImmutableMap;
+import com.ane56.xsql.common.exception.XSQLException;
 import com.google.common.primitives.Ints;
 
+import java.io.IOException;
 import java.sql.*;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.ane56.engine.jdbc.resultset.UltraResultSet.resultsException;
 import static java.lang.Math.toIntExact;
 import static java.util.Objects.requireNonNull;
 
@@ -37,7 +32,6 @@ public class UltraStatement implements Statement {
     private final AtomicReference<UltraResultSet> currentResult = new AtomicReference<>();
     private final AtomicLong currentUpdateCount = new AtomicLong(-1);
     private final AtomicReference<String> currentUpdateType = new AtomicReference<>();
-    private final AtomicInteger statementDepth = new AtomicInteger(0);
 
 
     public UltraStatement(UltraConnection connection) {
@@ -49,27 +43,6 @@ public class UltraStatement implements Statement {
      */
     protected final void checkOpen() throws SQLException {
         connection();
-    }
-
-    public String getUpdateType()
-            throws SQLException {
-        checkOpen();
-        return currentUpdateType.get();
-    }
-
-    public void partialCancel()
-            throws SQLException {
-        checkOpen();
-
-        StatementClient client = executingClient.get();
-        if (client != null) {
-            client.cancelLeafStage();
-        } else {
-            UltraResultSet resultSet = currentResult.get();
-            if (resultSet != null) {
-                resultSet.partialCancel();
-            }
-        }
     }
 
     /**
@@ -102,16 +75,8 @@ public class UltraStatement implements Statement {
         }
     }
 
-    private Map<String, String> getStatementSessionProperties() {
-        ImmutableMap.Builder<String, String> sessionProperties = ImmutableMap.builder();
-        if (queryTimeoutSeconds.get() > 0) {
-            sessionProperties.put("query_max_run_time", queryTimeoutSeconds.get() + "s");
-        }
-        return sessionProperties.build();
-    }
-
     /**
-     * 执行Query
+     * 执行Query, 并且获得结果
      *
      * @param sql an SQL statement to be sent to the database, typically a
      *            static SQL <code>SELECT</code> statement
@@ -126,6 +91,10 @@ public class UltraStatement implements Statement {
         return currentResult.get();
     }
 
+    /**
+     * 关闭连接
+     * @throws SQLException
+     */
     @Override
     public void close() throws SQLException {
         connection.set(null);
@@ -202,7 +171,7 @@ public class UltraStatement implements Statement {
         checkOpen();
         StatementClient client = executingClient.get();
         if (client != null) {
-            client.close();
+            // TODO close it
         }
         closeResultSet();
     }
@@ -223,6 +192,13 @@ public class UltraStatement implements Statement {
         // TODO not support feature
     }
 
+    /**
+     * true -> 返回结果
+     * false -> 不返回结果
+     * @param sql any SQL statement
+     * @return
+     * @throws SQLException
+     */
     @Override
     public boolean execute(String sql) throws SQLException {
         return internalExecute(sql);
@@ -249,46 +225,37 @@ public class UltraStatement implements Statement {
         boolean intercepted = false;
 
         try {
-            int statementDepth = this.statementDepth.incrementAndGet();
             // 开始查询
-            client = connection().startQuery(sql, getStatementSessionProperties());
-            if (client.isFinished()) {
-                QueryStatusInfo finalStatusInfo = client.finalStatusInfo();
-                if (finalStatusInfo.getError() != null) {
-                    throw resultsException(finalStatusInfo);
-                }
-            }
+            client = connection().startQuery(sql);
+            boolean isQuery = client.advance();
             executingClient.set(client);
-            resultSet = new UltraResultSet(this, client, maxRows.get());
-            // TODO 检查是否是一个query
-            if (client.currentStatusInfo().getUpdateType() == null) {
+            if (isQuery) {
+                client.refreshResultSet(this);
+                resultSet = client.getResultSet();
                 currentResult.set(resultSet);
                 return true;
             }
-
             // this is an update
-            while (resultSet.next()) {
+            while (resultSet!= null && resultSet.next()) {
                 // no-ops
             }
 
-            connection().updateSession(client);
-
-            Long updateCount = client.finalStatusInfo().getUpdateCount();
-            currentUpdateCount.set((updateCount != null) ? updateCount : 0);
-            currentUpdateType.set(client.finalStatusInfo().getUpdateType());
-            return false;
+            return isQuery;
         } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (XSQLException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
             // TODO 别的catch补全
-            this.statementDepth.decrementAndGet();
             executingClient.set(null);
             if (currentResult.get() == null) {
                 if (resultSet != null) {
                     resultSet.close();
                 }
                 if (client != null) {
-                    client.close();
+                    // TODO 关闭client
                 }
             }
         }

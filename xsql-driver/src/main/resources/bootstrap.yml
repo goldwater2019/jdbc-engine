@@ -14,3 +14,8 @@ spring:
         file-extension: yaml
   profiles:
     active: dev
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

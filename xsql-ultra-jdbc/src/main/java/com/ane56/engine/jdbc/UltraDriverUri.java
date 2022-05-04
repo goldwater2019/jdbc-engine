@@ -1,7 +1,5 @@
 package com.ane56.engine.jdbc;
 
-import com.ane56.engine.jdbc.connection.ConnectionProperty;
-import com.ane56.engine.jdbc.connection.UltraConnectionProperties;
 import com.ane56.xsql.common.utils.OkHttpUtil;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
@@ -17,7 +15,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-import static com.ane56.engine.jdbc.connection.UltraConnectionProperties.*;
+import static com.ane56.engine.jdbc.UltraConnectionProperties.*;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 
@@ -119,8 +117,8 @@ public class UltraDriverUri {
         OkHttpUtil.setupTimeouts(builder, getTimeout().get(), TimeUnit.MILLISECONDS);
 
         String password = PASSWORD.getValue(properties).orElse("");
-        if (!password.isEmpty() && !password.equals("***empty***")) {
-            throw new SQLException("Authentication using username/password requires SSL to be enabled");
+        if (password.isEmpty() || password.equals("***empty***")) {
+            throw new SQLException("Authentication using username/password is expected, but got null/empty on password");
         }
 
         // TODO 鉴权

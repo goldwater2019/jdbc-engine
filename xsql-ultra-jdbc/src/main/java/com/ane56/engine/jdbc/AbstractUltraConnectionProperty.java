@@ -1,8 +1,7 @@
-package com.ane56.engine.jdbc.connection;
+package com.ane56.engine.jdbc;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
-import okhttp3.Protocol;
 
 import java.io.File;
 import java.sql.DriverPropertyInfo;
@@ -14,7 +13,6 @@ import java.util.Properties;
 import java.util.function.Predicate;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.lang.String.format;
 import static java.util.Locale.ENGLISH;

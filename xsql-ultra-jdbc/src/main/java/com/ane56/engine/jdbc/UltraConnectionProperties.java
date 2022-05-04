@@ -1,4 +1,4 @@
-package com.ane56.engine.jdbc.connection;
+package com.ane56.engine.jdbc;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -6,7 +6,7 @@ import com.google.common.collect.ImmutableSet;
 import java.util.Map;
 import java.util.Set;
 
-import static com.ane56.engine.jdbc.connection.AbstractUltraConnectionProperty.StringMapConverter.STRING_MAP_CONVERTER;
+import static com.ane56.engine.jdbc.AbstractUltraConnectionProperty.StringMapConverter.STRING_MAP_CONVERTER;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;

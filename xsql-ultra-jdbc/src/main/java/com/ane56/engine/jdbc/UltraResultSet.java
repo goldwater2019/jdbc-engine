@@ -1,14 +1,11 @@
-package com.ane56.engine.jdbc.resultset;
+package com.ane56.engine.jdbc;
 
-import com.ane56.engine.jdbc.NotImplementedException;
-import com.ane56.engine.jdbc.common.Column;
-import com.ane56.engine.jdbc.common.QueryError;
-import com.ane56.engine.jdbc.common.QueryStats;
-import com.ane56.engine.jdbc.common.QueryStatusInfo;
-import com.ane56.engine.jdbc.common.client.StatementClient;
-import com.google.common.collect.AbstractIterator;
-import com.google.common.collect.ImmutableMap;
-import lombok.*;
+import com.ane56.xsql.common.model.UltraDatabaseMetaData;
+import com.ane56.xsql.common.model.UltraResultColumnMetaData;
+import com.ane56.xsql.common.model.UltraResultRow;
+import com.ane56.xsql.common.model.UltraResultSetMetaData;
+import com.google.common.collect.ImmutableList;
+import lombok.Builder;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.*;
 
@@ -22,11 +19,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.google.common.base.Verify.verify;
-import static com.google.common.collect.Iterables.getOnlyElement;
-import static com.google.common.collect.Iterators.concat;
-import static com.google.common.collect.Iterators.transform;
-import static java.lang.String.format;
 import static java.math.RoundingMode.HALF_UP;
 import static java.util.Locale.ENGLISH;
 import static java.util.Objects.requireNonNull;
@@ -38,13 +30,27 @@ import static java.util.Objects.requireNonNull;
  * @Version: v1.0
  */
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
-@EqualsAndHashCode
-@ToString
 public class UltraResultSet implements ResultSet {
+
+    public static UltraResultSet parseFromListOfUltraResultRow(List<UltraResultRow> ultraResultRowList) {
+        UltraResultSet ultraResultSet = new UltraResultSet();
+        List<List<Object>> data = new LinkedList<>();
+        for (UltraResultRow ultraResultRow : ultraResultRowList) {
+            if (ultraResultSet.getResultSetMetaData() == null) {
+                List<UltraResultColumnMetaData> columnMetaDataList = new LinkedList<>();
+                UltraResultSetMetaData ultraResultSetMetaData = ultraResultRow.getUltraResultSetMetaData();
+                List<UltraResultColumnMetaData> ultraColumnMetaDataList = ultraResultSetMetaData.getColumnMetaDataList();
+                columnMetaDataList = ImmutableList.copyOf(ultraColumnMetaDataList);
+                UltraResultSetMetaDataV2 ultraResultSetMetaDataV2 =new UltraResultSetMetaDataV2(columnMetaDataList);
+                ultraResultSet.setResultSetMetaData(ultraResultSetMetaDataV2);
+            }
+            data.add(ultraResultRow.getUltraResultSetData());
+        }
+        ultraResultSet.setResults(data.iterator());
+        return ultraResultSet;
+    }
+
     static final DateTimeFormatter DATE_FORMATTER = ISODateTimeFormat.date();
     static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern("HH:mm:ss.SSS");
     static final DateTimeFormatter TIME_WITH_TIME_ZONE_FORMATTER = new DateTimeFormatterBuilder()
@@ -68,14 +74,14 @@ public class UltraResultSet implements ResultSet {
 
     private Statement statement;
     private StatementClient client;
-    // private DateTimeZone sessionTimeZone;
-    private String queryId;
     private Iterator<List<Object>> results;
-    private Map<String, Integer> fieldMap;  // (fieldName, index)
-    private ResultSetMetaData resultSetMetaData;
-    private AtomicReference<List<Object>> row = new AtomicReference<>();
+    private UltraResultSetMetaDataV2 resultSetMetaData;
     private AtomicBoolean wasNull = new AtomicBoolean();
     private AtomicBoolean closed = new AtomicBoolean();
+
+    private AtomicReference<Map<String, Integer>> fieldMap = new AtomicReference<>();
+
+    private AtomicReference<List<Object>> row = new AtomicReference<>();
 
 
     /**
@@ -91,22 +97,86 @@ public class UltraResultSet implements ResultSet {
         this.statement = requireNonNull(statement, "statement is null");
         this.client = requireNonNull(client, "client is null");
 
-        // this.sessionTimeZone = DateTimeZone.forID(client.getTimeZone().getId());
-        this.queryId = client.currentStatusInfo().getId();
 
-        List<Column> columns = getColumns(client);
-        this.fieldMap = getFieldMap(columns);
-        this.resultSetMetaData = new UltraResultSetMetaData(columns);
+        this.resultSetMetaData = client.getUltraResultSetMetaDataV2();
 
-        this.results = flatten(new ResultsPageIterator(client), maxRows);
+        this.results = client.getCurrentData().getData().iterator();
+        Map<String, Integer> temp = new LinkedHashMap<>();
+        int columnCount = this.resultSetMetaData.getColumnCount();
+        for (int i = 0; i < columnCount; i++) {
+            temp.put(this.resultSetMetaData.getColumnLabel(i + 1).toLowerCase(ENGLISH), i + 1);
+        }
+        fieldMap.set(temp);
     }
 
-    public String getQueryId() {
-        return queryId;
+    public void setStatement(Statement statement) {
+        this.statement = statement;
     }
 
-    public QueryStats getStats() {
-        return QueryStats.create(queryId, client.getStats());
+    public StatementClient getClient() {
+        return client;
+    }
+
+    public void setClient(StatementClient client) {
+        this.client = client;
+    }
+
+    public Iterator<List<Object>> getResults() {
+        return results;
+    }
+
+    public void setResults(Iterator<List<Object>> results) {
+        this.results = results;
+    }
+
+    public UltraResultSetMetaDataV2 getResultSetMetaData() {
+        return resultSetMetaData;
+    }
+
+    public void setResultSetMetaData(UltraResultSetMetaDataV2 resultSetMetaData) {
+        this.resultSetMetaData = resultSetMetaData;
+    }
+
+    public AtomicBoolean getWasNull() {
+        return wasNull;
+    }
+
+    public void setWasNull(AtomicBoolean wasNull) {
+        this.wasNull = wasNull;
+    }
+
+    public AtomicBoolean getClosed() {
+        return closed;
+    }
+
+    public void setClosed(AtomicBoolean closed) {
+        this.closed = closed;
+    }
+
+    public AtomicReference<Map<String, Integer>> getFieldMap() {
+        return fieldMap;
+    }
+
+    public void setFieldMap(AtomicReference<Map<String, Integer>> fieldMap) {
+        this.fieldMap = fieldMap;
+    }
+
+    public void setRow(AtomicReference<List<Object>> row) {
+        this.row = row;
+    }
+
+    public UltraResultSet(Statement statement, StatementClient client, Iterator<List<Object>> results, UltraResultSetMetaDataV2 resultSetMetaData, AtomicBoolean wasNull, AtomicBoolean closed, AtomicReference<Map<String, Integer>> fieldMap, AtomicReference<List<Object>> row) {
+        this.statement = statement;
+        this.client = client;
+        this.results = results;
+        this.resultSetMetaData = resultSetMetaData;
+        this.wasNull = wasNull;
+        this.closed = closed;
+        this.fieldMap = fieldMap;
+        this.row = row;
+    }
+
+    public UltraResultSet() {
     }
 
     @Override
@@ -132,7 +202,7 @@ public class UltraResultSet implements ResultSet {
     public void close()
             throws SQLException {
         closed.set(true);
-        client.close();
+        // TODO 客户端的关闭
     }
 
     @Override
@@ -240,10 +310,9 @@ public class UltraResultSet implements ResultSet {
             return null;
         }
 
-        // ColumnInfo columnInfo = columnInfo(columnIndex);
-        List<Column> columns = getColumns(this.client);
-        Column column = columns.get(columnIndex);
-        if (column.getColumnTypeName().equalsIgnoreCase("time")) {
+        // TODO 检查此处是否存在下标越界的问题
+        String columnTypeName = resultSetMetaData.getColumnTypeName(columnIndex);
+        if (columnTypeName.equalsIgnoreCase("time")) {
             try {
                 return new Time(TIME_FORMATTER.withZone(localTimeZone).parseMillis(String.valueOf(value)));
             } catch (IllegalArgumentException e) {
@@ -251,7 +320,7 @@ public class UltraResultSet implements ResultSet {
             }
         }
 
-        if (column.getColumnTypeName().equalsIgnoreCase("time with time zone")) {
+        if (columnTypeName.equalsIgnoreCase("time with time zone")) {
             try {
                 return new Time(TIME_WITH_TIME_ZONE_FORMATTER.parseMillis(String.valueOf(value)));
             } catch (IllegalArgumentException e) {
@@ -259,7 +328,7 @@ public class UltraResultSet implements ResultSet {
             }
         }
 
-        throw new IllegalArgumentException("Expected column to be a time type but is " + column.getColumnTypeName());
+        throw new IllegalArgumentException("Expected column to be a time type but is " + columnTypeName);
     }
 
     @Override
@@ -276,8 +345,10 @@ public class UltraResultSet implements ResultSet {
         }
 
         // ColumnInfo columnInfo = columnInfo(columnIndex);
-        Column column = getColumns(this.client).get(columnIndex);
-        if (column.getColumnTypeName().equalsIgnoreCase("timestamp")) {
+        // Column column = getColumns(this.client).get(columnIndex);
+        // TODO 检查此处的数组下标越界问题
+        String columnTypeName = resultSetMetaData.getColumnTypeName(columnIndex);
+        if (columnTypeName.equalsIgnoreCase("timestamp")) {
             try {
                 return new Timestamp(TIMESTAMP_FORMATTER.withZone(localTimeZone).parseMillis(String.valueOf(value)));
             } catch (IllegalArgumentException e) {
@@ -285,7 +356,7 @@ public class UltraResultSet implements ResultSet {
             }
         }
 
-        if (column.getColumnTypeName().equalsIgnoreCase("timestamp with time zone")) {
+        if (columnTypeName.equalsIgnoreCase("timestamp with time zone")) {
             try {
                 return new Timestamp(TIMESTAMP_WITH_TIME_ZONE_FORMATTER.parseMillis(String.valueOf(value)));
             } catch (IllegalArgumentException e) {
@@ -293,7 +364,7 @@ public class UltraResultSet implements ResultSet {
             }
         }
 
-        throw new IllegalArgumentException("Expected column to be a timestamp type but is " + column.getColumnTypeName());
+        throw new IllegalArgumentException("Expected column to be a timestamp type but is " + columnTypeName);
     }
 
     @Override
@@ -440,29 +511,29 @@ public class UltraResultSet implements ResultSet {
     @Override
     public Object getObject(int columnIndex)
             throws SQLException {
-        List<Column> columns = getColumns(this.client);
-        Column column = columns.get(columnIndex);
-        switch (column.getColumnType()) {
-            case Types.DATE:
-                return getDate(columnIndex);
-            case Types.TIME:
-                return getTime(columnIndex);
-            case Types.TIMESTAMP:
-                return getTimestamp(columnIndex);
-            case Types.ARRAY:
-                return getArray(columnIndex);
-            case Types.DECIMAL:
-                return getBigDecimal(columnIndex);
-            case Types.JAVA_OBJECT:
-//                if (column.getColumnTypeName().equalsIgnoreCase("interval year to month")) {
-//                    return getIntervalYearMonth(columnIndex);
-//                }
-//                if (columnInfo.getColumnTypeName().equalsIgnoreCase("interval day to second")) {
-//                    return getIntervalDayTime(columnIndex);
-//                }
-                throw new SQLException("un support data type, java object");
+//        List<Column> columns = getColumns(this.client);
+//        Column column = columns.get(columnIndex);
+        String columnClassName = resultSetMetaData.getColumnClassName(columnIndex);
+        if (columnClassName.toLowerCase(Locale.ROOT).endsWith("localdatetime")) {
+            return column(columnIndex);
         }
         return column(columnIndex);
+//        Integer columnType = resultSetMetaData.getColumnType(columnIndex);
+//        switch (columnType) {
+//            case Types.DATE:
+//                return getDate(columnIndex);
+//            case Types.TIME:
+//                return getTime(columnIndex);
+//            case Types.TIMESTAMP:
+//                return getTimestamp(columnIndex);
+//            case Types.ARRAY:
+//                return getArray(columnIndex);
+//            case Types.DECIMAL:
+//                return getBigDecimal(columnIndex);
+//            case Types.JAVA_OBJECT:
+//                throw new SQLException("un support data type, java object");
+//        }
+//        return column(columnIndex);
     }
 
     @Override
@@ -951,12 +1022,7 @@ public class UltraResultSet implements ResultSet {
         if (value == null) {
             return null;
         }
-
-        ColumnInfo columnInfo = columnInfo(columnIndex);
-
-        String elementTypeName = getOnlyElement(columnInfo.getColumnTypeSignature().getParameters()).toString();
-        int elementType = getOnlyElement(columnInfo.getColumnParameterTypes());
-        return new PrestoArray(elementTypeName, elementType, (List<?>) value);
+        throw new SQLFeatureNotSupportedException("getArray");
     }
 
     @Override
@@ -1402,9 +1468,6 @@ public class UltraResultSet implements ResultSet {
         return iface.isInstance(this);
     }
 
-    public void partialCancel() {
-        client.cancelLeafStage();
-    }
 
     private void checkOpen()
             throws SQLException {
@@ -1446,7 +1509,7 @@ public class UltraResultSet implements ResultSet {
         if (label == null) {
             throw new SQLException("Column label is null");
         }
-        Integer index = fieldMap.get(label.toLowerCase(ENGLISH));
+        Integer index = fieldMap.get().get(label.toLowerCase(ENGLISH));
         if (index == null) {
             throw new SQLException("Invalid column label: " + label);
         }
@@ -1467,103 +1530,92 @@ public class UltraResultSet implements ResultSet {
         throw new SQLException("Value is not a number: " + value.getClass().getCanonicalName());
     }
 
-    private static List<Column> getColumns(StatementClient client)
-            throws SQLException {
-        while (client.isRunning()) {
-            QueryStatusInfo results = client.currentStatusInfo();
-            List<Column> columns = results.getColumns();
-            if (columns != null) {
-                return columns;
-            }
-            client.advance();
-        }
+//    private static List<Column> getColumns(StatementClient client)
+//            throws SQLException {
+//        while (client.isRunning()) {
+//            QueryStatusInfo results = client.currentStatusInfo();
+//            List<Column> columns = results.getColumns();
+//            if (columns != null) {
+//                return columns;
+//            }
+//            client.advance();
+//        }
+//
+//        verify(client.isFinished());
+//        QueryStatusInfo results = client.finalStatusInfo();
+//        if (results.getError() == null) {
+//            throw new SQLException(format("Query has no columns (#%s)", results.getId()));
+//        }
+//        throw resultsException(results);
+//    }
 
-        verify(client.isFinished());
-        QueryStatusInfo results = client.finalStatusInfo();
-        if (results.getError() == null) {
-            throw new SQLException(format("Query has no columns (#%s)", results.getId()));
-        }
-        throw resultsException(results);
-    }
-
-    private static <T> Iterator<T> flatten(Iterator<Iterable<T>> iterator, long maxRows) {
-        Iterator<T> rowsIterator = concat(transform(iterator, Iterable::iterator));
-        return (maxRows > 0) ? new LengthLimitedIterator<>(rowsIterator, maxRows) : rowsIterator;
-    }
-
-    private static class ResultsPageIterator
-            extends AbstractIterator<Iterable<List<Object>>> {
-        private StatementClient client;
-        private boolean isQuery;
-
-        private ResultsPageIterator(StatementClient client) {
-            this.client = requireNonNull(client, "client is null");
-            this.isQuery = isQuery(client);
-        }
-
-        private static boolean isQuery(StatementClient client) {
-            String updateType;
-            if (client.isRunning()) {
-                updateType = client.currentStatusInfo().getUpdateType();
-            } else {
-                updateType = client.finalStatusInfo().getUpdateType();
-            }
-            return updateType == null;
-        }
-
-        @Override
-        protected Iterable<List<Object>> computeNext() {
-            if (isQuery) {
-            }
-            while (client.isRunning()) {
-                checkInterruption(null);
-
-                QueryStatusInfo results = client.currentStatusInfo();
-                Iterable<List<Object>> data = client.currentData().getData();
-
-                try {
-                    client.advance();
-                } catch (RuntimeException e) {
-                    checkInterruption(e);
-                    throw e;
-                }
-
-                if (data != null) {
-                    return data;
-                }
-            }
-
-            verify(client.isFinished());
-            QueryStatusInfo results = client.finalStatusInfo();
-            if (results.getError() != null) {
-                throw new RuntimeException(resultsException(results));
-            }
-
-            return endOfData();
-        }
-
-        private void checkInterruption(Throwable t) {
-            if (Thread.currentThread().isInterrupted()) {
-                client.close();
-                throw new RuntimeException(new SQLException("ResultSet thread was interrupted", t));
-            }
-        }
-    }
-
-    public static SQLException resultsException(QueryStatusInfo results) {
-        QueryError error = requireNonNull(results.getError());
-        String message = format("Query failed (#%s): %s", results.getId(), error.getMessage());
-        return new SQLException(message);
-    }
-
-    private static Map<String, Integer> getFieldMap(List<Column> columns) {
-        Map<String, Integer> map = new HashMap<>();
-        for (int i = 0; i < columns.size(); i++) {
-            String name = columns.get(i).getColumnName().toLowerCase(ENGLISH);
-            if (!map.containsKey(name)) {
-                map.put(name, i + 1);
-            }
-        }
-        return ImmutableMap.copyOf(map);
-    }
+//    private static class ResultsPageIterator
+//            extends AbstractIterator<Iterable<List<Object>>> {
+//        private StatementClient client;
+//        private boolean isQuery;
+//
+//        private ResultsPageIterator(StatementClient client) {
+//            this.client = requireNonNull(client, "client is null");
+//            this.isQuery = isQuery(client);
+//        }
+//
+//        private static boolean isQuery(StatementClient client) {
+//            return client.isQuery();
+//        }
+//
+//        @Override
+//        protected Iterable<List<Object>> computeNext() {
+//            if (isQuery) {
+//            }
+//            while (client.isRunning()) {
+//                checkInterruption(null);
+//
+//                QueryStatusInfo results = client.currentStatusInfo();
+//                Iterable<List<Object>> data = client.currentData().getData();
+//
+//                try {
+//                    client.advance();
+//                } catch (RuntimeException e) {
+//                    checkInterruption(e);
+//                    throw e;
+//                }
+//
+//                if (data != null) {
+//                    return data;
+//                }
+//            }
+//
+//            verify(client.isFinished());
+//            QueryStatusInfo results = client.finalStatusInfo();
+//            if (results.getError() != null) {
+//                throw new RuntimeException(resultsException(results));
+//            }
+//
+//            return endOfData();
+//        }
+//
+//        private void checkInterruption(Throwable t) {
+//            if (Thread.currentThread().isInterrupted()) {
+//                // client.close();
+//                throw new RuntimeException(new SQLException("ResultSet thread was interrupted", t));
+//            }
+//        }
+//    }
+//
+//    public static SQLException resultsException(QueryStatusInfo results) {
+//        QueryError error = requireNonNull(results.getError());
+//        String message = format("Query failed (#%s): %s", results.getId(), error.getMessage());
+//        return new SQLException(message);
+//    }
+//
+//    private static Map<String, Integer> getFieldMap(List<Column> columns) {
+//        Map<String, Integer> map = new HashMap<>();
+//        for (int i = 0; i < columns.size(); i++) {
+//            String name = columns.get(i).getColumnName().toLowerCase(ENGLISH);
+//            if (!map.containsKey(name)) {
+//                map.put(name, i + 1);
+//            }
+//        }
+//        return ImmutableMap.copyOf(map);
+//    }
 }

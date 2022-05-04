@@ -4,20 +4,14 @@ import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidPooledConnection;
 import com.ane56.xsql.common.enumeration.UltraColumnType;
 import com.ane56.xsql.common.exception.XSQLException;
-import com.ane56.xsql.common.model.UltraCatalog;
-import com.ane56.xsql.common.model.UltraResultColumnMetaData;
-import com.ane56.xsql.common.model.UltraResultRow;
-import com.ane56.xsql.common.model.UltraResultSetMetaData;
+import com.ane56.xsql.common.model.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -86,7 +80,7 @@ public class PooledDataSourceManager {
     }
 
     public void checkDataSource(UltraCatalog catalog) {
-        DruidDataSource druidDataSource = name2source.get(catalog.getName());
+        DruidDataSource druidDataSource = name2source.get(catalog.getCatalogName());
         boolean needUpdate = isNeedUpdate(druidDataSource);
         if (needUpdate) {
             // 数据源配置
@@ -103,7 +97,7 @@ public class PooledDataSourceManager {
             dataSource.setMaxWait(2000);  // 获取连接的最大等待时间，单位毫秒
             dataSource.setPoolPreparedStatements(true); // 缓存PreparedStatement，默认false
             dataSource.setMaxOpenPreparedStatements(20); // 缓存PreparedStatement的最大数量，默认-1（不缓存）。大于0时会自动开启缓存PreparedStatement，所以可以省略上一句代码
-            name2source.put(catalog.getName(), dataSource);
+            name2source.put(catalog.getCatalogName(), dataSource);
         }
     }
 
@@ -113,7 +107,7 @@ public class PooledDataSourceManager {
      * @param catalog
      */
     public void addCatalog(UltraCatalog catalog) {
-        name2catalog.put(catalog.getName(), catalog);
+        name2catalog.put(catalog.getCatalogName(), catalog);
     }
 
     /**
@@ -133,8 +127,9 @@ public class PooledDataSourceManager {
         log.info("get data source costs: " + (System.currentTimeMillis() - startTime));
         startTime = System.currentTimeMillis();
         DruidPooledConnection connection = dataSource.getConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(sqlStatement);
-        ResultSet resultSet = preparedStatement.executeQuery();
+//        PreparedStatement preparedStatement = connection.prepareStatement(sqlStatement);
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(sqlStatement);
         List<UltraResultRow> result = new LinkedList<>();
         while (resultSet.next()) {
             List<Object> ultraResultSetData = new LinkedList<>();
@@ -181,6 +176,7 @@ public class PooledDataSourceManager {
                             .build()
             );
         }
+        statement.close();
         connection.close();
         log.info("query pool costs: " + (System.currentTimeMillis() - startTime));
         return result;
@@ -196,10 +192,168 @@ public class PooledDataSourceManager {
         log.info("get data source costs: " + (System.currentTimeMillis() - startTime));
         startTime = System.currentTimeMillis();
         DruidPooledConnection connection = dataSource.getConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(sqlStatement);
-        boolean executeResult = preparedStatement.execute();
+        Statement statement = connection.createStatement();
+//        PreparedStatement preparedStatement = connection.prepareStatement(sqlStatement);
+        boolean executeResult = statement.execute(sqlStatement);
+        statement.close();
         connection.close();
         log.info("query pool costs: " + (System.currentTimeMillis() - startTime));
         return;
+    }
+
+    public UltraDatabaseMetaData getDatabaseMetaData(String catalogName) throws XSQLException, SQLException {
+        long startTime = System.currentTimeMillis();
+        DruidDataSource druidDataSource = getName2source().get(catalogName);
+        if (druidDataSource == null) {
+            log.error("catalog: " + catalogName + " not exists, please initialize it before use");
+            throw new XSQLException("catalog: " + catalogName + " not exists, please initialize it before use");
+        }
+        log.info("get data source costs: " + (System.currentTimeMillis() - startTime));
+        startTime = System.currentTimeMillis();
+        DruidPooledConnection connection = druidDataSource.getConnection();
+        DatabaseMetaData metaData = connection.getMetaData();
+        UltraDatabaseMetaData ultraDatabaseMetaData = new UltraDatabaseMetaData();
+        connection.close();
+//        ultraDatabaseMetaData.setSupportsTransactionIsolationLevel(metaData.supportsTransactionIsolationLevel());
+        ultraDatabaseMetaData.setCatalogTerm(metaData.getCatalogTerm());
+        ultraDatabaseMetaData.setAllProceduresAreCallable(metaData.allProceduresAreCallable());
+        ultraDatabaseMetaData.setAllTablesAreSelectable(metaData.allTablesAreSelectable());
+        ultraDatabaseMetaData.setURL(metaData.getURL());
+        ultraDatabaseMetaData.setUserName(metaData.getUserName());
+        ultraDatabaseMetaData.setReadOnly(metaData.isReadOnly());
+        ultraDatabaseMetaData.setNullsAreSortedHigh(metaData.nullsAreSortedHigh());
+        ultraDatabaseMetaData.setNullsAreSortedLow(metaData.nullsAreSortedLow());
+        ultraDatabaseMetaData.setNullsAreSortedAtStart(metaData.nullsAreSortedAtStart());
+        ultraDatabaseMetaData.setNullsAreSortedAtEnd(metaData.nullsAreSortedAtEnd());
+        ultraDatabaseMetaData.setDatabaseProductName(metaData.getDatabaseProductName());
+        ultraDatabaseMetaData.setDatabaseProductVersion(metaData.getDatabaseProductVersion());
+        ultraDatabaseMetaData.setDriverName(metaData.getDriverName());
+        ultraDatabaseMetaData.setDriverVersion(metaData.getDriverVersion());
+        ultraDatabaseMetaData.setDriverMajorVersion(metaData.getDriverMajorVersion());
+        ultraDatabaseMetaData.setDriverMinorVersion(metaData.getDriverMinorVersion());
+        ultraDatabaseMetaData.setUsesLocalFiles(metaData.usesLocalFiles());
+        ultraDatabaseMetaData.setUsesLocalFilePerTable(metaData.usesLocalFilePerTable());
+        ultraDatabaseMetaData.setSupportsMixedCaseIdentifiers(metaData.supportsMixedCaseIdentifiers());
+        ultraDatabaseMetaData.setStoresUpperCaseIdentifiers(metaData.storesUpperCaseIdentifiers());
+        ultraDatabaseMetaData.setStoresLowerCaseIdentifiers(metaData.storesLowerCaseIdentifiers());
+        ultraDatabaseMetaData.setStoresMixedCaseIdentifiers(metaData.storesMixedCaseIdentifiers());
+        ultraDatabaseMetaData.setSupportsMixedCaseQuotedIdentifiers(metaData.supportsMixedCaseQuotedIdentifiers());
+        ultraDatabaseMetaData.setStoresUpperCaseQuotedIdentifiers(metaData.storesUpperCaseQuotedIdentifiers());
+        ultraDatabaseMetaData.setStoresLowerCaseQuotedIdentifiers(metaData.storesLowerCaseQuotedIdentifiers());
+        ultraDatabaseMetaData.setStoresMixedCaseQuotedIdentifiers(metaData.storesMixedCaseQuotedIdentifiers());
+        ultraDatabaseMetaData.setIdentifierQuoteString(metaData.getIdentifierQuoteString());
+        ultraDatabaseMetaData.setSqlKeywords(metaData.getSQLKeywords());
+        ultraDatabaseMetaData.setNumericFunctions(metaData.getNumericFunctions());
+        ultraDatabaseMetaData.setStringFunctions(metaData.getStringFunctions());
+        ultraDatabaseMetaData.setSystemFunctions(metaData.getSystemFunctions());
+        ultraDatabaseMetaData.setTimeDateFunctions(metaData.getTimeDateFunctions());
+        ultraDatabaseMetaData.setSearchStringEscape(metaData.getSearchStringEscape());
+        ultraDatabaseMetaData.setExtraNameCharacters(metaData.getExtraNameCharacters());
+        ultraDatabaseMetaData.setSupportsAlterTableWithAddColumn(metaData.supportsAlterTableWithAddColumn());
+        ultraDatabaseMetaData.setSupportsAlterTableWithDropColumn(metaData.supportsAlterTableWithDropColumn());
+        ultraDatabaseMetaData.setSupportsColumnAliasing(metaData.supportsColumnAliasing());
+        ultraDatabaseMetaData.setNullPlusNonNullIsNull(metaData.nullPlusNonNullIsNull());
+        ultraDatabaseMetaData.setSupportsConvert(metaData.supportsConvert());
+        ultraDatabaseMetaData.setSupportsTableCorrelationNames(metaData.supportsTableCorrelationNames());
+        ultraDatabaseMetaData.setSupportsDifferentTableCorrelationNames(metaData.supportsDifferentTableCorrelationNames());
+        ultraDatabaseMetaData.setSupportsExpressionsInOrderBy(metaData.supportsExpressionsInOrderBy());
+        ultraDatabaseMetaData.setSupportsOrderByUnrelated(metaData.supportsOrderByUnrelated());
+        ultraDatabaseMetaData.setSupportsGroupBy(metaData.supportsGroupBy());
+        ultraDatabaseMetaData.setSupportsGroupByUnrelated(metaData.supportsGroupByUnrelated());
+        ultraDatabaseMetaData.setSupportsGroupByBeyondSelect(metaData.supportsGroupByBeyondSelect());
+        ultraDatabaseMetaData.setSupportsLikeEscapeClause(metaData.supportsLikeEscapeClause());
+        ultraDatabaseMetaData.setSupportsMultipleResultSets(metaData.supportsMultipleResultSets());
+        ultraDatabaseMetaData.setSupportsMultipleTransactions(metaData.supportsMultipleTransactions());
+        ultraDatabaseMetaData.setSupportsNonNullableColumns(metaData.supportsNonNullableColumns());
+        ultraDatabaseMetaData.setSupportsMinimumSQLGrammar(metaData.supportsMinimumSQLGrammar());
+        ultraDatabaseMetaData.setSupportsCoreSQLGrammar(metaData.supportsCoreSQLGrammar());
+        ultraDatabaseMetaData.setSupportsExtendedSQLGrammar(metaData.supportsExtendedSQLGrammar());
+        ultraDatabaseMetaData.setSupportsANSI92EntryLevelSQL(metaData.supportsANSI92EntryLevelSQL());
+        ultraDatabaseMetaData.setSupportsANSI92IntermediateSQL(metaData.supportsANSI92IntermediateSQL());
+        ultraDatabaseMetaData.setSupportsANSI92FullSQL(metaData.supportsANSI92FullSQL());
+        ultraDatabaseMetaData.setSupportsIntegrityEnhancementFacility(metaData.supportsIntegrityEnhancementFacility());
+        ultraDatabaseMetaData.setSupportsOuterJoins(metaData.supportsOuterJoins());
+        ultraDatabaseMetaData.setSupportsFullOuterJoins(metaData.supportsFullOuterJoins());
+        ultraDatabaseMetaData.setSupportsLimitedOuterJoins(metaData.supportsLimitedOuterJoins());
+        ultraDatabaseMetaData.setSchemaTerm(metaData.getSchemaTerm());
+        ultraDatabaseMetaData.setProcedureTerm(metaData.getProcedureTerm());
+        ultraDatabaseMetaData.setDatalogTerm(metaData.getCatalogTerm());
+        ultraDatabaseMetaData.setCatalogAtStart(metaData.isCatalogAtStart());
+        ultraDatabaseMetaData.setCatalogSeparator(metaData.getCatalogSeparator());
+        ultraDatabaseMetaData.setSupportsSchemasInDataManipulation(metaData.supportsSchemasInDataManipulation());
+        ultraDatabaseMetaData.setSupportsSchemasInProcedureCalls(metaData.supportsSchemasInProcedureCalls());
+        ultraDatabaseMetaData.setSupportsSchemasInTableDefinitions(metaData.supportsSchemasInTableDefinitions());
+        ultraDatabaseMetaData.setSupportsSchemasInIndexDefinitions(metaData.supportsSchemasInIndexDefinitions());
+        ultraDatabaseMetaData.setSupportsSchemasInPrivilegeDefinitions(metaData.supportsSchemasInPrivilegeDefinitions());
+        ultraDatabaseMetaData.setSupportsCatalogsInDataManipulation(metaData.supportsCatalogsInDataManipulation());
+        ultraDatabaseMetaData.setSupportsCatalogsInProcedureCalls(metaData.supportsCatalogsInProcedureCalls());
+        ultraDatabaseMetaData.setSupportsCatalogsInTableDefinitions(metaData.supportsCatalogsInTableDefinitions());
+        ultraDatabaseMetaData.setSupportsCatalogsInIndexDefinitions(metaData.supportsCatalogsInIndexDefinitions());
+        ultraDatabaseMetaData.setSupportsCatalogsInPrivilegeDefinitions(metaData.supportsCatalogsInPrivilegeDefinitions());
+        ultraDatabaseMetaData.setSupportsPositionedDelete(metaData.supportsPositionedDelete());
+        ultraDatabaseMetaData.setSupportsPositionedUpdate(metaData.supportsPositionedUpdate());
+        ultraDatabaseMetaData.setSupportsSelectForUpdate(metaData.supportsSelectForUpdate());
+        ultraDatabaseMetaData.setSupportsStoredProcedures(metaData.supportsStoredProcedures());
+        ultraDatabaseMetaData.setSupportsSubqueriesInComparisons(metaData.supportsSubqueriesInComparisons());
+        ultraDatabaseMetaData.setSupportsSubqueriesInExists(metaData.supportsSubqueriesInExists());
+        ultraDatabaseMetaData.setSupportsSubqueriesInIns(metaData.supportsSubqueriesInIns());
+        ultraDatabaseMetaData.setSupportsSubqueriesInQuantifieds(metaData.supportsSubqueriesInQuantifieds());
+        ultraDatabaseMetaData.setSupportsCorrelatedSubqueries(metaData.supportsCorrelatedSubqueries());
+        ultraDatabaseMetaData.setSupportsUnion(metaData.supportsUnion());
+        ultraDatabaseMetaData.setSupportsUnionAll(metaData.supportsUnionAll());
+        ultraDatabaseMetaData.setSupportsOpenCursorsAcrossCommit(metaData.supportsOpenCursorsAcrossCommit());
+        ultraDatabaseMetaData.setSupportsOpenCursorsAcrossRollback(metaData.supportsOpenCursorsAcrossRollback());
+        ultraDatabaseMetaData.setSupportsOpenStatementsAcrossCommit(metaData.supportsOpenStatementsAcrossCommit());
+        ultraDatabaseMetaData.setSupportsOpenStatementsAcrossRollback(metaData.supportsOpenStatementsAcrossRollback());
+        ultraDatabaseMetaData.setMaxBinaryLiteralLength(metaData.getMaxBinaryLiteralLength());
+        ultraDatabaseMetaData.setMaxCharLiteralLength(metaData.getMaxCharLiteralLength());
+        ultraDatabaseMetaData.setMaxColumnNameLength(metaData.getMaxColumnNameLength());
+        ultraDatabaseMetaData.setMaxColumnsInGroupBy(metaData.getMaxColumnsInGroupBy());
+        ultraDatabaseMetaData.setMaxColumnsInIndex(metaData.getMaxColumnsInIndex());
+        ultraDatabaseMetaData.setMaxColumnsInOrderBy(metaData.getMaxColumnsInOrderBy());
+        ultraDatabaseMetaData.setMaxColumnsInSelect(metaData.getMaxColumnsInSelect());
+        ultraDatabaseMetaData.setMaxColumnsInTable(metaData.getMaxColumnsInTable());
+        ultraDatabaseMetaData.setMaxConnections(metaData.getMaxConnections());
+        ultraDatabaseMetaData.setMaxCursorNameLength(metaData.getMaxCursorNameLength());
+        ultraDatabaseMetaData.setMaxIndexLength(metaData.getMaxIndexLength());
+        ultraDatabaseMetaData.setMaxSchemaNameLength(metaData.getMaxSchemaNameLength());
+        ultraDatabaseMetaData.setMaxProcedureNameLength(metaData.getMaxProcedureNameLength());
+        ultraDatabaseMetaData.setMaxCatalogNameLength(metaData.getMaxCatalogNameLength());
+        ultraDatabaseMetaData.setMaxRowSize(metaData.getMaxRowSize());
+        ultraDatabaseMetaData.setDoesMaxRowSizeIncludeBlobs(metaData.doesMaxRowSizeIncludeBlobs());
+        ultraDatabaseMetaData.setMaxStatementLength(metaData.getMaxStatementLength());
+        ultraDatabaseMetaData.setMaxStatements(metaData.getMaxStatements());
+        ultraDatabaseMetaData.setMaxTableNameLength(metaData.getMaxTableNameLength());
+        ultraDatabaseMetaData.setMaxTablesInSelect(metaData.getMaxTablesInSelect());
+        ultraDatabaseMetaData.setMaxUserNameLength(metaData.getMaxUserNameLength());
+        ultraDatabaseMetaData.setDefaultTransactionIsolation(metaData.getDefaultTransactionIsolation());
+        ultraDatabaseMetaData.setSupportsTransactions(metaData.supportsTransactions());
+        ultraDatabaseMetaData.setSupportsDataDefinitionAndDataManipulationTransactions(metaData.supportsDataDefinitionAndDataManipulationTransactions());
+        ultraDatabaseMetaData.setSupportsDataManipulationTransactionsOnly(metaData.supportsDataManipulationTransactionsOnly());
+        ultraDatabaseMetaData.setDataDefinitionCausesTransactionCommit(metaData.dataDefinitionCausesTransactionCommit());
+        ultraDatabaseMetaData.setDataDefinitionIgnoredInTransactions(metaData.dataDefinitionIgnoredInTransactions());
+        ultraDatabaseMetaData.setSchemas(UltraResultRow.parseResultSet(metaData.getSchemas()));
+        ultraDatabaseMetaData.setCatalogs(UltraResultRow.parseResultSet(metaData.getCatalogs()));
+        ultraDatabaseMetaData.setTableTypes(UltraResultRow.parseResultSet(metaData.getTableTypes()));
+        ultraDatabaseMetaData.setTypeInfo(UltraResultRow.parseResultSet(metaData.getTypeInfo()));
+        ultraDatabaseMetaData.setSupportsBatchUpdates(metaData.supportsBatchUpdates());
+        ultraDatabaseMetaData.setSupportsSavepoints(metaData.supportsSavepoints());
+        ultraDatabaseMetaData.setSupportsNamedParameters(metaData.supportsNamedParameters());
+        ultraDatabaseMetaData.setSupportsMultipleOpenResults(metaData.supportsMultipleOpenResults());
+        ultraDatabaseMetaData.setSupportsGetGeneratedKeys(metaData.supportsGetGeneratedKeys());
+        ultraDatabaseMetaData.setResultSetHoldability(metaData.getResultSetHoldability());
+        ultraDatabaseMetaData.setDatabaseMajorVersion(metaData.getDatabaseMajorVersion());
+        ultraDatabaseMetaData.setDatabaseMinorVersion(metaData.getDatabaseMinorVersion());
+        ultraDatabaseMetaData.setJdbcMajorVersion(metaData.getJDBCMajorVersion());
+        ultraDatabaseMetaData.setJdbcMinorVersion(metaData.getJDBCMinorVersion());
+        ultraDatabaseMetaData.setSqlStateType(metaData.getSQLStateType());
+        ultraDatabaseMetaData.setLocatorsUpdateCopy(metaData.locatorsUpdateCopy());
+        ultraDatabaseMetaData.setSupportsStatementPooling(metaData.supportsStatementPooling());
+        ultraDatabaseMetaData.setRowIdLifetime(metaData.getRowIdLifetime());
+        ultraDatabaseMetaData.setSupportsStoredFunctionsUsingCallSyntax(metaData.supportsStoredFunctionsUsingCallSyntax());
+        ultraDatabaseMetaData.setAutoCommitFailureClosesAllResultSets(metaData.autoCommitFailureClosesAllResultSets());
+        ultraDatabaseMetaData.setClientInfoProperties(UltraResultRow.parseResultSet(metaData.getClientInfoProperties()));
+        ultraDatabaseMetaData.setGeneratedKeyAlwaysReturned(metaData.generatedKeyAlwaysReturned());
+        return ultraDatabaseMetaData;
     }
 }

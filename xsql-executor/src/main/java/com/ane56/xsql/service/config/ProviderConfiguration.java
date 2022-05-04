@@ -1,4 +1,4 @@
-package com.ane56.xsql.service.configuration;
+package com.ane56.xsql.service.config;
 
 import org.apache.dubbo.config.ProviderConfig;
 import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;

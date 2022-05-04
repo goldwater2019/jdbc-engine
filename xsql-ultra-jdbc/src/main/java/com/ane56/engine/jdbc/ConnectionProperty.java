@@ -1,4 +1,4 @@
-package com.ane56.engine.jdbc.connection;
+package com.ane56.engine.jdbc;
 
 import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;

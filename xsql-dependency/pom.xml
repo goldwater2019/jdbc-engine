@@ -36,10 +36,28 @@
         <fastjson.version>1.2.76</fastjson.version>
         <guava.version>31.0.1-jre</guava.version>
         <joda-time.version>2.10.10</joda-time.version>
+        <jdbc.presto.version>0.270</jdbc.presto.version>
+        <mybatis.version>3.5.7</mybatis.version>
+        <mybatis.spring.starter.version>2.2.2</mybatis.spring.starter.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis</artifactId>
+                <version>${mybatis.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mybatis.spring.boot</groupId>
+                <artifactId>mybatis-spring-boot-starter</artifactId>
+                <version>${mybatis.spring.starter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.facebook.presto</groupId>
+                <artifactId>presto-jdbc</artifactId>
+                <version>${jdbc.presto.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
