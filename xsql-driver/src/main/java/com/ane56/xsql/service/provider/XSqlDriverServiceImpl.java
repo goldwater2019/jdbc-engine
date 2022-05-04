@@ -95,7 +95,6 @@ public class XSqlDriverServiceImpl implements XSqlDriverService {
      */
     @Override
     public List<UltraCatalog> getAllCatalogsWithFilter(Boolean isForbidden, Boolean isAvailable) {
-        // TODO 根据条件筛选数据
         return this.tDriverCatalogDao.getAllCatalogsWithFilter(isForbidden, isAvailable);
     }
 

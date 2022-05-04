@@ -149,8 +149,8 @@
                create_time,
                update_time
         from t_driver_catalog
-        where is_forbidden = #{isForbidden}
-        and is_available = #{isAvailable}
+        where is_forbidden = ${isForbidden}
+        and is_available = ${isAvailable}
         order by create_time asc
     </select>
 

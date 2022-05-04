@@ -36,40 +36,7 @@ public class XSqlExecutorConsumer {
     public void init() {
         List<UltraCatalog> catalogs = xSqlExecutorService.showCatalogs();
         if (catalogs == null || catalogs.size() == 0) {
-            xSqlExecutorService.addCatalog(
-                    UltraCatalog.builder()
-                            .catalogName("starrocks")
-                            .driverClassName("com.mysql.cj.jdbc.Driver")
-                            .isAvailable(true)
-                            .isForbidden(false)
-                            .jdbcUrl("jdbc:mysql://10.10.230.2:9030/tx_dev")
-                            .username("anetx")
-                            .password("anetx")
-                            .build()
-            );
-
-            xSqlExecutorService.addCatalog(
-                    UltraCatalog.builder()
-                            .catalogName("aliyun")
-                            .driverClassName("com.mysql.cj.jdbc.Driver")
-                            .isAvailable(true)
-                            .isForbidden(false)
-                            .jdbcUrl("jdbc:mysql://rm-uf67xpwhzp9xvuciv2o.mysql.rds.aliyuncs.com:3306")
-                            .username("root")
-                            .password("Luxin@19980516")
-                            .build()
-            );
-            xSqlExecutorService.addCatalog(
-                    UltraCatalog.builder()
-                            .catalogName("presto")
-                            .driverClassName("com.facebook.presto.jdbc.PrestoDriver")
-                            .isAvailable(true)
-                            .isForbidden(false)
-                            .jdbcUrl("jdbc:presto://bdtnode04:8881")
-                            .username("root")
-                            .password("")
-                            .build()
-            );
+            log.info("no available catalog exists");
         }
 
         List<UltraCatalog> ultraCatalogs = xSqlExecutorService.showCatalogs();

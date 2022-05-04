@@ -92,6 +92,6 @@ public interface TDriverCatalogDao {
      */
     UltraCatalog queryByCatalogName(String catalogName);
 
-    List<UltraCatalog> getAllCatalogsWithFilter(boolean isForbidden, boolean isAvailable);
+    List<UltraCatalog> getAllCatalogsWithFilter(@Param("isForbidden") boolean isForbidden, @Param("isAvailable") boolean isAvailable);
 }
 
