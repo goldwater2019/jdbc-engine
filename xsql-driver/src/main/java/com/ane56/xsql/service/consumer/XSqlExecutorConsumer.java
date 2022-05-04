@@ -38,7 +38,7 @@ public class XSqlExecutorConsumer {
         if (catalogs == null || catalogs.size() == 0) {
             xSqlExecutorService.addCatalog(
                     UltraCatalog.builder()
-                            .name("starrocks")
+                            .catalogName("starrocks")
                             .driverClassName("com.mysql.cj.jdbc.Driver")
                             .isAvailable(true)
                             .isForbidden(false)
@@ -50,7 +50,7 @@ public class XSqlExecutorConsumer {
 
             xSqlExecutorService.addCatalog(
                     UltraCatalog.builder()
-                            .name("aliyun")
+                            .catalogName("aliyun")
                             .driverClassName("com.mysql.cj.jdbc.Driver")
                             .isAvailable(true)
                             .isForbidden(false)
@@ -61,7 +61,7 @@ public class XSqlExecutorConsumer {
             );
             xSqlExecutorService.addCatalog(
                     UltraCatalog.builder()
-                            .name("presto")
+                            .catalogName("presto")
                             .driverClassName("com.facebook.presto.jdbc.PrestoDriver")
                             .isAvailable(true)
                             .isForbidden(false)
@@ -109,7 +109,7 @@ public class XSqlExecutorConsumer {
     public void ping() throws SQLException, XSQLException {
         List<UltraCatalog> ultraCatalogs = xSqlExecutorService.showUnForbiddenCatalogs();
         for (UltraCatalog ultraCatalog : ultraCatalogs) {
-            List<UltraResultRow> ultraResultRows = xSqlExecutorService.query(ultraCatalog.getName(), "select 1");
+            List<UltraResultRow> ultraResultRows = xSqlExecutorService.query(ultraCatalog.getCatalogName(), "select 1");
             log.info(String.valueOf(ultraResultRows.get(0)));
         }
     }

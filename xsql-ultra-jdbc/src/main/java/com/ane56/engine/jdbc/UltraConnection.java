@@ -179,7 +179,7 @@ public class UltraConnection implements Connection {
             if (catalogs.size() == 0) {
                 // TODO 抛出catalog获得server端错误的异常
             }
-            catalog.set(catalogs.get(0).getName());
+            catalog.set(catalogs.get(0).getCatalogName());
         }
         return queryExecutor.getDatabaseMetaData(session, catalog.get());
     }

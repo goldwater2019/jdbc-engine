@@ -147,7 +147,7 @@ public class StatementClient {
         }
         String newCatalogName = temp[1].trim();
         List<UltraCatalog> availableCatalogs = clientSession.getAvailableCatalogs();
-        List<String> catalogNameList = availableCatalogs.stream().map(UltraCatalog::getName)
+        List<String> catalogNameList = availableCatalogs.stream().map(UltraCatalog::getCatalogName)
                 .collect(Collectors.toList());
         if (catalogNameList.stream()
                 .filter(x -> x.equals(newCatalogName))
@@ -167,7 +167,7 @@ public class StatementClient {
         }
         if (split[0].equals("show") && split[1].equals("catalogs")) {
             List<UltraCatalog> availableCatalogs = clientSession.getAvailableCatalogs();
-            String catalogListStr = String.join(",", availableCatalogs.stream().map(UltraCatalog::getName).collect(Collectors.toList()));
+            String catalogListStr = String.join(",", availableCatalogs.stream().map(UltraCatalog::getCatalogName).collect(Collectors.toList()));
             this.query = "select '" + catalogListStr + "' as catalogs";
             return;
         }
@@ -191,7 +191,7 @@ public class StatementClient {
         List<UltraCatalog> availableCatalogs = clientSession.getAvailableCatalogs();
         List<String> catalogNameList = new LinkedList<>();
         for (UltraCatalog availableCatalog : availableCatalogs) {
-            catalogNameList.add(availableCatalog.getName());
+            catalogNameList.add(availableCatalog.getCatalogName());
         }
         ArrayUtil<String> stringArrayUtil = new ArrayUtil<>();
         if (isQuery(query)) {

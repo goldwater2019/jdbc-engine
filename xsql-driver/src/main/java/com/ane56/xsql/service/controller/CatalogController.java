@@ -4,15 +4,11 @@ import com.ane56.xsql.common.exception.XSQLException;
 import com.ane56.xsql.common.model.*;
 import com.ane56.xsql.service.consumer.XSqlDriverConsumer;
 import com.ane56.xsql.service.consumer.XSqlExecutorConsumer;
-import com.ane56.xsql.service.entity.TDriverCatalog;
-import com.ane56.xsql.service.service.TDriverCatalogService;
+import com.ane56.xsql.service.provider.XSqlDriverServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -31,8 +27,9 @@ public class CatalogController {
     @Autowired
     private XSqlExecutorConsumer xSqlExecutorConsumer;
 
-    @Resource
-    private TDriverCatalogService tDriverCatalogService;
+    @Autowired
+    // private TDriverCatalogService tDriverCatalogService;
+    private XSqlDriverServiceImpl xSqlExecutorDriverService;
 
     @GetMapping("echo")
     public String echo() {
@@ -60,17 +57,7 @@ public class CatalogController {
         return xSqlExecutorConsumer.getMetaData(ultraBaseStatement);
     }
 
-    /**
-     * 分页查询
-     *
-     * @param tDriverCatalog 筛选条件
-     * @param pageRequest    分页对象
-     * @return 查询结果
-     */
-    @GetMapping
-    public ResponseEntity<Page<TDriverCatalog>> queryByPage(TDriverCatalog tDriverCatalog, PageRequest pageRequest) {
-        return ResponseEntity.ok(this.tDriverCatalogService.queryByPage(tDriverCatalog, pageRequest));
-    }
+    // TODO 分页查询
 
     /**
      * 通过主键查询单条数据
@@ -79,30 +66,30 @@ public class CatalogController {
      * @return 单条数据
      */
     @GetMapping("{id}")
-    public ResponseEntity<TDriverCatalog> queryById(@PathVariable("id") Integer id) {
-        return ResponseEntity.ok(this.tDriverCatalogService.queryById(id));
+    public ResponseEntity<UltraCatalog> queryById(@PathVariable("id") Integer id) {
+        return ResponseEntity.ok(this.xSqlExecutorDriverService.queryById(id));
     }
 
     /**
      * 新增数据
      *
-     * @param tDriverCatalog 实体
+     * @param ultraCatalog 实体
      * @return 新增结果
      */
     @PostMapping
-    public ResponseEntity<TDriverCatalog> add(TDriverCatalog tDriverCatalog) {
-        return ResponseEntity.ok(this.tDriverCatalogService.insert(tDriverCatalog));
+    public ResponseEntity<UltraCatalog> add(UltraCatalog ultraCatalog) {
+        return ResponseEntity.ok(this.xSqlExecutorDriverService.insert(ultraCatalog));
     }
 
     /**
      * 编辑数据
      *
-     * @param tDriverCatalog 实体
+     * @param ultraCatalog 实体
      * @return 编辑结果
      */
     @PutMapping
-    public ResponseEntity<TDriverCatalog> edit(TDriverCatalog tDriverCatalog) {
-        return ResponseEntity.ok(this.tDriverCatalogService.update(tDriverCatalog));
+    public ResponseEntity<UltraCatalog> edit(UltraCatalog ultraCatalog) {
+        return ResponseEntity.ok(this.xSqlExecutorDriverService.update(ultraCatalog));
     }
 
     /**
@@ -113,6 +100,6 @@ public class CatalogController {
      */
     @DeleteMapping
     public ResponseEntity<Boolean> deleteById(Integer id) {
-        return ResponseEntity.ok(this.tDriverCatalogService.deleteById(id));
+        return ResponseEntity.ok(this.xSqlExecutorDriverService.deleteById(id));
     }
 }

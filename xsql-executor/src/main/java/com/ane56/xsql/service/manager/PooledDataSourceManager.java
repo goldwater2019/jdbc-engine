@@ -80,7 +80,7 @@ public class PooledDataSourceManager {
     }
 
     public void checkDataSource(UltraCatalog catalog) {
-        DruidDataSource druidDataSource = name2source.get(catalog.getName());
+        DruidDataSource druidDataSource = name2source.get(catalog.getCatalogName());
         boolean needUpdate = isNeedUpdate(druidDataSource);
         if (needUpdate) {
             // 数据源配置
@@ -97,7 +97,7 @@ public class PooledDataSourceManager {
             dataSource.setMaxWait(2000);  // 获取连接的最大等待时间，单位毫秒
             dataSource.setPoolPreparedStatements(true); // 缓存PreparedStatement，默认false
             dataSource.setMaxOpenPreparedStatements(20); // 缓存PreparedStatement的最大数量，默认-1（不缓存）。大于0时会自动开启缓存PreparedStatement，所以可以省略上一句代码
-            name2source.put(catalog.getName(), dataSource);
+            name2source.put(catalog.getCatalogName(), dataSource);
         }
     }
 
@@ -107,7 +107,7 @@ public class PooledDataSourceManager {
      * @param catalog
      */
     public void addCatalog(UltraCatalog catalog) {
-        name2catalog.put(catalog.getName(), catalog);
+        name2catalog.put(catalog.getCatalogName(), catalog);
     }
 
     /**
