@@ -109,34 +109,76 @@
             </if>
         </where>
     </select>
+    <select id="getAllCatalogs" resultMap="TDriverCatalogMap">
+        select catalog_id,
+               catalog_name,
+               driver_class_name,
+               jdbc_url,
+               username,
+               password,
+               is_forbidden,
+               is_available,
+               create_time,
+               update_time
+        from t_driver_catalog
+        order by create_time asc
+    </select>
+    <select id="queryByCatalogName" resultMap="TDriverCatalogMap">
+        select catalog_id,
+               catalog_name,
+               driver_class_name,
+               jdbc_url,
+               username,
+               password,
+               is_forbidden,
+               is_available,
+               create_time,
+               update_time
+        from t_driver_catalog
+        where catalog_name = #{catalogName}
+    </select>
+    <select id="getAllCatalogsWithFilter" resultMap="TDriverCatalogMap">
+        select catalog_id,
+               catalog_name,
+               driver_class_name,
+               jdbc_url,
+               username,
+               password,
+               is_forbidden,
+               is_available,
+               create_time,
+               update_time
+        from t_driver_catalog
+        where is_forbidden = #{isForbidden}
+        and is_available = #{isAvailable}
+        order by create_time asc
+    </select>
 
     <!--新增所有列-->
     <insert id="insert" keyProperty="catalogId" useGeneratedKeys="true">
         insert into t_driver_catalog(catalog_name, driver_class_name, jdbc_url, username, password, is_forbidden,
-                                     is_available, create_time, update_time)
+                                     is_available)
         values (#{catalogName}, #{driverClassName}, #{jdbcUrl}, #{username}, #{password}, #{isForbidden},
-                #{isAvailable}, #{createTime}, #{updateTime})
+                #{isAvailable})
     </insert>
 
     <insert id="insertBatch" keyProperty="catalogId" useGeneratedKeys="true">
         insert into t_driver_catalog(catalog_name, driver_class_name, jdbc_url, username, password, is_forbidden,
-        is_available, create_time, update_time)
+        is_available)
         values
         <foreach collection="entities" item="entity" separator=",">
             (#{entity.catalogName}, #{entity.driverClassName}, #{entity.jdbcUrl}, #{entity.username},
-            #{entity.password}, #{entity.isForbidden}, #{entity.isAvailable}, #{entity.createTime},
-            #{entity.updateTime})
+            #{entity.password}, #{entity.isForbidden}, #{entity.isAvailable})
         </foreach>
     </insert>
 
     <insert id="insertOrUpdateBatch" keyProperty="catalogId" useGeneratedKeys="true">
         insert into t_driver_catalog(catalog_name, driver_class_name, jdbc_url, username, password, is_forbidden,
-        is_available, create_time, update_time)
+        is_available)
         values
         <foreach collection="entities" item="entity" separator=",">
             (#{entity.catalogName}, #{entity.driverClassName}, #{entity.jdbcUrl}, #{entity.username},
-            #{entity.password}, #{entity.isForbidden}, #{entity.isAvailable}, #{entity.createTime},
-            #{entity.updateTime})
+            #{entity.password}, #{entity.isForbidden}, #{entity.isAvailable})
         </foreach>
         on duplicate key update
         catalog_name = values(catalog_name),
@@ -145,9 +187,7 @@
         username = values(username),
         password = values(password),
         is_forbidden = values(is_forbidden),
-        is_available = values(is_available),
-        create_time = values(create_time),
-        update_time = values(update_time)
+        is_available = values(is_available)
     </insert>
 
     <!--通过主键修改数据-->
@@ -174,12 +214,6 @@
             </if>
             <if test="isAvailable != null">
                 is_available = #{isAvailable},
-            </if>
-            <if test="createTime != null">
-                create_time = #{createTime},
-            </if>
-            <if test="updateTime != null">
-                update_time = #{updateTime},
             </if>
         </set>
         where catalog_id = #{catalogId}

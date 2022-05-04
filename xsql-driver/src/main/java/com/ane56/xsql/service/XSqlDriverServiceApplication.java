@@ -19,7 +19,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableDubbo
 @EnableDiscoveryClient
 @EnableScheduling
-@ComponentScan("com.ane56.xsql.service.dao")
+//@ComponentScan(basePackages = "com.ane56.xsql.service.dao")
 public class XSqlDriverServiceApplication {
     public static void main(String[] args) {
         SpringApplication.run(XSqlDriverServiceApplication.class, args);

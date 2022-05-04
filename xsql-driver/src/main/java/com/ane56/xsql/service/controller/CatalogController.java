@@ -19,7 +19,7 @@ import java.util.List;
  * @Version: v1.0
  */
 
-@RestController()
+@RestController
 @RequestMapping("catalog")
 public class CatalogController {
     @Autowired
@@ -101,5 +101,29 @@ public class CatalogController {
     @DeleteMapping
     public ResponseEntity<Boolean> deleteById(Integer id) {
         return ResponseEntity.ok(this.xSqlExecutorDriverService.deleteById(id));
+    }
+
+    @GetMapping("get")
+    public JsonResult<List<UltraCatalog>> getAllCatalogs() {
+        List<UltraCatalog> allCatalogs = this.xSqlExecutorDriverService.getAllCatalogs();
+        return new JsonResult<>(allCatalogs);
+    }
+
+    @PostMapping("get/name")
+    public JsonResult<UltraCatalog> queryByCatalogName(@RequestBody UltraCatalog ultraCatalog) {
+        UltraCatalog catalog = this.xSqlExecutorDriverService.queryByCatalogName(ultraCatalog);
+        return new JsonResult<>(catalog);
+    }
+
+    @PostMapping("upsert/one")
+    public JsonResult<Boolean> upsertOneCatalog(@RequestBody UltraCatalog ultraCatalog) {
+        Boolean result = this.xSqlExecutorDriverService.upsertOneCatalog(ultraCatalog);
+        return new JsonResult<>(result);
+    }
+
+    @PostMapping("upsert/batch")
+    public JsonResult<Boolean> upsertBatchCatalogs(@RequestBody List<UltraCatalog> ultraCatalogList) {
+        Boolean result = this.xSqlExecutorDriverService.upsertBatchCatalogs(ultraCatalogList);
+        return new JsonResult<>(result);
     }
 }
