@@ -40,4 +40,13 @@
         <target.version>1.8</target.version>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>ane56-thirdparty</id>
+            <name>ane56 Repository thirdparty</name>
+            <layout>default</layout>
+            <url>http://10.10.103.2:8081/repository/public/</url>
+        </repository>
+    </repositories>
+
 </project>
