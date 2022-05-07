@@ -36,9 +36,10 @@
         <fastjson.version>1.2.76</fastjson.version>
         <guava.version>31.0.1-jre</guava.version>
         <joda-time.version>2.10.10</joda-time.version>
-        <jdbc.presto.version>0.270</jdbc.presto.version>
+        <jdbc.presto.version>0.196</jdbc.presto.version>
         <mybatis.version>3.5.7</mybatis.version>
         <mybatis.spring.starter.version>2.2.2</mybatis.spring.starter.version>
+        <jdbc.trino.version>379</jdbc.trino.version>
     </properties>
 
     <dependencyManagement>
@@ -57,6 +58,11 @@
                 <groupId>com.facebook.presto</groupId>
                 <artifactId>presto-jdbc</artifactId>
                 <version>${jdbc.presto.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.trino</groupId>
+                <artifactId>trino-jdbc</artifactId>
+                <version>${jdbc.trino.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>

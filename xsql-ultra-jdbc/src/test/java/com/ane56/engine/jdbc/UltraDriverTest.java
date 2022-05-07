@@ -51,19 +51,19 @@ public class UltraDriverTest {
         conn.close();
     }
 
-    @Test
-    public void testChangeCatalog() throws ClassNotFoundException, SQLException {
-        Class.forName(DRIVER_NAME);
-        Properties connectionProperties = new Properties();
-        connectionProperties.setProperty("user", USERNAME);
-        connectionProperties.setProperty("password", PASSWORD);
-        connectionProperties.setProperty("applicationName", "ultra-test");
-        Connection conn = DriverManager.getConnection(JDBC_URL, connectionProperties);
-        Statement statement = conn.createStatement();
-        statement.execute("set backend.catalog = presto");
-        statement.close();
-        conn.close();
-    }
+//    @Test
+//    public void testChangeCatalog() throws ClassNotFoundException, SQLException {
+//        Class.forName(DRIVER_NAME);
+//        Properties connectionProperties = new Properties();
+//        connectionProperties.setProperty("user", USERNAME);
+//        connectionProperties.setProperty("password", PASSWORD);
+//        connectionProperties.setProperty("applicationName", "ultra-test");
+//        Connection conn = DriverManager.getConnection(JDBC_URL, connectionProperties);
+//        Statement statement = conn.createStatement();
+//        statement.execute("set backend.catalog = presto");
+//        statement.close();
+//        conn.close();
+//    }
 
     @Test
     public void testSelectFromCatalog() throws SQLException, ClassNotFoundException {
@@ -223,47 +223,6 @@ public class UltraDriverTest {
         return sb.toString();
     }
 
-    //    @Test
-    public void testMySQL() throws SQLException, ClassNotFoundException {
-//        .name("aliyun")
-//                            .driverClassName("com.mysql.cj.jdbc.Driver")
-//                            .isAvailable(true)
-//                            .isForbidden(false)
-//                            .jdbcUrl("jdbc:mysql://rm-uf67xpwhzp9xvuciv2o.mysql.rds.aliyuncs.com:3306")
-//                            .username("root")
-//                            .password("Luxin@19980516")
-//                            .build()
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection connection = DriverManager.getConnection("jdbc:mysql://rm-uf67xpwhzp9xvuciv2o.mysql.rds.aliyuncs.com:3306", "root", "Luxin@19980516");
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery("select * from engine.t_click_logs limit 100 offset 10");
-        while (resultSet.next()) {
-            ResultSetMetaData metaData = resultSet.getMetaData();
-            int columnCount = metaData.getColumnCount();
-            for (int i = 0; i < columnCount; i++) {
-                System.out.println(metaData.getColumnLabel(i + 1));
-            }
-            for (int i = 0; i < columnCount; i++) {
-                System.out.printf(" %10s |", resultSet.getString(i + 1));
-            }
-        }
-        statement.close();
-        connection.close();
-    }
-
-    @Test
-    public void testPrestoJDBCConnection() throws SQLException, ClassNotFoundException {
-        Class.forName("com.facebook.presto.jdbc.PrestoDriver");
-        Connection connection = DriverManager.getConnection("jdbc:presto://bdtnode04:8881", "presto", "");
-        Statement statement = connection.createStatement();
-        statement.execute("use hive.edw_cdm");
-        String sql = "show tables";
-        ResultSet resultSet = statement.executeQuery(sql);
-        printSchemaAndData(sql, resultSet);
-        statement.close();
-        connection.close();
-    }
-
     @Test
     public void testPrestoConnection() throws SQLException, ClassNotFoundException {
         Class.forName(DRIVER_NAME);
@@ -274,7 +233,9 @@ public class UltraDriverTest {
         Connection connection = DriverManager.getConnection(JDBC_URL, connectionProperties);
         Statement statement = connection.createStatement();
 //        statement.execute("use hive.edw_cdm");
-        ResultSet resultSet = statement.executeQuery("show tables from hive.edw_cdm");
+        String sql = "show tables from presto.hive.edw_cdm";
+        sql = "select 1 from presto";
+        ResultSet resultSet = statement.executeQuery(sql);
         while (resultSet.next()) {
             ResultSetMetaData metaData = resultSet.getMetaData();
             int columnCount = metaData.getColumnCount();
@@ -286,6 +247,19 @@ public class UltraDriverTest {
             }
         }
         statement.close();
+        connection.close();
+    }
+
+    @Test
+    public void testTrinoOriginalJDBCConnection() throws ClassNotFoundException, SQLException {
+        Class.forName("io.trino.jdbc.TrinoDriver");
+        Properties properties = new Properties();
+        properties.put("user", "root");
+        Connection connection = DriverManager.getConnection("jdbc:trino://bdtnode10:8888", properties);
+        Statement statement = connection.createStatement();
+        String sql = "select 1";
+        ResultSet resultSet = statement.executeQuery(sql);
+        printSchemaAndData(sql, resultSet, 50);
         connection.close();
     }
 }

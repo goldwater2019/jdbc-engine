@@ -60,8 +60,9 @@ public class XSqlExecutorServiceImpl implements XSqlExecutorService {
     @Override
     public List<UltraResultRow> query(String catalogName, String query) throws SQLException, XSQLException {
         checkInitialStatus();
-        List<UltraResultRow> result = pooledDataSourceManager.query(catalogName, query);
-        return result;
+        // TODO 关注一下此处是否需要关闭这个操作
+        showAvailableCatalogs();
+        return pooledDataSourceManager.query(catalogName, query);
     }
 
     @Override
