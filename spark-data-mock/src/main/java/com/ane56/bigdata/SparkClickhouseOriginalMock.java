@@ -57,7 +57,6 @@ public class SparkClickhouseOriginalMock {
         Dataset<Row> siteData = spark.read()
                 .option("header", true)
                 .csv("file://" + properties.getProperty("data"));
-        siteData.printSchema();
         siteData.registerTempTable("site_info");
         Dataset<Row> phaseOne = spark.sql("select int(site_id), site_name, round(random() * 10000, 3) as overall_calc_weight," +
                 "0 as weight_interval_start," +
@@ -81,14 +80,15 @@ public class SparkClickhouseOriginalMock {
                 "union all select * from phaseTwo)" +
                 " union all select * from phaseThree) ");
         partitionRow.registerTempTable("partitionRow");
-        Dataset<Row> sql = spark.sql("select site_id, " +
+        String querySql = "select site_id, " +
                 "site_name, " +
                 "weight_interval_start, " +
                 "weight_interval_end, " +
-                "overall_calc_weight " +
+                "overall_calc_weight, " +
+                "to_date('" + formattedDateStr + "') as stat_date " +
                 "from partitionRow " +
-                "where site_id is not null " +
-                "distribute by 1");
+                "where site_id is not null";
+        Dataset<Row> sql = spark.sql(querySql);
         Properties prop = new Properties();
         prop.put("driver", properties.getProperty("driver"));
         if (properties.getProperty("user") != null) {
