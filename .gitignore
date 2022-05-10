@@ -12,4 +12,15 @@ pid
 pid/**
 
 target
-target/**
+target/**data/
+pid/
+logs/
+
+**/*.log
+**/*.tgz
+**/*.tar.gz
+
+data
+data/**
+**/*.csv
+**/*.json

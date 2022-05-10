@@ -1,0 +1,10 @@
+<configuration>
+    <property>
+        <name>hive.metastore.uris</name>
+        <value>thrift://bdtnode10:9083</value>
+    </property>
+    <property>
+        <name>hive.enforce.bucketing</name>
+        <value>true</value>
+    </property>
+</configuration>

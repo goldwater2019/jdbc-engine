@@ -118,17 +118,31 @@ public class PooledDataSourceManager {
      * @return
      */
     public List<UltraResultRow> query(String catalogName, String sqlStatement) throws SQLException, XSQLException {
+        sqlStatement = sqlStatement.trim();
         long startTime = System.currentTimeMillis();
         DruidDataSource dataSource = getName2source().get(catalogName);
         if (dataSource == null) {
-            log.error("catalog: " + catalogName + " not exists, please initialize it before use");
-            throw new XSQLException("catalog: " + catalogName + " not exists, please initialize it before use");
+            log.error("catalog: " + catalogName + " not exists, please initialize it before use. Now automatically " +
+                    "initializing it");
+            UltraCatalog ultraCatalog = getName2catalog().get(catalogName);
+            if (ultraCatalog == null) {
+                throw new XSQLException("catalog: " + catalogName + " not exists, please initialize it before use");
+            }
+            checkDataSource(ultraCatalog);
+            dataSource = getName2source().get(catalogName);  // 重新获取datasource
+            if (dataSource == null) {
+                log.error("catalog: " + catalogName + " not exists, automatically initializing failed");
+                throw new XSQLException("catalog: " + catalogName + " not exists, please check whether " +
+                        "it's ilenga or not");
+            }
         }
         log.info("get data source costs: " + (System.currentTimeMillis() - startTime));
         startTime = System.currentTimeMillis();
         DruidPooledConnection connection = dataSource.getConnection();
 //        PreparedStatement preparedStatement = connection.prepareStatement(sqlStatement);
         Statement statement = connection.createStatement();
+        log.info("get data connection costs: " + (System.currentTimeMillis() - startTime));
+        startTime = System.currentTimeMillis();
         ResultSet resultSet = statement.executeQuery(sqlStatement);
         List<UltraResultRow> result = new LinkedList<>();
         while (resultSet.next()) {
