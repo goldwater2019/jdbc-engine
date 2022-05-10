@@ -7,6 +7,7 @@ import org.apache.spark.sql.SparkSession;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Properties;
 
 /**
@@ -40,7 +41,7 @@ public class SparkClickhouseOriginalMock {
                 .getOrCreate();
 
         String year = properties.getProperty("year");
-        int nYear = year != null ? Integer.parseInt(year) : 10;
+        int nYear = year != null ? Integer.parseInt(year) : 1;
 
         for (int i = 0; i < 365 * nYear; i++) {
             Date d = new Date();
@@ -48,6 +49,10 @@ public class SparkClickhouseOriginalMock {
             String formattedDateStr = sdf.format(new Date(d.getTime() - i * 24L * 60L * 60L * 1000L));
             System.out.println(formattedDateStr);
             mockAndWriteData(spark, formattedDateStr, properties);
+            String isBreakable = properties.getProperty("break");
+            if (isBreakable != null && isBreakable.equals("true")) {
+                break;
+            }
         }
         spark.close();
     }
@@ -55,22 +60,22 @@ public class SparkClickhouseOriginalMock {
     private static void mockAndWriteData(SparkSession spark,
                                          String formattedDateStr, Properties properties) {
         Dataset<Row> siteData = spark.read()
-                .option("header", true)
-                .csv("file://" + properties.getProperty("data"));
+//                .option("header", true)
+                .json("file://" + properties.getProperty("data"));
         siteData.registerTempTable("site_info");
-        Dataset<Row> phaseOne = spark.sql("select int(site_id), site_name, round(random() * 10000, 3) as overall_calc_weight," +
+        Dataset<Row> phaseOne = spark.sql("select *, round(random() * 10000, 3) as overall_calc_weight," +
                 "0 as weight_interval_start," +
                 "70 as weight_interval_end from site_info");
 
         phaseOne.registerTempTable("phaseOne");
 
-        Dataset<Row> phaseTwo = spark.sql("select int(site_id), site_name, round(random() * 10000, 3) as overall_calc_weight," +
+        Dataset<Row> phaseTwo = spark.sql("select *, round(random() * 10000, 3) as overall_calc_weight," +
                 "70 as weight_interval_start," +
                 "800 as weight_interval_end from site_info");
 
         phaseTwo.registerTempTable("phaseTwo");
 
-        Dataset<Row> phaseThree = spark.sql("select int(site_id), site_name, round(random() * 10000, 3) as overall_calc_weight," +
+        Dataset<Row> phaseThree = spark.sql("select *, round(random() * 10000, 3) as overall_calc_weight," +
                 "800 as weight_interval_start," +
                 "-1 as weight_interval_end from site_info");
 
@@ -80,14 +85,40 @@ public class SparkClickhouseOriginalMock {
                 "union all select * from phaseTwo)" +
                 " union all select * from phaseThree) ");
         partitionRow.registerTempTable("partitionRow");
-        String querySql = "select site_id, " +
-                "site_name, " +
-                "weight_interval_start, " +
+        String querySql = "select " +
+//                "fith_lvl_org_brnch_cd, " +
+                "fith_lvl_org_brnch_id, " +
+                "fith_lvl_org_brnch_nm, " +
+//                "foth_lvl_busi_org_brnch_cd, " +
+                "foth_lvl_busi_org_brnch_id, " +
+                "foth_lvl_busi_org_brnch_nm, " +
+//                "foth_lvl_org_brnch_cd, " +
+                "foth_lvl_org_brnch_id, " +
+                "foth_lvl_org_brnch_nm, " +
+//                "fst_lvl_org_brnch_cd, " +
+                "fst_lvl_org_brnch_id, " +
+                "fst_lvl_org_brnch_nm, " +
+                "org_brnch_custom_type," +
+                " org_brnch_lvl, " +
+                "org_brnch_path," +
+                " overall_calc_weight, " +
+                "product_type, " +
+//                "secd_lvl_org_brnch_cd, " +
+                "secd_lvl_org_brnch_id, " +
+                "secd_lvl_org_brnch_nm, " +
+//                "svth_lvl_org_brnch_cd, " +
+                "svth_lvl_org_brnch_id, " +
+                "svth_lvl_org_brnch_nm, " +
+//                "sxth_lvl_org_brnch_cd, " +
+                "sxth_lvl_org_brnch_id, " +
+                "sxth_lvl_org_brnch_nm, " +
+//                "thrd_lvl_org_brnch_cd, " +
+                "thrd_lvl_org_brnch_id, " +
+                "thrd_lvl_org_brnch_nm, " +
                 "weight_interval_end, " +
-                "overall_calc_weight, " +
+                "weight_interval_start, " +
                 "to_date('" + formattedDateStr + "') as stat_date " +
-                "from partitionRow " +
-                "where site_id is not null";
+                "from partitionRow ";
         Dataset<Row> sql = spark.sql(querySql);
         Properties prop = new Properties();
         prop.put("driver", properties.getProperty("driver"));
@@ -110,6 +141,7 @@ public class SparkClickhouseOriginalMock {
         sql.write()
                 .mode(SaveMode.Append)
                 .option("batchsize", "20000")
-                .jdbc(url, "ane.ads_management_daily_site_overall", properties);
+                .jdbc(url, "ane.ads_management_daily_overall", properties);
+//        sql.sample(0.05).toJavaRDD().collect().forEach(System.out::println);
     }
 }
