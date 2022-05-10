@@ -22,3 +22,5 @@ logs/
 
 data
 data/**
+**/*.csv
+**/*.json
