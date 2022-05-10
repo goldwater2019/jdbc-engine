@@ -19,3 +19,6 @@ logs/
 **/*.log
 **/*.tgz
 **/*.tar.gz
+
+data
+data/**
